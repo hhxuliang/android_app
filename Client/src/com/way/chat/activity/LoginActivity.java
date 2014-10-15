@@ -192,7 +192,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 			switch (msg.getType()) {
 			case LOGIN:// LoginActivity只处理登录的消息
 				List<User> list = (List<User>) msg.getObject();
-				if (list.size() > 0) {
+				if (list!=null && list.size() > 0) {
 					// 保存用户信息
 					SharePreferenceUtil util = new SharePreferenceUtil(
 							LoginActivity.this, Constants.SAVE_USER);
@@ -206,7 +206,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 					db.addUser(list);
 
 					Intent i = new Intent(LoginActivity.this,
-							FriendListActivity.class);
+							MyMainActivity.class);
 					i.putExtra(Constants.MSGKEY, msg);
 					startActivity(i);
 

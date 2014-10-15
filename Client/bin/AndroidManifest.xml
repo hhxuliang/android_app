@@ -18,14 +18,15 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <activity android:name=".Whatsnew">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".WelcomeActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".LoginActivity"
@@ -39,7 +40,7 @@
         </activity>
 
         <service android:name="com.way.chat.activity.GetMsgService" >
-        </service>
+        </service><activity android:name=".MyMainActivity"></activity>
 
         <activity
             android:name=".FriendListActivity"
@@ -57,6 +58,9 @@
             android:name=".ChatActivity"
             android:windowSoftInputMode="adjustResize" >
         </activity>
+        
+        
+        
         
     </application>
 
