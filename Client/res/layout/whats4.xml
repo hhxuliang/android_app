@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="35dp"
         android:gravity="center"
-        android:text="老师家长即时通讯\n家长分享育儿经验"
+        android:text="\n老师家长即时通讯\n家长分享育儿经验"
         android:textColor="#fff"
         android:textSize="22sp" />
 

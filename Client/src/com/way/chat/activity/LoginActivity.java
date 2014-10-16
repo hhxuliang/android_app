@@ -201,13 +201,9 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 					util.setEmail(list.get(0).getEmail());
 					util.setName(list.get(0).getName());
 					util.setImg(list.get(0).getImg());
-
-					UserDB db = new UserDB(LoginActivity.this);
-					db.addUser(list);
-
+					application.getUserDB().updateUser(list);
 					Intent i = new Intent(LoginActivity.this,
 							MyMainActivity.class);
-					i.putExtra(Constants.MSGKEY, msg);
 					startActivity(i);
 
 					if (mDialog.isShowing())

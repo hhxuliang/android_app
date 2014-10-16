@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="35dp"
         android:gravity="center"
-        android:text="\n好老师\n幼儿园老师贴心的免费手机应用"
+        android:text="\n\n免费的幼儿园管理沟通手机应用"
         android:textColor="#fff"
         android:textSize="22sp" />
 

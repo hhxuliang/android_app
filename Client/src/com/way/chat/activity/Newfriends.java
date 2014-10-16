@@ -101,8 +101,16 @@ public class Newfriends extends MyActivity implements OnClickListener {
                     ViewHolder vHollder = (ViewHolder) mAllUserLV.getChildAt(i).getTag();    
                     newFriendlist.add(new User(Integer.parseInt((String)vHollder.id.getText()),(String)vHollder.title.getText()));    
                 }    
-            }  
-			addFriends();
+            } 
+			if(newFriendlist.size()>0)
+			{
+				addFriends();
+			}else
+			{
+				Toast.makeText(Newfriends.this,
+						"请选择您想添加的好友!", 0)
+						.show();
+			}
 			
 		}});
         
@@ -124,7 +132,7 @@ public class Newfriends extends MyActivity implements OnClickListener {
 			switch (msg.getType()) {
 			case ALLUSERS:// OK
 				List<User> list = (List<User>) msg.getObject();
-				if (list.size() > 0) {
+				if (list!=null && list.size() > 0) {
 					
 					MyAdapter adapter=new MyAdapter(this,list);  
 					mAllUserLV.setAdapter(adapter);  

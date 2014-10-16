@@ -87,7 +87,6 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	private int offset = 0;// 动画图片偏移量
 	private int bmpW;// 动画图片宽度
 
-	private TranObject msg;
 	private List<User> list;
 	private MenuInflater mi;// 菜单
 	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
@@ -127,17 +126,12 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 * 初始化系统数据
 	 */
 	private void initData() {
-		userDB = new UserDB(FriendListActivity.this);// 本地用户数据库
-		messageDB = new MessageDB(this);// 本地消息数据库
+		userDB = application.getUserDB();// 本地用户数据库
+		messageDB = application.getMessageDB();// 本地消息数据库
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 
-		msg = (TranObject) getIntent().getSerializableExtra(Constants.MSGKEY);// 从intent中取出消息对象
-		if (msg == null) {// 如果为空，说明是从后台切换过来的，需要从数据库中读取好友列表信息
-			list = userDB.getUser();
-		} else {// 如果是登录界面切换过来的，就把好友列表信息保存到数据库
-			list = (List<User>) msg.getObject();
-			userDB.updateUser(list);
-		}
+		if (list!=null && list.size()>0) list.clear();
+		list = userDB.getUser();
 		initListViewData(list);
 	}
 
@@ -277,14 +271,6 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	}
 
 	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		if (messageDB != null)
-			messageDB.close();
-	}
-
-	@Override
 	// 菜单选项添加事件处理
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -292,32 +278,10 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 			//Toast.makeText(getApplicationContext(), "亲！此功能暂未实现哦", 0).show();
 			goNewFriend();
 			break;
-		case R.id.friend_menu_exit:
-			exitDialog(FriendListActivity.this, "QQ提示", "亲！您真的要退出吗？");
-			break;
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	// 完全退出提示窗
-	private void exitDialog(Context context, String title, String msg) {
-		new AlertDialog.Builder(context).setTitle(title).setMessage(msg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// 关闭服务
-						if (application.isClientStart()) {
-							Intent service = new Intent(
-									FriendListActivity.this,
-									GetMsgService.class);
-							stopService(service);
-						}
-						close();// 父类关闭方法
-					}
-				}).setNegativeButton("取消", null).create().show();
 	}
 
 	@Override 
@@ -328,7 +292,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		if (1 == requestCode && RESULT_OK == resultCode) 
 		{ 
 			List<User> result = (List<User>) data.getSerializableExtra("newfriends"); 
-			userDB.addUser(list);
+			userDB.addUser(result);
 			updateListViewData(result);
 			myExAdapter.notifyDataSetChanged();
 
@@ -393,11 +357,11 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
 		// TODO Auto-generated method stub
 		// 发送广播，通知服务，已进入后台运行
-		Intent i = new Intent();
-		i.setAction(Constants.BACKKEY_ACTION);
-		sendBroadcast(i);
+		//Intent i = new Intent();
+		//i.setAction(Constants.BACKKEY_ACTION);
+		//sendBroadcast(i);
 
-		util.setIsStart(true);// 设置后台运行标志，正在运行
+		//util.setIsStart(true);// 设置后台运行标志，正在运行
 		finish();// 再结束自己
 	}
 

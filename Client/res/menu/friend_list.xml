@@ -4,9 +4,5 @@
         android:id="@+id/friend_menu_add"
         android:icon="@drawable/addfriends_icon_icon"
         android:title="添加好友"/>
-    <item
-        android:id="@+id/friend_menu_exit"
-        android:icon="@drawable/menu_exit"
-        android:title="退出"/>
 
 </menu>

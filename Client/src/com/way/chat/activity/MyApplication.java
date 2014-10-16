@@ -4,7 +4,9 @@ import java.util.LinkedList;
 
 import com.way.chat.common.util.Constants;
 import com.way.client.Client;
+import com.way.util.MessageDB;
 import com.way.util.SharePreferenceUtil;
+import com.way.util.UserDB;
 
 import android.app.Application;
 import android.app.NotificationManager;
@@ -17,6 +19,8 @@ public class MyApplication extends Application {
 	private LinkedList<RecentChatEntity> mRecentList;
 	private RecentChatAdapter mRecentAdapter;
 	private int recentNum = 0;
+	private UserDB userDB;
+	private MessageDB messageDB;
 
 	@Override
 	public void onCreate() {
@@ -27,9 +31,18 @@ public class MyApplication extends Application {
 		mRecentList = new LinkedList<RecentChatEntity>();
 		mRecentAdapter = new RecentChatAdapter(getApplicationContext(),
 				mRecentList);
+		userDB = new UserDB(MyApplication.this);// 本地用户数据库
 		super.onCreate();
 	}
 
+	public UserDB getUserDB() {
+		return userDB;
+	}
+	
+	public MessageDB getMessageDB() {
+		return messageDB;
+	}
+	
 	public Client getClient() {
 		return client;
 	}
@@ -80,5 +93,12 @@ public class MyApplication extends Application {
 
 	public void setRecentNum(int recentNum) {
 		this.recentNum = recentNum;
+	}
+	public void clossDB()
+	{
+		
+		if (messageDB != null)
+			messageDB.close();
+		
 	}
 }

@@ -283,10 +283,10 @@ public final class R {
         public static final int chat_name=0x7f090003;
         public static final int chat_send=0x7f090006;
         public static final int content_001=0x7f090039;
+        public static final int exit=0x7f09005f;
         public static final int friend_list_myImg=0x7f09000f;
         public static final int friend_list_myName=0x7f090010;
         public static final int friend_menu_add=0x7f09005c;
-        public static final int friend_menu_exit=0x7f09005d;
         public static final int head_arrowImageView=0x7f090019;
         public static final int head_contentLayout=0x7f090018;
         public static final int head_lastUpdatedTextView=0x7f09001c;
@@ -305,8 +305,8 @@ public final class R {
         public static final int listViewAllUsers=0x7f09003d;
         public static final int listview=0x7f090004;
         public static final int login_btn=0x7f090029;
-        public static final int login_menu_exit=0x7f09005f;
-        public static final int login_menu_setting=0x7f09005e;
+        public static final int login_menu_exit=0x7f09005e;
+        public static final int login_menu_setting=0x7f09005d;
         public static final int login_password=0x7f090028;
         public static final int loginpage=0x7f090024;
         public static final int menu=0x7f09002c;
@@ -394,6 +394,7 @@ public final class R {
     public static final class menu {
         public static final int friend_list=0x7f080000;
         public static final int login_menu=0x7f080001;
+        public static final int mymainactivity=0x7f080002;
     }
     public static final class raw {
         public static final int msg=0x7f040000;

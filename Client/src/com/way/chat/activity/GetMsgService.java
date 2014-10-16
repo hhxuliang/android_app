@@ -195,12 +195,12 @@ public class GetMsgService extends Service {
 		RemoteViews contentView = new RemoteViews(mContext.getPackageName(),
 				R.layout.notify_view);
 		contentView.setTextViewText(R.id.notify_name, util.getName());
-		contentView.setTextViewText(R.id.notify_msg, "手机QQ正在后台运行");
+		contentView.setTextViewText(R.id.notify_msg, "正在后台运行");
 		contentView.setTextViewText(R.id.notify_time, MyDate.getDate());
 		// 指定个性化视图
 		mNotification.contentView = contentView;
 
-		Intent intent = new Intent(this, FriendListActivity.class);
+		Intent intent = new Intent(this, MyMainActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		// 指定内容意图
