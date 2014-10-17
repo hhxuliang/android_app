@@ -15,6 +15,8 @@ import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
 
+
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +36,7 @@ import android.widget.Toast;
 public class ChatActivity extends MyActivity implements OnClickListener {
 	private Button mBtnSend;// 发送btn
 	private Button mBtnBack;// 返回btn
+	private Button mBtnSendPic;// 返回btn
 	private EditText mEditTextContent;
 	private TextView mFriendName;
 	private ListView mListView;
@@ -65,6 +68,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		mBtnSend.setOnClickListener(this);
 		mBtnBack = (Button) findViewById(R.id.chat_back);
 		mBtnBack.setOnClickListener(this);
+		mBtnSendPic = (Button) findViewById(R.id.pic_send);
+		mBtnSendPic.setOnClickListener(this);
 		mFriendName = (TextView) findViewById(R.id.chat_name);
 		mFriendName.setText(util.getName());
 		mEditTextContent = (EditText) findViewById(R.id.chat_editmessage);
@@ -103,6 +108,12 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.chat_send:// 发送按钮点击事件
 			send();
+			break;
+		case R.id.pic_send:// 发送按钮点击事件
+			 Intent intent = new Intent(ChatActivity.this, CramerProActivity.class);  
+             startActivity(intent);  
+             //finish();  
+			//send_pic();
 			break;
 		case R.id.chat_back:// 返回按钮点击事件
 			finish();// 结束,实际开发中，可以返回主界面

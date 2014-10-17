@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">children</string>
+    <string name="hello">Hello World, MainActivity!</string>
     <string name="app_display_name">儿童时代</string>
     <string name="group_online">在线好友</string>
     <string name="group_stranger">陌生人</string>
