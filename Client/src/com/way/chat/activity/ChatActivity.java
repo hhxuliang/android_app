@@ -110,7 +110,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			send();
 			break;
 		case R.id.pic_send:// 发送按钮点击事件
-			 Intent intent = new Intent(ChatActivity.this, CramerProActivity.class);  
+			 Intent intent = new Intent(ChatActivity.this, CameraProActivity.class);  
              startActivity(intent);  
              //finish();  
 			//send_pic();

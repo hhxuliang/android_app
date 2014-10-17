@@ -20,20 +20,20 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-//ѡ���ļ�������
+//选择文件操作类
 public class SelectPicActivity extends Activity implements OnClickListener{
 
-	//ʹ����������ջ�ȡͼƬ
+	//使用照相机拍照获取图片
 	public static final int SELECT_PIC_BY_TACK_PHOTO = 1;
-	//ʹ������е�ͼƬ
+	//使用相册中的图片
 	public static final int SELECT_PIC_BY_PICK_PHOTO = 2;
-	//��Intent��ȡͼƬ·����KEY
+	//从Intent获取图片路径的KEY
 	public static final String KEY_PHOTO_PATH = "photo_path";	
 	private static final String TAG = "SelectPicActivity";	
 	private LinearLayout dialogLayout;
 	private Button takePhotoBtn,pickPhotoBtn,cancelBtn;
 
-	/**��ȡ����ͼƬ·��*/
+	/**获取到的图片路径*/
 	private String picPath;
 	private Intent lastIntent ;	
 	private Uri photoUri;
@@ -72,19 +72,19 @@ public class SelectPicActivity extends Activity implements OnClickListener{
 	}
 
 	/**
-	 * ���ջ�ȡͼƬ
+	 * 拍照获取图片
 	 */
 	private void takePhoto() {
-		//ִ������ǰ��Ӧ�����ж�SD���Ƿ����
+		//执行拍照前，应该先判断SD卡是否存在
 		String SDState = Environment.getExternalStorageState();
 		if(SDState.equals(Environment.MEDIA_MOUNTED))
 		{
 			
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//"android.media.action.IMAGE_CAPTURE"
 			/***
-			 * ��Ҫ˵��һ�£����²���ʹ����������գ����պ��ͼƬ����������е�
-			 * ����ʹ�õ����ַ�ʽ��һ���ô����ǻ�ȡ��ͼƬ�����պ��ԭͼ
-			 * �����ʵ��ContentValues�����Ƭ·���Ļ������պ��ȡ��ͼƬΪ����ͼ������
+			 * 需要说明一下，以下操作使用照相机拍照，拍照后的图片会存放在相册中的
+			 * 这里使用的这种方式有一个好处就是获取的图片是拍照后的原图
+			 * 如果不实用ContentValues存放照片路径的话，拍照后获取的图片为缩略图不清晰
 			 */
 			ContentValues values = new ContentValues();  
 			photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);  
@@ -92,14 +92,14 @@ public class SelectPicActivity extends Activity implements OnClickListener{
 			/**-----------------*/
 			startActivityForResult(intent, SELECT_PIC_BY_TACK_PHOTO);
 		}else{
-			Toast.makeText(this,"�ڴ濨������", Toast.LENGTH_LONG).show();
+			Toast.makeText(this,"内存卡不存在", Toast.LENGTH_LONG).show();
 		}
 	}
 				
 	
 	
 	/***
-	 * �������ȡͼƬ
+	 * 从相册中取图片
 	 */
 	private void pickPhoto() {
 		Intent intent = new Intent();
@@ -126,20 +126,20 @@ public class SelectPicActivity extends Activity implements OnClickListener{
 	}
 	
 	/**
-	 * ѡ��ͼƬ�󣬻�ȡͼƬ��·��
+	 * 选择图片后，获取图片的路径
 	 * @param requestCode
 	 * @param data
 	 */
 	private void doPhoto(int requestCode,Intent data){
-		if(requestCode == SELECT_PIC_BY_PICK_PHOTO )  //�����ȡͼƬ����Щ�ֻ����쳣�������ע��
+		if(requestCode == SELECT_PIC_BY_PICK_PHOTO )  //从相册取图片，有些手机有异常情况，请注意
 		{
 			if(data == null){
-				Toast.makeText(this, "ѡ��ͼƬ�ļ�����", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "选择图片文件出错", Toast.LENGTH_LONG).show();
 				return;
 			}
 			photoUri = data.getData();
 			if(photoUri == null ){
-				Toast.makeText(this, "ѡ��ͼƬ�ļ�����", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "选择图片文件出错", Toast.LENGTH_LONG).show();
 				return;
 			}
 		}
@@ -158,8 +158,9 @@ public class SelectPicActivity extends Activity implements OnClickListener{
 			setResult(Activity.RESULT_OK, lastIntent);
 			finish();
 		}else{
-			Toast.makeText(this, "ѡ���ļ�����ȷ!", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "选择文件不正确!", Toast.LENGTH_LONG).show();
 			
 		}
 	}
 }
+

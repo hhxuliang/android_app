@@ -63,7 +63,7 @@
             android:name=".ChatActivity"
             android:windowSoftInputMode="adjustResize" >
         </activity>
-        <activity android:name=".CramerProActivity"></activity>
+        <activity android:name=".CameraProActivity"></activity>
         <activity android:name=".SystemCatalogActivity"></activity>
         <activity android:name=".SelectPicActivity"></activity>
         
