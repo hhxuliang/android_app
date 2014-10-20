@@ -16,7 +16,8 @@ import android.app.AlertDialog;
 
 public class MyMainActivity extends MyActivity {
     /** Called when the activity is first created. */
-	MyImageView joke;
+	MyImageView message;
+	MyImageView picture;
 	private MenuInflater mi;// 菜单
 	MyApplication application;
     @Override
@@ -24,13 +25,22 @@ public class MyMainActivity extends MyActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_home);
         mi = new MenuInflater(this);
-        joke=(MyImageView) findViewById(R.id.c_joke);
+        message=(MyImageView) findViewById(R.id.c_joke);
+        picture=(MyImageView) findViewById(R.id.c_constellation);
         application = (MyApplication) this.getApplicationContext();
-        joke.setOnClickIntent(new MyImageView.OnViewClick() {
+        message.setOnClickIntent(new MyImageView.OnViewClick() {
 			@Override
 			public void onClick() {
 				Intent i = new Intent(MyMainActivity.this,
 						FriendListActivity.class);
+				startActivity(i);
+			}
+		});
+        picture.setOnClickIntent(new MyImageView.OnViewClick() {
+			@Override
+			public void onClick() {
+				Intent i = new Intent(MyMainActivity.this,
+						PullToRefreshSampleActivity.class);
 				startActivity(i);
 			}
 		});
