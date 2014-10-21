@@ -80,7 +80,7 @@ public class RegisterActivity extends MyActivity implements OnClickListener {
 	}
 
 	private void toast(Context context) {
-		new AlertDialog.Builder(context).setTitle("QQ注册")
+		new AlertDialog.Builder(context).setTitle("注册")
 				.setMessage("亲！您真的不注册了吗？")
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
@@ -97,7 +97,7 @@ public class RegisterActivity extends MyActivity implements OnClickListener {
 		String passwd2 = mPasswdEt2.getText().toString();
 		if (email.equals("") || name.equals("") || passwd.equals("")
 				|| passwd2.equals("")) {
-			DialogFactory.ToastDialog(RegisterActivity.this, "QQ注册",
+			DialogFactory.ToastDialog(RegisterActivity.this, "注册",
 					"亲！带*项是不能为空的哦");
 		} else {
 			if (passwd.equals(passwd2)) {
@@ -118,11 +118,11 @@ public class RegisterActivity extends MyActivity implements OnClickListener {
 				} else {
 					if (mDialog.isShowing())
 						mDialog.dismiss();
-					DialogFactory.ToastDialog(this, "QQ注册", "亲！服务器暂未开放哦");
+					DialogFactory.ToastDialog(this, "注册", "亲！服务器暂未开放哦");
 				}
 
 			} else {
-				DialogFactory.ToastDialog(RegisterActivity.this, "QQ注册",
+				DialogFactory.ToastDialog(RegisterActivity.this, "注册",
 						"亲！您两次输入的密码不同哦");
 			}
 		}
@@ -140,15 +140,26 @@ public class RegisterActivity extends MyActivity implements OnClickListener {
 					mDialog.dismiss();
 					mDialog = null;
 				}
-				DialogFactory.ToastDialog(RegisterActivity.this, "QQ注册",
-						"亲！请牢记您的登录QQ哦：" + id);
+				DialogFactory.ToastDialog(RegisterActivity.this, "注册",
+						"亲！您的登录ID是：" + id);
+				finish();
 			} else {
 				if (mDialog != null) {
 					mDialog.dismiss();
 					mDialog = null;
 				}
-				DialogFactory.ToastDialog(RegisterActivity.this, "QQ注册",
-						"亲！很抱歉！QQ号暂时缺货哦");
+				if (id == 0) 
+				{
+					DialogFactory.ToastDialog(RegisterActivity.this, "注册",
+							"亲！很抱歉！注册失败！请联系我们!");
+					finish();
+				}
+				if (id == -1) 
+					DialogFactory.ToastDialog(RegisterActivity.this, "注册",
+							"亲！很抱歉！您的邮箱已经被注册!请更改后重新注册!");
+				if (id == -2) 
+					DialogFactory.ToastDialog(RegisterActivity.this, "注册",
+							"亲！很抱歉！您的昵称已经被注册!请更改后重新注册!");
 			}
 			break;
 

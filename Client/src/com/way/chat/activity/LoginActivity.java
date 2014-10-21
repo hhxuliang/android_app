@@ -58,17 +58,18 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 		application = (MyApplication) this.getApplicationContext();
 		initView();
 		mi = new MenuInflater(this);
-	}
-
-	@Override
-	protected void onResume() {// 在onResume方法里面先判断网络是否可用，再启动服务,这样在打开网络连接之后返回当前Activity时，会重新启动服务联网，
-		super.onResume();
 		if (isNetworkAvailable()) {
 			Intent service = new Intent(this, GetMsgService.class);
 			startService(service);
 		} else {
 			toast(this);
 		}
+	}
+
+	@Override
+	protected void onResume() {// 在onResume方法里面先判断网络是否可用，再启动服务,这样在打开网络连接之后返回当前Activity时，会重新启动服务联网，
+		super.onResume();
+		
 	}
 
 	public void initView() {
@@ -89,7 +90,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 		if (mAutoSavePassword.isChecked()) {
 			SharePreferenceUtil util = new SharePreferenceUtil(
 					LoginActivity.this, Constants.SAVE_USER);
-			mAccounts.setText(util.getId());
+			mAccounts.setText(util.getName());
 			mPassword.setText(util.getPasswd());
 		}
 	}
@@ -162,7 +163,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 		String accounts = mAccounts.getText().toString();
 		String password = mPassword.getText().toString();
 		if (accounts.length() == 0 || password.length() == 0) {
-			DialogFactory.ToastDialog(this, "QQ登录", "亲！帐号或密码不能为空哦");
+			DialogFactory.ToastDialog(this, "登录", "亲！帐号或密码不能为空哦");
 		} else {
 			showRequestDialog();
 			// 通过Socket验证信息
@@ -171,14 +172,14 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 				ClientOutputThread out = client.getClientOutputThread();
 				TranObject<User> o = new TranObject<User>(TranObjectType.LOGIN);
 				User u = new User();
-				u.setId(Integer.parseInt(accounts));
+				u.setLoginAccount(accounts);
 				u.setPassword(Encode.getEncode("MD5", password));
 				o.setObject(u);
 				out.setMsg(o);
 			} else {
 				if (mDialog.isShowing())
 					mDialog.dismiss();
-				DialogFactory.ToastDialog(LoginActivity.this, "QQ登录",
+				DialogFactory.ToastDialog(LoginActivity.this, "登录",
 						"亲！服务器暂未开放哦");
 			}
 		}
@@ -196,7 +197,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 					// 保存用户信息
 					SharePreferenceUtil util = new SharePreferenceUtil(
 							LoginActivity.this, Constants.SAVE_USER);
-					util.setId(mAccounts.getText().toString());
+					util.setId(list.get(0).getId()+"");
 					util.setPasswd(mPassword.getText().toString());
 					util.setEmail(list.get(0).getEmail());
 					util.setName(list.get(0).getName());
@@ -211,7 +212,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 					finish();
 					Toast.makeText(getApplicationContext(), "登录成功", 0).show();
 				} else {
-					DialogFactory.ToastDialog(LoginActivity.this, "QQ登录",
+					DialogFactory.ToastDialog(LoginActivity.this, "登录",
 							"亲！您的帐号或密码错误哦");
 					if (mDialog.isShowing())
 						mDialog.dismiss();
@@ -238,7 +239,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 			setDialog();
 			break;
 		case R.id.login_menu_exit:
-			exitDialog(LoginActivity.this, "QQ提示", "亲！您真的要退出吗？");
+			exitDialog(LoginActivity.this, "提示", "亲！您真的要退出吗？");
 			break;
 		default:
 			break;
@@ -248,7 +249,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 
 	@Override
 	public void onBackPressed() {// 捕获返回按键
-		exitDialog(LoginActivity.this, "QQ提示", "亲！您真的要退出吗？");
+		exitDialog(LoginActivity.this, "提示", "亲！您真的要退出吗？");
 	}
 
 	/**

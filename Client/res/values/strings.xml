@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">children</string>
+    <string name="app_name">幼儿园</string>
     <string name="hello">Hello World, MainActivity!</string>
-    <string name="app_display_name">儿童时代</string>
+    <string name="app_display_name">幼儿园</string>
     <string name="group_online">在线好友</string>
     <string name="group_stranger">陌生人</string>
     <string name="group_blcak_list">黑名单</string>
@@ -54,7 +54,7 @@
     <string name="account_setting">状态管理</string>
     <string name="account_setting2">帐号设置</string>
     <string name="login">登 录</string>
-    <string name="account">输入登陆号码</string>
+    <string name="account">输入登陆昵称/邮箱</string>
     <string name="password">输入密码</string>
     <string name="login_prompt">正在验证帐号…</string>
     <string name="timeout_prompt">操作超时！</string>
@@ -558,8 +558,8 @@
     <string name="sc_MoreAppNotify_App">我的应用消息提醒</string>
     <string name="sc_QQMsgNotiry_time">通知接收时段</string>
     <string name="sc_isCallQZone">调用手机QQ空间</string>
-    <string name="qr_register_new_num">注册QQ号码</string>
-    <string name="qr_register">QQ注册</string>
+    <string name="qr_register_new_num">注册号码</string>
+    <string name="qr_register">注册</string>
     <string name="qr_location">所在地</string>
     <string name="qr_mobile_num">手机号</string>
     <string name="qr_input_mobile_num">请输入手机号码</string>
@@ -1168,7 +1168,7 @@
     <string name="reply_my_shuoshuo">回复了我 :</string>
     <string name="gift">送了一个语音祝福给你，赶快听听吧~</string>
     <string name="file">[文件]</string>
-    <string name="register_tip">提示 \n带*项为必填项\n填写邮箱方便您找回密码以及了解更多QQ信息</string>
+    <string name="register_tip">提示 \n带*项为必填项\n填写邮箱,手机号方便您找回密码以及了解更多信息</string>
     <string name="ptr_pull_to_refresh">Pull to refresh</string>
     <string name="ptr_release_to_refresh">Release to refresh</string>
     <string name="ptr_refreshing">Refreshing</string>

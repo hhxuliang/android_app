@@ -9,7 +9,7 @@
         android:id="@+id/RelativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="60dp"
-        android:background="@drawable/login_bg" >
+        android:background="@drawable/title_bar" >
 
         <ImageView
             android:id="@+id/friend_list_myImg"
@@ -48,7 +48,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="45dp"
-        android:background="@drawable/login_moremenu_back"
+        android:background="@drawable/title_bar_2"
         android:orientation="horizontal" >
 
         <LinearLayout

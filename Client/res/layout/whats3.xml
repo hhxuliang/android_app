@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="35dp"
         android:gravity="center"
-        android:text="\n上传小朋友照片\n记录幼儿园生活的点点滴滴\n"
+        android:text="\n方便管理幼儿园班级\n老师绝对的好帮手"
         android:textColor="#fff"
         android:textSize="22sp" />
 

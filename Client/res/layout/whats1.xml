@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="35dp"
         android:gravity="center"
-        android:text="\n\n免费的幼儿园管理沟通手机应用"
+        android:text="\n上传小朋友照片\n记录幼儿园生活的点点滴滴"
         android:textColor="#fff"
         android:textSize="22sp" />
 
