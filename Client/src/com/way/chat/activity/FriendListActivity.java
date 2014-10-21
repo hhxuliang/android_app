@@ -425,7 +425,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		@Override
 		public void onRefresh() {
-			new AsyncTask<Void, Void, Void>() {
+			AsyncTask<Void, Void, Void> tk=new AsyncTask<Void, Void, Void>() {
 				List<User> list;
 
 				protected Void doInBackground(Void... params) {
@@ -468,6 +468,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 				}
 
 			};
+			tk.execute();
 		}
 	}
 }
