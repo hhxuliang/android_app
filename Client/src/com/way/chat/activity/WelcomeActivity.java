@@ -10,9 +10,11 @@ import java.io.OutputStream;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.way.chat.common.util.Constants;
 import com.way.util.SharePreferenceUtil;
@@ -37,8 +39,36 @@ public class WelcomeActivity extends Activity {
 			moveSound();
 		}
 		initView();
+		createSDCardDir();
 	}
+	
+	public void createSDCardDir(){
+		MyApplication application = (MyApplication) this.getApplicationContext();
+	     if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
+	            // 创建一个文件夹对象，赋值为外部存储器的目录
+	             File sdcardDir =Environment.getExternalStorageDirectory();
+	           //得到一个路径，内容是sdcard的文件夹路径和名字
+	             String path=sdcardDir.getPath()+"/children";
+	             File path1 = new File(path);
+	             if (!path1.exists()) {
+	                //若不存在，创建目录，可以在应用启动的时候创建
+	                path1.mkdirs();
+	             }
+	             application.setHomePath(path);
+	             String path_camera=application.getCameraPath();
+	             File path_camera_f = new File(path_camera);
+	             if (!path_camera_f.exists()) {
+	                //若不存在，创建目录，可以在应用启动的时候创建
+	            	 path_camera_f.mkdirs();
+	             }
+	     }
+	     else{
+	      Toast.makeText(this,"内存卡不存在...", Toast.LENGTH_LONG).show();
+	      return;
+	
+	    }
 
+   }
 	public void initView() {
 		if (util.getIsStart()) {// 如果正在后台运行
 			goFriendListActivity();

@@ -21,6 +21,8 @@ public class MyApplication extends Application {
 	private int recentNum = 0;
 	private UserDB userDB;
 	private MessageDB messageDB;
+	private String home_path;
+	private String camera_path;
 
 	@Override
 	public void onCreate() {
@@ -35,6 +37,15 @@ public class MyApplication extends Application {
 		super.onCreate();
 	}
 
+	public String getHomePath(){
+		return home_path;
+	}
+	public void setHomePath(String p){
+		home_path = p;
+	}
+	public String getCameraPath(){
+		return home_path + "/camerapicpath";
+	}
 	public UserDB getUserDB() {
 		return userDB;
 	}
