@@ -3,6 +3,7 @@ package com.way.chat.activity;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -58,18 +59,21 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	private static final int PAGE2 = 1;// 页面2
 	private static final int PAGE3 = 2;// 页面3
 	private List<GroupFriend> group;// 需要传递给适配器的数据
-	private String[] groupName = { "我的好友", "我的同学", "我的家人" };// 大组成员名
+	private List<GroupFriend> group_crowd;
+	//private String[] groupName = { "我的好友", "我的同学", "我的家人" };// 大组成员名
+	//List<String> groupName;
 	private SharePreferenceUtil util;
 	private UserDB userDB;// 保存好友列表数据库对象
 	private MessageDB messageDB;// 消息数据库对象
 
 	private MyListView myListView;// 好友列表自定义listView
 	private MyExAdapter myExAdapter;// 好
+	private MyExAdapter myExAdapter_crowd;
 
 	private ListView mRecentListView;// 最近会话的listView
 	private int newNum = 0;
 
-	private ListView mGroupListView;// 群组listView
+	private MyListView mGroupListView;// 群组listView
 
 	private ViewPager mPager;
 	private List<View> mListViews;// Tab页面
@@ -127,7 +131,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 */
 	private void initData() {
 		userDB = application.getUserDB();// 本地用户数据库
-		messageDB = application.getMessageDB();// 本地消息数据库
+		messageDB = new MessageDB(this);// 本地消息数据库
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 
 		if (list!=null && list.size()>0) list.clear();
@@ -143,15 +147,64 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 */
 	private void initListViewData(List<User> list) {
 		group = new ArrayList<GroupFriend>();// 实例化
-		for (int i = 0; i < groupName.length; ++i) {// 根据大组的数量，循环给各大组分配成员
-			List<User> child = new ArrayList<User>();// 装小组成员的list
-			GroupFriend groupInfo = new GroupFriend(groupName[i], child);// 我们自定义的大组成员对象
-			for (User u : list) {
-				if (u.getGroup() == i)// 判断一下是属于哪个大组
+		group_crowd = new ArrayList<GroupFriend>();// 实例化
+		
+		GroupFriend g_info=null;
+		for (User u : list) {
+			boolean findG=false;
+			if(u.getIsCrowd()==1)
+			{
+				for (GroupFriend g : group_crowd)
+				{	
+					if (u.getGroup().equals(g.getGroupName()))
+					{
+						g_info = g;
+						findG=true;
+						break;
+					}
+				}
+				System.out.println("group_crowd name is " + u.getGroup() + findG);
+				if(findG==false)
+				{
+					List<User> child = new ArrayList<User>();// 装小组成员的list
 					child.add(u);
+					GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
+					group_crowd.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
+					//group_crowd.add(groupInfo);
+				}
+				else
+				{
+					if(g_info!=null) g_info.getGroupChild().add(u);
+				}
+			}	
+			else
+			{
+				for (GroupFriend g : group)
+				{	
+					if (u.getGroup().equals(g.getGroupName()))
+					{
+						g_info = g;
+						findG=true;
+						break;
+					}
+				}
+				System.out.println("group name is " + u.getGroup() + findG);
+				if(findG==false)
+				{
+					List<User> child = new ArrayList<User>();// 装小组成员的list
+					child.add(u);
+					GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
+					group.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
+					//group_crowd.add(groupInfo);
+				}
+				else
+				{
+					if(g_info!=null) g_info.getGroupChild().add(u);
+				}
 			}
-			group.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
 		}
+		
+		
 	}
 	
 	/**
@@ -161,12 +214,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 *            
 	 */
 	private void updateListViewData(List<User> list) {
-		for (int i = 0; i < groupName.length; ++i) {// 根据大组的数量，循环给各大组分配成员
-			for (User u : list) {
-				if (u.getGroup() == i)// 判断一下是属于哪个大组
-					group.get(i).add(u);
-			}
-		}
+		initListViewData(list);
 	}
 
 	/**
@@ -235,15 +283,17 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		myListView.setonRefreshListener(new MyRefreshListener());
 
 		// 下面是群组界面处理
-		mGroupListView = (ListView) lay3.findViewById(R.id.tab3_listView);
-		List<GroupEntity> groupList = new ArrayList<GroupEntity>();
-		GroupEntity entity = new GroupEntity(0, "C175地带", "怀念高中生活...");
-		GroupEntity entity2 = new GroupEntity(0, "Android开发",
-				"爱生活...爱Android...");
-		groupList.add(entity);
-		groupList.add(entity2);
-		GroupAdapter adapter = new GroupAdapter(this, groupList);
-		mGroupListView.setAdapter(adapter);
+		mGroupListView = (MyListView) lay3.findViewById(R.id.tab3_listView);
+		
+		myExAdapter_crowd = new MyExAdapter(this, group_crowd);
+		mGroupListView.setAdapter(myExAdapter_crowd);
+		mGroupListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
+		mGroupListView.setDivider(null);// 设置图片可拉伸的
+		mGroupListView.setFocusable(true);// 聚焦才可以下拉刷新
+		mGroupListView.setonRefreshListener(new MyRefreshListener());
+		
+		
+		
 	}
 
 	@Override

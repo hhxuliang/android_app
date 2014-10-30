@@ -64,12 +64,16 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 
 	// 得到大组成员名称
 	public Object getGroup(int groupPosition) {
-		return group.get(groupPosition).getGroupName();
+		if(group!=null)
+			return group.get(groupPosition).getGroupName();
+		return null;
 	}
 
 	// 得到大组成员总数
 	public int getGroupCount() {
-		return group.size();
+		if(group!=null)
+			return group.size();
+		return 0;
 	}
 
 	// 得到小组成员的view
