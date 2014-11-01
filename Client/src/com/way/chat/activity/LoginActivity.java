@@ -211,6 +211,12 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 						mDialog.dismiss();
 					finish();
 					Toast.makeText(getApplicationContext(), "登录成功", 0).show();
+					if (list.get(0).getOffLineMessUser()!=null && list.get(0).getOffLineMessUser().size()>0)
+					{
+						Toast.makeText(getApplicationContext(), "你有离线的消息，请查阅！", 0).show();
+						application.setOffLineList(list.get(0).getOffLineMessUser());
+					}
+					
 				} else {
 					DialogFactory.ToastDialog(LoginActivity.this, "登录",
 							"亲！您的帐号或密码错误哦");
@@ -218,6 +224,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 						mDialog.dismiss();
 				}
 				break;
+			
 			default:
 				break;
 			}

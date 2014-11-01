@@ -36,10 +36,5 @@
 			<type>2</type>
 			<location>D:/Program Files/android/Android_OO/common/Share/src</location>
 		</link>
-		<link>
-			<name>src_share</name>
-			<type>2</type>
-			<location>D:/Program Files/android/Android_OO/Share/src</location>
-		</link>
 	</linkedResources>
 </projectDescription>

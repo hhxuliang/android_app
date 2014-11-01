@@ -135,7 +135,10 @@ public class GetMsgService extends Service {
 
 				@Override
 				public void Message(TranObject msg) {
-					// System.out.println("GetMsgService:" + msg);
+					System.out.println("GetMsgService:" + msg);
+					System.out.println("GetMsgService:" + msg.getType());
+					System.out.println("GetMsgService:" + msg.getFromUser());
+					System.out.println("GetMsgService:" + util.getIsStart());
 					if (util.getIsStart()) {// 如果 是在后台运行，就更新通知栏，否则就发送广播给Activity
 						if (msg.getType() == TranObjectType.MESSAGE) {// 只处理文本消息类型
 							// System.out.println("收到新消息");

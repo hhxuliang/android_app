@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.way.chat.common.bean.CommonMsg;
 import com.way.chat.common.bean.TextMessage;
 import com.way.chat.common.bean.User;
 import com.way.chat.common.tran.bean.TranObject;
@@ -46,6 +47,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private User user;
 	private MessageDB messageDB;
 	private MyApplication application;
+	private ClientOutputThread out;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,10 +57,36 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		messageDB = new MessageDB(this);
 		user = (User) getIntent().getSerializableExtra("user");
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
+		Client client = application.getClient();
+		out = client.getClientOutputThread();
 		initView();// 初始化view
 		initData();// 初始化数据
+		getOffLineMess();
+		if(application.getOffLineList()!=null)
+		{
+			for(String s:application.getOffLineList())
+		
+			{
+				if (s.equals(util.getId())){
+					application.getOffLineList().remove(s);
+					break;
+				}
+			}
+		}
 	}
 
+	public void getOffLineMess() {
+		/**/
+		CommonMsg cm = new CommonMsg();
+		cm.setarg1(user.getId()+"");
+		cm.setarg2(util.getId());
+		cm.setarg3(user.getIsCrowd()+"");
+		TranObject<CommonMsg> msg2Object = new TranObject<CommonMsg>(
+				TranObjectType.OFFLINEMESS);
+		msg2Object.setObject(cm);
+		out.setMsg(msg2Object);
+		
+	}
 	/**
 	 * 初始化view
 	 */
@@ -140,10 +168,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
 			mEditTextContent.setText("");// 清空编辑框数据
 			mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项
-			MyApplication application = (MyApplication) this
-					.getApplicationContext();
-			Client client = application.getClient();
-			ClientOutputThread out = client.getClientOutputThread();
+			
 			if (out != null) {
 				TranObject<TextMessage> o = new TranObject<TextMessage>(
 						TranObjectType.MESSAGE);
@@ -152,6 +177,10 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
 				o.setToUser(user.getId());
+				if(user.getIsCrowd()==1)
+					o.setCrowd(user.getId());
+				else
+					o.setCrowd(0);
 				out.setMsg(o);
 			}
 			// 下面是添加到最近会话列表的处理，在按发送键之后
@@ -173,8 +202,14 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			String message = tm.getMessage();
 			ChatMsgEntity entity = new ChatMsgEntity(user.getName(),
 					MyDate.getDateEN(), message, user.getImg(), true);// 收到的消息
-			if (msg.getFromUser() == user.getId() || msg.getFromUser() == 0) {// 如果是正在聊天的好友的消息，或者是服务器的消息
-
+			System.out.println("herris ====>"+msg.getFromUser());
+			System.out.println("herris ====>"+user.getId());
+			if (msg.getFromUser() == user.getId() || msg.getFromUser() == 0 || msg.getCrowd() == user.getId()) {// 如果是正在聊天的好友的消息，或者是服务器的消息
+				if(msg.getCrowd() == user.getId())
+				{
+					entity.setName(msg.getFromUserName());
+					entity.setImg(msg.getFromImg());
+				}
 				messageDB.saveMsg(user.getId(), entity);
 
 				mDataArrays.add(entity);

@@ -123,6 +123,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 			application.setNewMsgNum(0);// 把消息数目置0
 			application.getmRecentAdapter().notifyDataSetChanged();
 		}
+		
 		super.onResume();
 	}
 
@@ -275,7 +276,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		// 下面是处理好友列表界面处理
 		myListView = (MyListView) lay2.findViewById(R.id.tab2_listView);
-		myExAdapter = new MyExAdapter(this, group);
+		myExAdapter = new MyExAdapter(this, group,application.getOffLineList());
 		myListView.setAdapter(myExAdapter);
 		myListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
 		myListView.setDivider(null);// 设置图片可拉伸的
@@ -285,14 +286,12 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		// 下面是群组界面处理
 		mGroupListView = (MyListView) lay3.findViewById(R.id.tab3_listView);
 		
-		myExAdapter_crowd = new MyExAdapter(this, group_crowd);
+		myExAdapter_crowd = new MyExAdapter(this, group_crowd,application.getOffLineList());
 		mGroupListView.setAdapter(myExAdapter_crowd);
 		mGroupListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
 		mGroupListView.setDivider(null);// 设置图片可拉伸的
 		mGroupListView.setFocusable(true);// 聚焦才可以下拉刷新
 		mGroupListView.setonRefreshListener(new MyRefreshListener());
-		
-		
 		
 	}
 

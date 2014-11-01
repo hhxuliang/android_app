@@ -27,13 +27,16 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
 			R.drawable.f3, R.drawable.f4, R.drawable.f5, R.drawable.f6,
 			R.drawable.f7, R.drawable.f8, R.drawable.f9 };// 头像资源数组
+	private int[] imgs_more = { R.drawable.page_indicator_focused};// 头像资源数组
 	private Context context;
 	private List<GroupFriend> group;// 传递过来的经过处理的总数据
+	private List<String> offlineuserid;
 
-	public MyExAdapter(Context context, List<GroupFriend> group) {
+	public MyExAdapter(Context context, List<GroupFriend> group,List<String> ls) {
 		super();
 		this.context = context;
 		this.group = group;
+		this.offlineuserid = ls;
 	}
 
 	// 得到大组成员的view
@@ -89,6 +92,8 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				.findViewById(R.id.id_item);// 显示用户id
 		ImageView icon = (ImageView) convertView
 				.findViewById(R.id.imageView_item);// 显示用户头像，其实还可以判断是否在线，选择黑白和彩色头像，我这里未处理，没资源，呵呵
+		ImageView icon_more = (ImageView) convertView
+				.findViewById(R.id.imageView_item_more);// 显示用户头像，其实还可以判断是否在线，选择黑白和彩色头像，我这里未处理，没资源，呵呵
 
 		final String name = group.get(groupPosition).getChild(childPosition)
 				.getName();
@@ -97,9 +102,25 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				+ "";
 		final int img = group.get(groupPosition).getChild(childPosition)
 				.getImg();
+		final int iscrowd = group.get(groupPosition).getChild(childPosition).getIsCrowd();
+				
 		title.setText(name);// 大标题
 		title2.setText(id);// 小标题
 		icon.setImageResource(imgs[img]);
+		icon_more.setVisibility(View.INVISIBLE );
+		System.out.println("asdfasdfasdf:"+iscrowd);
+		if(offlineuserid!=null)
+		{
+			for(String s:offlineuserid)
+			{
+				if (s.equals(id))
+				{
+					icon_more.setVisibility(View.VISIBLE );
+					icon_more.setImageResource(imgs_more[0]);
+				}
+			}
+		}
+		
 		convertView.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -109,6 +130,8 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				u.setName(name);
 				u.setId(Integer.parseInt(id));
 				u.setImg(img);
+				u.setIsCrowd(iscrowd);
+				System.out.println("asdfasdfasdf:"+iscrowd);
 				Intent intent = new Intent(context, ChatActivity.class);
 				intent.putExtra("user", u);
 				context.startActivity(intent);

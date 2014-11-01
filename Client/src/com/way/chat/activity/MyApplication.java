@@ -1,5 +1,6 @@
 package com.way.chat.activity;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.way.chat.common.util.Constants;
@@ -23,6 +24,7 @@ public class MyApplication extends Application {
 	private MessageDB messageDB;
 	private String home_path;
 	private String camera_path;
+	private ArrayList<String> offlinemsslist;
 
 	@Override
 	public void onCreate() {
@@ -36,7 +38,14 @@ public class MyApplication extends Application {
 		userDB = new UserDB(MyApplication.this);// 本地用户数据库
 		super.onCreate();
 	}
-
+	public ArrayList<String> getOffLineList()
+	{
+		return offlinemsslist;
+	}
+	public void setOffLineList(ArrayList<String> l)
+	{
+		offlinemsslist = l;
+	}
 	public String getHomePath(){
 		return home_path;
 	}

@@ -27,7 +27,7 @@ public abstract class MyActivity extends Activity {
 			TranObject msg = (TranObject) intent
 					.getSerializableExtra(Constants.MSGKEY);
 			if (msg != null) {//如果不是空，说明是消息广播
-				// System.out.println("MyActivity:" + msg);
+				System.out.println("MyActivity:" + msg.getFromUser());
 				getMessage(msg);// 把收到的消息传递给子类
 			} else {//如果是空消息，说明是关闭应用的广播
 				close();
