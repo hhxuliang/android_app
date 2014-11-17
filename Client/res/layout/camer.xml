@@ -57,7 +57,7 @@
         android:layout_height="230dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/table_qiandao_text"
-        android:scaleType="fitXY" /> 
+        /> 
 
         <ImageView
             android:layout_width="fill_parent"
@@ -104,21 +104,6 @@
             android:layout_marginLeft="120dp"
             android:background="@drawable/camera_icon" />
     </RelativeLayout>
-    
-    <TextView
-        android:id="@+id/txt1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#DC143C"
-        android:text="" />
-    
-    <TextView
-        android:id="@+id/uploadImageResult"
-        android:layout_width="fill_parent"
-        android:layout_height="50dip"
-        android:textColor="#DC143C"
-        android:text="" />
-
     <Button
         android:id="@+id/uploadImage"
         android:layout_width="wrap_content"

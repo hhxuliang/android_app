@@ -1,5 +1,8 @@
 package com.way.chat.activity;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,11 +15,13 @@ import com.way.chat.common.tran.bean.TranObjectType;
 import com.way.chat.common.util.Constants;
 import com.way.client.Client;
 import com.way.client.ClientOutputThread;
+import com.way.client.Client.ClientThread;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
 
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -48,6 +53,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private MessageDB messageDB;
 	private MyApplication application;
 	private ClientOutputThread out;
+	private boolean alreadycreate;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,7 +67,38 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		out = client.getClientOutputThread();
 		initView();// 初始化view
 		initData();// 初始化数据
-		getOffLineMess();
+		alreadycreate=false;
+		Runnable runnable = new Runnable(){
+			public void run(){
+				try {
+					Thread.sleep(10000);//we need to wait 10s for friendActivity not receive the message, 
+										//that will cause duplicate message save in DB
+										//maybe other good solution
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (alreadycreate)
+					getOffLineMess();		
+			}
+		};
+		new Thread(runnable).start();
+	}
+	@Override
+	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
+		alreadycreate = true;
+		super.onResume();
+	}
+	public void getOffLineMess() {
+		/**/
+		CommonMsg cm = new CommonMsg();
+		cm.setarg1(user.getId()+"");
+		cm.setarg2(util.getId());
+		cm.setarg3(user.getIsCrowd()+"");
+		TranObject<CommonMsg> msg2Object = new TranObject<CommonMsg>(
+				TranObjectType.OFFLINEMESS);
+		msg2Object.setObject(cm);
+		out.setMsg(msg2Object);
 		if(application.getOffLineList()!=null)
 		{
 			for(String s:application.getOffLineList())
@@ -73,18 +110,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				}
 			}
 		}
-	}
-
-	public void getOffLineMess() {
-		/**/
-		CommonMsg cm = new CommonMsg();
-		cm.setarg1(user.getId()+"");
-		cm.setarg2(util.getId());
-		cm.setarg3(user.getIsCrowd()+"");
-		TranObject<CommonMsg> msg2Object = new TranObject<CommonMsg>(
-				TranObjectType.OFFLINEMESS);
-		msg2Object.setObject(cm);
-		out.setMsg(msg2Object);
 		
 	}
 	/**
@@ -135,11 +160,13 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.chat_send:// 发送按钮点击事件
-			send();
+			String contString = mEditTextContent.getText().toString();
+			send(contString);
+			mEditTextContent.setText("");// 清空编辑框数据
 			break;
 		case R.id.pic_send:// 发送按钮点击事件
 			 Intent intent = new Intent(ChatActivity.this, CameraProActivity.class);  
-             startActivity(intent);  
+             startActivityForResult(intent,1);
              //finish();  
 			//send_pic();
 			break;
@@ -152,8 +179,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	/**
 	 * 发送消息
 	 */
-	private void send() {
-		String contString = mEditTextContent.getText().toString();
+	private void send(String contString) {
+		
 		if (contString.length() > 0) {
 			ChatMsgEntity entity = new ChatMsgEntity();
 			entity.setName(util.getName());
@@ -166,7 +193,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 
 			mDataArrays.add(entity);
 			mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
-			mEditTextContent.setText("");// 清空编辑框数据
+			
 			mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项
 			
 			if (out != null) {
@@ -240,4 +267,21 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			break;
 		}
 	}
+	
+	@Override 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{ 
+		// requestCode用于区分业务  
+		// resultCode用于区分某种业务的执行情况  
+		if (1 == requestCode && RESULT_OK == resultCode) 
+		{ 
+			String result = data.getStringExtra("pic_path"); 
+			send(result);
+			
+		} 
+		else 
+		{ 
+
+		} 
+	} 
 }

@@ -105,7 +105,6 @@ public class SystemCatalogActivity extends ListActivity
 	                			
 	                			//把选择的文件路径传递给上传文件路径picPath
 	                			CameraProActivity.picPath=file.getPath();
-	                			CameraProActivity.txt.setText("文件路径:"+file.getPath());
 	                			Toast.makeText(SystemCatalogActivity.this,"已选择文件"+file.getName()+"\n"+"点击上传", Toast.LENGTH_LONG).show();
 	                			Intent intent = new Intent(SystemCatalogActivity.this, CameraProActivity.class);  
 	                            startActivity(intent);  

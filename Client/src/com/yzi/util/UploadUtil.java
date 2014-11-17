@@ -14,18 +14,18 @@ import java.util.UUID;
 
 import android.util.Log;
 
-//ÉÏ´«¹¤¾ßÀà Ö§³ÖÉÏ´«ÎÄ¼þºÍ²ÎÊý
+//ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ö§ï¿½ï¿½ï¿½Ï´ï¿½ï¿½Ä¼ï¿½ï¿½Í²ï¿½ï¿½ï¿½
 public class UploadUtil {
 	private static UploadUtil uploadUtil;
-	private static final String BOUNDARY =  UUID.randomUUID().toString(); // ±ß½ç±êÊ¶ Ëæ»úÉú³É
+	private static final String BOUNDARY =  UUID.randomUUID().toString(); // ï¿½ß½ï¿½ï¿½Ê¶ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private static final String PREFIX = "--";
 	private static final String LINE_END = "\r\n";
-	private static final String CONTENT_TYPE = "multipart/form-data"; // ÄÚÈÝÀàÐÍ
+	private static final String CONTENT_TYPE = "multipart/form-data"; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private UploadUtil() {
 
 	}
 	/**
-	 * µ¥ÀýÄ£Ê½»ñÈ¡ÉÏ´«¹¤¾ßÀà
+	 * ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½È¡ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 * @return
 	 */
 	public static UploadUtil getInstance() {
@@ -36,65 +36,65 @@ public class UploadUtil {
 	}
 
 	private static final String TAG = "UploadUtil";
-	private int readTimeOut = 10 * 1000; // ¶ÁÈ¡³¬Ê±
-	private int connectTimeout = 10 * 1000; // ³¬Ê±Ê±¼ä
-	private static int requestTime = 0;	//ÇëÇóÊ¹ÓÃ¶à³¤Ê±¼ä
-	private static final String CHARSET = "utf-8"; // ÉèÖÃ±àÂë
-	public static final int UPLOAD_SUCCESS_CODE = 1; //ÉÏ´«³É¹¦
-	//ÎÄ¼þ²»´æÔÚ
+	private int readTimeOut = 10 * 1000; // ï¿½ï¿½È¡ï¿½ï¿½Ê±
+	private int connectTimeout = 10 * 1000; // ï¿½ï¿½Ê±Ê±ï¿½ï¿½
+	private static int requestTime = 0;	//ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã¶à³¤Ê±ï¿½ï¿½
+	private static final String CHARSET = "utf-8"; // ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½
+	public static final int UPLOAD_SUCCESS_CODE = 1; //ï¿½Ï´ï¿½ï¿½É¹ï¿½
+	//ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	public static final int UPLOAD_FILE_NOT_EXISTS_CODE = 2;
-	//·þÎñÆ÷³ö´í
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	public static final int UPLOAD_SERVER_ERROR_CODE = 3;
 	protected static final int WHAT_TO_UPLOAD = 1;
 	protected static final int WHAT_UPLOAD_DONE = 2;
 	
 	/**
-	 * androidÉÏ´«ÎÄ¼þµ½·þÎñÆ÷
+	 * androidï¿½Ï´ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 * 
 	 * @param filePath
-	 *            ÐèÒªÉÏ´«µÄÎÄ¼þµÄÂ·¾¶
+	 *            ï¿½ï¿½Òªï¿½Ï´ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Â·ï¿½ï¿½
 	 * @param fileKey
-	 *            ÔÚÍøÒ³ÉÏ<input type=file name=xxx/> xxx¾ÍÊÇÕâÀïµÄfileKey
+	 *            ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½<input type=file name=xxx/> xxxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fileKey
 	 * @param RequestURL
-	 *            ÇëÇóµÄURL
+	 *            ï¿½ï¿½ï¿½ï¿½ï¿½URL
 	 */
 	public void uploadFile(String filePath, String fileKey, String RequestURL,
 			Map<String, String> param) {
 		if (filePath == null) {
-			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE,"ÎÄ¼þ²»´æÔÚ");
+			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE,"ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 			return;
 		}
 		try {
 			File file = new File(filePath);
 			uploadFile(file, fileKey, RequestURL, param);
 		} catch (Exception e) {
-			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE,"ÎÄ¼þ²»´æÔÚ");
+			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE,"ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 			e.printStackTrace();
 			return;
 		}
 	}
 
 	/**
-	 * androidÉÏ´«ÎÄ¼þµ½·þÎñÆ÷
+	 * androidï¿½Ï´ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 * 
 	 * @param file
-	 *            ÐèÒªÉÏ´«µÄÎÄ¼þ
+	 *            ï¿½ï¿½Òªï¿½Ï´ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 	 * @param fileKey
-	 *            ÔÚÍøÒ³ÉÏ<input type=file name=xxx/> xxx¾ÍÊÇÕâÀïµÄfileKey
+	 *            ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½<input type=file name=xxx/> xxxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fileKey
 	 * @param RequestURL
-	 *            ÇëÇóµÄURL
+	 *            ï¿½ï¿½ï¿½ï¿½ï¿½URL
 	 */
 	public void uploadFile(final File file, final String fileKey,
 			final String RequestURL, final Map<String, String> param) {
 		if (file == null || (!file.exists())) {
-			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE,"ÎÄ¼þ²»´æÔÚ");
+			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE,"ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 			return;
 		}
 
-		Log.i(TAG, "ÇëÇóµÄURL=" + RequestURL);
-		Log.i(TAG, "ÇëÇóµÄfileName=" + file.getName());
-		Log.i(TAG, "ÇëÇóµÄfileKey=" + fileKey);
-		new Thread(new Runnable() {  //¿ªÆôÏß³ÌÉÏ´«ÎÄ¼þ
+		Log.i(TAG, "ï¿½ï¿½ï¿½ï¿½ï¿½URL=" + RequestURL);
+		Log.i(TAG, "ï¿½ï¿½ï¿½ï¿½ï¿½fileName=" + file.getName());
+		Log.i(TAG, "ï¿½ï¿½ï¿½ï¿½ï¿½fileKey=" + fileKey);
+		new Thread(new Runnable() {  //ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½ï¿½Ï´ï¿½ï¿½Ä¼ï¿½
 			 
 			public void run() {
 				toUploadFile(file, fileKey, RequestURL, param);
@@ -116,23 +116,23 @@ public class UploadUtil {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setReadTimeout(readTimeOut);
 			conn.setConnectTimeout(connectTimeout);
-			conn.setDoInput(true); // ÔÊÐíÊäÈëÁ÷
-			conn.setDoOutput(true); // ÔÊÐíÊä³öÁ÷
-			conn.setUseCaches(false); // ²»ÔÊÐíÊ¹ÓÃ»º´æ
-			conn.setRequestMethod("POST"); // ÇëÇó·½Ê½
-			conn.setRequestProperty("Charset", CHARSET); // ÉèÖÃ±àÂë
+			conn.setDoInput(true); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			conn.setDoOutput(true); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			conn.setUseCaches(false); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã»ï¿½ï¿½ï¿½
+			conn.setRequestMethod("POST"); // ï¿½ï¿½ï¿½ï¿½Ê½
+			conn.setRequestProperty("Charset", CHARSET); // ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½
 			conn.setRequestProperty("connection", "keep-alive");
 			conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
 			conn.setRequestProperty("Content-Type", CONTENT_TYPE + ";boundary=" + BOUNDARY);
 //			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			
-			//µ±ÎÄ¼þ²»Îª¿Õ£¬°ÑÎÄ¼þ°ü×°²¢ÇÒÉÏ´«
+			//ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Îªï¿½Õ£ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½
 			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
 			StringBuffer sb = null;
 			String params = "";
 			
 			/***
-			 * ÒÔÏÂÊÇÓÃÓÚÉÏ´«²ÎÊý
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½
 			 */
 			if (param != null && param.size() > 0) {
 				Iterator<String> it = param.keySet().iterator();
@@ -155,20 +155,20 @@ public class UploadUtil {
 			params = null;
 			sb = new StringBuffer();
 			/**
-			 * ÕâÀïÖØµã×¢Òâ£º nameÀïÃæµÄÖµÎª·þÎñÆ÷¶ËÐèÒªkey Ö»ÓÐÕâ¸ökey ²Å¿ÉÒÔµÃµ½¶ÔÓ¦µÄÎÄ¼þ
-			 * filenameÊÇÎÄ¼þµÄÃû×Ö£¬°üº¬ºó×ºÃûµÄ ±ÈÈç:abc.png
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½×¢ï¿½â£º nameï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªkey Ö»ï¿½ï¿½ï¿½ï¿½ï¿½key ï¿½Å¿ï¿½ï¿½ÔµÃµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ä¼ï¿½
+			 * filenameï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ºï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½:abc.png
 			 */
 			sb.append(PREFIX).append(BOUNDARY).append(LINE_END);
 			sb.append("Content-Disposition:form-data; name=\"" + fileKey
 					+ "\"; filename=\"" + file.getName() + "\"" + LINE_END);
-			sb.append("Content-Type:image/pjpeg" + LINE_END); // ÕâÀïÅäÖÃµÄContent-typeºÜÖØÒªµÄ £¬ÓÃÓÚ·þÎñÆ÷¶Ë±æ±ðÎÄ¼þµÄÀàÐÍµÄ
+			sb.append("Content-Type:image/pjpeg" + LINE_END); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Content-typeï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë±ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½
 			sb.append(LINE_END);
 			params = sb.toString();
 			sb = null;
 			
 			Log.i(TAG, file.getName()+"=" + params+"##");
 			dos.write(params.getBytes());
-			/**ÉÏ´«ÎÄ¼þ*/
+			/**ï¿½Ï´ï¿½ï¿½Ä¼ï¿½*/
 			InputStream is = new FileInputStream(file);
 			onUploadProcessListener.initUpload((int)file.length());
 			byte[] bytes = new byte[1024];
@@ -187,7 +187,7 @@ public class UploadUtil {
 			dos.flush();	
 			//dos.write(tempOutputStream.toByteArray());
 			
-			//»ñÈ¡ÏìÓ¦Âë 200=³É¹¦ µ±ÏìÓ¦³É¹¦£¬»ñÈ¡ÏìÓ¦µÄÁ÷
+			//ï¿½ï¿½È¡ï¿½ï¿½Ó¦ï¿½ï¿½ 200=ï¿½É¹ï¿½ ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½
 			int res = conn.getResponseCode();
 			responseTime = System.currentTimeMillis();
 			this.requestTime = (int) ((responseTime-requestTime)/1000);
@@ -202,46 +202,45 @@ public class UploadUtil {
 				}
 				result = sb1.toString();
 				Log.e(TAG, "result : " + result);
-				sendMessage(UPLOAD_SUCCESS_CODE, "ÉÏ´«½á¹û£º"
-						+ result);
+				sendMessage(UPLOAD_SUCCESS_CODE, result);
 				return;
 			} else {
 				Log.e(TAG, "request error");
-				sendMessage(UPLOAD_SERVER_ERROR_CODE,"ÉÏ´«Ê§°Ü£ºcode=" + res);
+				sendMessage(UPLOAD_SERVER_ERROR_CODE,"ï¿½Ï´ï¿½Ê§ï¿½Ü£ï¿½code=" + res);
 				return;
 			}
 		} catch (MalformedURLException e) {
-			sendMessage(UPLOAD_SERVER_ERROR_CODE,"ÉÏ´«Ê§°Ü£ºerror=" + e.getMessage());
+			sendMessage(UPLOAD_SERVER_ERROR_CODE,"ï¿½Ï´ï¿½Ê§ï¿½Ü£ï¿½error=" + e.getMessage());
 			e.printStackTrace();
 			return;
 		} catch (IOException e) {
-			sendMessage(UPLOAD_SERVER_ERROR_CODE,"ÉÏ´«Ê§°Ü£ºerror=" + e.getMessage());
+			sendMessage(UPLOAD_SERVER_ERROR_CODE,"ï¿½Ï´ï¿½Ê§ï¿½Ü£ï¿½error=" + e.getMessage());
 			e.printStackTrace();
 			return;
 		}
 	}
 
-	//·¢ËÍÉÏ´«½á¹û
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ï¿½
 	private void sendMessage(int responseCode,String responseMessage)
 	{
 		onUploadProcessListener.onUploadDone(responseCode, responseMessage);
 	}
 	
-	//×Ô¶¨ÒåµÄ»Øµ÷º¯Êý£¬ÓÃµ½»Øµ÷ÉÏ´«ÎÄ¼þÊÇ·ñÍê³É
+	//ï¿½Ô¶ï¿½ï¿½ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½Øµï¿½ï¿½Ï´ï¿½ï¿½Ä¼ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½
 	public static interface OnUploadProcessListener {
 		/**
-		 * ÉÏ´«ÏìÓ¦
+		 * ï¿½Ï´ï¿½ï¿½ï¿½Ó¦
 		 * @param responseCode
 		 * @param message
 		 */
 		void onUploadDone(int responseCode, String message);
 		/**
-		 * ÉÏ´«ÖÐ
+		 * ï¿½Ï´ï¿½ï¿½ï¿½
 		 * @param uploadSize
 		 */
 		void onUploadProcess(int uploadSize);
 		/**
-		 * ×¼±¸ÉÏ´«
+		 * ×¼ï¿½ï¿½ï¿½Ï´ï¿½
 		 * @param fileSize
 		 */
 		void initUpload(int fileSize);
@@ -269,7 +268,7 @@ public class UploadUtil {
 	public void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 	}
-	//»ñÈ¡ÉÏ´«Ê¹ÓÃµÄÊ±¼ä
+	//ï¿½ï¿½È¡ï¿½Ï´ï¿½Ê¹ï¿½Ãµï¿½Ê±ï¿½ï¿½
 	public static int getRequestTime() {
 		return requestTime;
 	}

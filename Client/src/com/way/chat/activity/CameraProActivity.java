@@ -1,6 +1,7 @@
 package com.way.chat.activity;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,11 +59,9 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	private static final int UPLOAD_IN_PROCESS = 5;
 	//请求服务器uri
 	//private String requestURL ="http://10.0.0.143:8888/AndroidServer/servlet/HttpServlet";
-	private static String requestURL = "http://10.0.0.147:8888/MyTest/p/file!upload";
+	private static String requestURL = "/Server/UploadFile";
 	private Button selectButton,uploadButton,back;
 	private ImageView imageView;
-	private TextView uploadImageResult;
-	static TextView txt;
 	private ProgressBar progressBar;
 	private ImageButton cramer;
 	private ImageButton imagefile;
@@ -80,10 +79,7 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
   public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.camer);
-      
-      uploadImageResult = (TextView) findViewById(R.id.uploadImageResult);
-      txt=(TextView) findViewById(R.id.txt1);
-		progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+      progressBar = (ProgressBar) findViewById(R.id.progressBar1);
       selectButton = (Button) findViewById(R.id.selectImage);
       uploadButton = (Button) findViewById(R.id.uploadImage);
       imageView = (ImageView) findViewById(R.id.imageView);
@@ -98,6 +94,7 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
       progressDialog = new ProgressDialog(this);
       application = (MyApplication) this.getApplicationContext();
       picPath = application.getCameraPath() + "/upload.jpg";
+      requestURL = "http://" + Constants.SERVER_IP + ":8080" + requestURL;
       
   }
   
@@ -228,7 +225,7 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	
 	private void toUploadFile()
 	{
-		uploadImageResult.setText("正在上传中...");
+		
 		progressDialog.setMessage("正在上传文件...");
 		/*uploadImageResult.setText("正在上传中...");
 		progressDialog.setMessage("正在请求服务器上传...");
@@ -267,13 +264,19 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 				progressBar.setProgress(msg.arg1);
 				break;
 			case UPLOAD_FILE_DONE:
-				String result = "响应码："+msg.arg1+"\n响应信息："+msg.obj+"\n耗时："+UploadUtil.getRequestTime()+"秒";
-				uploadImageResult.setText(result);
+				Toast.makeText(getApplicationContext(), "图片上传成功", 0).show();
 				break;
 			default:
 				break;
 			}
 			super.handleMessage(msg);
+			if(msg.what==UPLOAD_FILE_DONE && msg.arg1==UploadUtil.UPLOAD_SUCCESS_CODE)
+			{
+				Intent intent = new Intent(); 
+				intent.putExtra("pic_path",msg.obj+""); 
+				setResult(RESULT_OK, intent); // 设置结果数据  
+				finish();
+			}
 		}
 		
 	};
