@@ -1,7 +1,13 @@
 package com.way.chat.activity;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,10 +40,15 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SimpleAdapter;
+import android.widget.SimpleAdapter.ViewBinder;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,11 +71,8 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	//请求服务器uri
 	//private String requestURL ="http://10.0.0.143:8888/AndroidServer/servlet/HttpServlet";
 	private static String requestURL = "/Server/UploadFile";
-	private Button selectButton,uploadButton,back;
-	private ImageView imageView;
+	private Button selectButton,back;
 	private ProgressBar progressBar;
-	private ImageButton cramer;
-	private ImageButton imagefile;
 	public static String picPath = null;
 	private ProgressDialog progressDialog;
 	private Uri photoUri;
@@ -73,7 +81,11 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	//使用相册中的图片
 	public static final int SELECT_PIC_BY_PICK_PHOTO = 2;
 	private MyApplication application;
-	
+	private SimpleAdapter saMenuItem;
+	private ArrayList<HashMap<String, Object>> meumList;
+	private int pic_NO = 0;
+	private int total_pic=0;
+	private int upload_ok_pic=0;
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -81,30 +93,73 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
       setContentView(R.layout.camer);
       progressBar = (ProgressBar) findViewById(R.id.progressBar1);
       selectButton = (Button) findViewById(R.id.selectImage);
-      uploadButton = (Button) findViewById(R.id.uploadImage);
-      imageView = (ImageView) findViewById(R.id.imageView);
-      cramer=(ImageButton) findViewById(R.id.camera);   
-      imagefile=(ImageButton) findViewById(R.id.imagefile);   
       back=(Button) findViewById(R.id.back);
       back.setOnClickListener(this);
-      imagefile.setOnClickListener(this);
-      cramer.setOnClickListener(this);
       selectButton.setOnClickListener(this);
-      uploadButton.setOnClickListener(this);                		
       progressDialog = new ProgressDialog(this);
       application = (MyApplication) this.getApplicationContext();
-      picPath = application.getCameraPath() + "/upload.jpg";
+      picPath = application.getCameraPath() + "/upload";
+      //picPath = "/mnt/sdcard/children/camerapicpath/upload";
       requestURL = "http://" + Constants.SERVER_IP + ":8080" + requestURL;
-      
+      init_pic_grid();
   }
   
-  private void takePhoto() {
+  private void init_pic_grid()
+  {
+	    GridView gridview = (GridView) findViewById(R.id.GridView_upload_pic); 
+		meumList = new ArrayList<HashMap<String, Object>>(); 
+		
+		saMenuItem = new SimpleAdapter(this, 
+		  meumList, //数据源 
+		  R.layout.upload_pic_item, //xml实现 
+		  new String[]{"ItemImage","ItemText"}, //对应map的Key 
+		  new int[]{R.id.ItemImage,R.id.ItemText});  //对应R的Id 
+		
+		saMenuItem.setViewBinder(new ViewBinder(){    
+		    
+	          public boolean setViewValue(View view, Object data,     
+	                  String textRepresentation) {     
+	                //判断是否为我们要处理的对象      
+	                if(view instanceof ImageView && data instanceof Bitmap){     
+	                  ImageView iv = (ImageView) view;     
+	                  iv.setImageBitmap((Bitmap) data);     
+	                  return true;     
+	                }else     
+	                return false;     
+	              }     
+	    
+	        
+	      });   
+		//添加Item到网格中 
+		gridview.setAdapter(saMenuItem); 
+		gridview.setOnItemClickListener(new OnItemClickListener() { 
+				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) { 
+					System.out.println("click index:"+arg2); 
+					HashMap<String, Object> item=(HashMap<String, Object>) arg0.getItemAtPosition(arg2);  
+					if(((String)item.get("ItemText")).equals(pic_NO+""))
+						takePhoto(picPath + (String)item.get("ItemText") + ".jpg");
+					else
+					{}
+				} 
+			}	 
+		); 
+		
+		HashMap<String, Object> map = new HashMap<String, Object>(); 
+		map.put("ItemImage", R.drawable.camera_pic); 
+		map.put("ItemText", "" + pic_NO); 
+		meumList.add(map); 
+	
+		saMenuItem.notifyDataSetChanged();
+  }
+  
+ 
+  private void takePhoto(String picpathstr) {
 		//执行拍照前，应该先判断SD卡是否存在
 		
 		String SDState = Environment.getExternalStorageState();
 		if(SDState.equals(Environment.MEDIA_MOUNTED))
 		{
-			File file = new File(picPath);  
+			File file = new File(picpathstr);  
 			
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//"android.media.action.IMAGE_CAPTURE"
 			/***
@@ -134,32 +189,22 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.selectImage:
-			Intent intent = new Intent(this,SystemCatalogActivity.class);
-			startActivity(intent);
-			break;
-		case R.id.uploadImage:
-			if(picPath!=null)
-			{
+			total_pic=this.meumList.size();
+			if(total_pic>1)
+			{				
+				this.upload_ok_pic=0;
 				handler.sendEmptyMessage(TO_UPLOAD_FILE);
 			}else{
 				Toast.makeText(this, "上传的文件路径出错", Toast.LENGTH_LONG).show();
 			}
 			break;
-		case R.id.camera:
-			takePhoto();
-			break;
-		case R.id.imagefile:
-			pickPhoto();
-			break;
 		case R.id.back:
-			imageView.setImageBitmap(null);
 			finish();
 			break;
 		}
 	}
 	@Override
 	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
-		imageView.setImageBitmap(null);
 		finish();// 再结束自己
 	}
 	@Override
@@ -208,6 +253,23 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 				cursor.close();
 			}
 			Log.i(TAG, "imagePath = "+picPath);
+		}else if(requestCode == SELECT_PIC_BY_TACK_PHOTO)
+		{
+			meumList.remove(meumList.size()-1);
+			
+			HashMap<String, Object> map = new HashMap<String, Object>(); 
+			map.put("ItemImage", BitmapFactory.decodeFile(picPath + pic_NO + ".jpg")); 
+			map.put("ItemText", "" + pic_NO); 
+			pic_NO++;
+			meumList.add(map);
+			
+			map = new HashMap<String, Object>(); 
+			map.put("ItemImage",  R.drawable.camera_pic); 
+			map.put("ItemText", "" + pic_NO); 
+			meumList.add(map);
+			
+			saMenuItem.notifyDataSetChanged();
+			
 		}
 	}
 	/**
@@ -247,12 +309,15 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("orderId", "111");
-		uploadUtil.uploadFile( picPath,fileKey, requestURL,params);
+		String picstr=(String)((HashMap<String, Object>)this.meumList.get(0)).get("ItemText");
+		picstr=picPath + picstr + ".jpg";
+		uploadUtil.uploadFile(picstr ,fileKey, requestURL,params);
 	}
 	
 	private Handler handler = new Handler(){
 		@Override
 		public void handleMessage(Message msg) {
+			int  next=0;
 			switch (msg.what) {
 			case TO_UPLOAD_FILE:
 				toUploadFile();
@@ -264,7 +329,7 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 				progressBar.setProgress(msg.arg1);
 				break;
 			case UPLOAD_FILE_DONE:
-				Toast.makeText(getApplicationContext(), "图片上传成功", 0).show();
+				next=onUploadOK();
 				break;
 			default:
 				break;
@@ -272,15 +337,30 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 			super.handleMessage(msg);
 			if(msg.what==UPLOAD_FILE_DONE && msg.arg1==UploadUtil.UPLOAD_SUCCESS_CODE)
 			{
-				Intent intent = new Intent(); 
-				intent.putExtra("pic_path",msg.obj+""); 
-				setResult(RESULT_OK, intent); // 设置结果数据  
-				finish();
+				if(next==1)
+				{	
+					Intent intent = new Intent(); 
+					intent.putExtra("pic_path",msg.obj+""); 
+					System.out.println(msg.obj+"");
+					setResult(RESULT_OK, intent); // 设置结果数据  
+					finish();
+				}else if(next>1)
+				{
+					handler.sendEmptyMessage(TO_UPLOAD_FILE);
+				}
+					
 			}
 		}
 		
 	};
 
+	public int onUploadOK() {
+		this.upload_ok_pic++;
+		Toast.makeText(getApplicationContext(), "成功上传"+ upload_ok_pic +"/" + (this.total_pic-1), 0).show();
+		this.meumList.remove(0);
+		saMenuItem.notifyDataSetChanged();
+		return meumList.size();
+	}
 	 
 	public void onUploadProcess(int uploadSize) {
 		Message msg = Message.obtain();
@@ -298,9 +378,6 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	
 	@Override
 	protected void onResume() {
-		imageView.setImageBitmap(null);
-		Bitmap bm = BitmapFactory.decodeFile(picPath);
-		imageView.setImageBitmap(bm);
 		super.onResume();
 	}
 	
