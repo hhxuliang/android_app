@@ -18,9 +18,11 @@ import com.way.chat.activity.R;
 import com.way.chat.activity.R.id;
 import com.way.chat.activity.R.layout;
 import com.way.chat.common.util.Constants;
+import com.way.util.DialogFactory;
 import com.way.util.SharePreferenceUtil;
 import com.yzi.util.UploadUtil;
 import com.yzi.util.UploadUtil.OnUploadProcessListener;
+import com.zoom.ZoomImageView;
 
 
 import android.app.Activity;
@@ -28,6 +30,7 @@ import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -46,6 +49,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -75,11 +79,13 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	//private String requestURL ="http://10.0.0.143:8888/AndroidServer/servlet/HttpServlet";
 	private static String requestURL = "";
 	private Button selectButton,back;
+	private EditText progressText;
 	private ProgressBar progressBar;
 	public static String picPath = null;
 	private String pic_path_save = null;
 	private ProgressDialog progressDialog;
 	private Uri photoUri;
+	private Context ct = null;
 	//使用照相机拍照获取图片
 	public static final int SELECT_PIC_BY_TACK_PHOTO = 1;
 	//使用相册中的图片
@@ -98,7 +104,8 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
       super.onCreate(savedInstanceState);
       setContentView(R.layout.camer);
       progressBar = (ProgressBar) findViewById(R.id.progressBar1);
-      selectButton = (Button) findViewById(R.id.selectImage);
+      progressText = (EditText) findViewById(R.id.progressText);
+      selectButton = (Button) findViewById(R.id.uploadImage);
       back=(Button) findViewById(R.id.back);
       back.setOnClickListener(this);
       selectButton.setOnClickListener(this);
@@ -110,6 +117,9 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
       requestURL = "http://" + Constants.SERVER_IP + ":8080" +  "/Server/UploadFile";
       ap=new ArrayList<String>();
 	  alp=new ArrayList<String>();
+	  ct = this;
+	  progressBar.setVisibility(View.GONE);
+	  progressText.setVisibility(View.GONE);
       init_pic_grid();
   }
   
@@ -124,21 +134,20 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 		  new String[]{"ItemImage","ItemText"}, //对应map的Key 
 		  new int[]{R.id.ItemImage,R.id.ItemText});  //对应R的Id 
 		
-		saMenuItem.setViewBinder(new ViewBinder(){    
+		  saMenuItem.setViewBinder(new ViewBinder(){    
 		    
 	          public boolean setViewValue(View view, Object data,     
-	                  String textRepresentation) {     
-	                //判断是否为我们要处理的对象      
-	                if(view instanceof ImageView && data instanceof Bitmap){     
+                  String textRepresentation) {     
+                  //判断是否为我们要处理的对象      
+                  if(view instanceof ImageView && data instanceof Bitmap){     
 	                  ImageView iv = (ImageView) view;     
-	                  iv.setImageBitmap((Bitmap) data);     
+	                  iv.setImageBitmap((Bitmap) data); 
+	                  
 	                  return true;     
 	                }else     
 	                return false;     
 	              }     
-	    
-	        
-	      });   
+          });   
 		//添加Item到网格中 
 		gridview.setAdapter(saMenuItem); 
 		gridview.setOnItemClickListener(new OnItemClickListener() { 
@@ -148,7 +157,14 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 					if(((String)item.get("ItemText")).equals(pic_NO+""))
 						takePhoto(picPath + (String)item.get("ItemText") + ".jpg");
 					else
-					{}
+					{
+
+						ImageView image = (ImageView)arg1.findViewById(R.id.ItemImage);
+						image.setDrawingCacheEnabled(true);
+      	                Bitmap bitmap = image.getDrawingCache();
+  	                    ZoomImageView zoom = new ZoomImageView(ct, bitmap);
+  		                zoom.showZoomView();
+      	            }
 				} 
 			}	 
 		); 
@@ -198,15 +214,24 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	}
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.selectImage:
+		case R.id.uploadImage:
 			total_pic=this.meumList.size();
-			if(total_pic>1)
+			if(total_pic>1 && total_pic<=7)
 			{				
 				ap.clear();
 				alp.clear();
 				this.upload_ok_pic=0;
+				progressText.setText("0/"+(total_pic-1));
+				progressBar.setVisibility(View.VISIBLE);
+				progressText.setVisibility(View.VISIBLE);
 				handler.sendEmptyMessage(TO_UPLOAD_FILE);
-			}else{
+			}else if( total_pic > 7)
+			{
+				DialogFactory.ToastDialog(this, "发送照片",
+						"一次最多只能发送6张照片！请删除部分照片后发送！");
+			}
+			else
+			{
 				Toast.makeText(this, "上传的文件路径出错", Toast.LENGTH_LONG).show();
 			}
 			break;
@@ -368,6 +393,7 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 					intent.putStringArrayListExtra("pic_local_path", alp);
 					System.out.println(msg.obj+"");
 					setResult(RESULT_OK, intent); // 设置结果数据  
+					Toast.makeText(getApplicationContext(), "发送完成！", 0).show();
 					finish();
 				}else if(next>1)
 				{
@@ -407,7 +433,8 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 		this.upload_ok_pic++;
 		if(statu)
 		{
-			Toast.makeText(getApplicationContext(), "成功上传"+ upload_ok_pic +"/" + (this.total_pic-1), 0).show();
+			String uploadmsg=  upload_ok_pic +"/" + (this.total_pic-1);
+			progressText.setText(uploadmsg);
 			String picoldstr=(String)((HashMap<String, Object>)this.meumList.get(0)).get("ItemText");
 			picoldstr=picPath + picoldstr + ".jpg";
 			String picnewstr=(String)((HashMap<String, Object>)this.meumList.get(0)).get("ItemPath");
@@ -418,8 +445,6 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 		else
 		{
 			Toast.makeText(getApplicationContext(), "失败上传"+ upload_ok_pic +"/" + (this.total_pic-1), 0).show();
-			
-			
 		}
 		this.meumList.remove(0);
 		saMenuItem.notifyDataSetChanged();
