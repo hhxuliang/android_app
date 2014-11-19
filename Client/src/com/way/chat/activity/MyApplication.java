@@ -55,6 +55,9 @@ public class MyApplication extends Application {
 	public String getCameraPath(){
 		return home_path + "/camerapicpath";
 	}
+	public String getPicPath(){
+		return home_path + "/picpath";
+	}
 	public UserDB getUserDB() {
 		return userDB;
 	}

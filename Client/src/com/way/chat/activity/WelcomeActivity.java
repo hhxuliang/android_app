@@ -61,6 +61,12 @@ public class WelcomeActivity extends Activity {
 	                //若不存在，创建目录，可以在应用启动的时候创建
 	            	 path_camera_f.mkdirs();
 	             }
+	             String path_pic=application.getPicPath();
+	             File path_pic_f = new File(path_pic);
+	             if (!path_pic_f.exists()) {
+	                //若不存在，创建目录，可以在应用启动的时候创建
+	            	 path_pic_f.mkdirs();
+	             }
 	     }
 	     else{
 	      Toast.makeText(this,"内存卡不存在...", Toast.LENGTH_LONG).show();

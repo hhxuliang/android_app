@@ -1,12 +1,15 @@
 package com.way.chat.activity;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,10 +73,11 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	private static final int UPLOAD_IN_PROCESS = 5;
 	//请求服务器uri
 	//private String requestURL ="http://10.0.0.143:8888/AndroidServer/servlet/HttpServlet";
-	private static String requestURL = "/Server/UploadFile";
+	private static String requestURL = "";
 	private Button selectButton,back;
 	private ProgressBar progressBar;
 	public static String picPath = null;
+	private String pic_path_save = null;
 	private ProgressDialog progressDialog;
 	private Uri photoUri;
 	//使用照相机拍照获取图片
@@ -86,6 +90,8 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 	private int pic_NO = 0;
 	private int total_pic=0;
 	private int upload_ok_pic=0;
+	ArrayList<String> ap;
+	ArrayList<String> alp;
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -99,8 +105,11 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
       progressDialog = new ProgressDialog(this);
       application = (MyApplication) this.getApplicationContext();
       picPath = application.getCameraPath() + "/upload";
+      pic_path_save = application.getPicPath();
       //picPath = "/mnt/sdcard/children/camerapicpath/upload";
-      requestURL = "http://" + Constants.SERVER_IP + ":8080" + requestURL;
+      requestURL = "http://" + Constants.SERVER_IP + ":8080" +  "/Server/UploadFile";
+      ap=new ArrayList<String>();
+	  alp=new ArrayList<String>();
       init_pic_grid();
   }
   
@@ -143,10 +152,11 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 				} 
 			}	 
 		); 
-		
+		 
 		HashMap<String, Object> map = new HashMap<String, Object>(); 
 		map.put("ItemImage", R.drawable.camera_pic); 
 		map.put("ItemText", "" + pic_NO); 
+		map.put("ItemPath", ""); 
 		meumList.add(map); 
 	
 		saMenuItem.notifyDataSetChanged();
@@ -192,6 +202,8 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 			total_pic=this.meumList.size();
 			if(total_pic>1)
 			{				
+				ap.clear();
+				alp.clear();
 				this.upload_ok_pic=0;
 				handler.sendEmptyMessage(TO_UPLOAD_FILE);
 			}else{
@@ -256,16 +268,19 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 		}else if(requestCode == SELECT_PIC_BY_TACK_PHOTO)
 		{
 			meumList.remove(meumList.size()-1);
-			
+			SimpleDateFormat    sDateFormat    =   new    SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");       
+			String    date_str    =    sDateFormat.format(new    java.util.Date()); 
 			HashMap<String, Object> map = new HashMap<String, Object>(); 
 			map.put("ItemImage", BitmapFactory.decodeFile(picPath + pic_NO + ".jpg")); 
 			map.put("ItemText", "" + pic_NO); 
+			map.put("ItemPath", this.pic_path_save+"/"+date_str+".jpg"); 
 			pic_NO++;
 			meumList.add(map);
 			
 			map = new HashMap<String, Object>(); 
 			map.put("ItemImage",  R.drawable.camera_pic); 
 			map.put("ItemText", "" + pic_NO); 
+			map.put("ItemPath", ""); 
 			meumList.add(map);
 			
 			saMenuItem.notifyDataSetChanged();
@@ -329,7 +344,16 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 				progressBar.setProgress(msg.arg1);
 				break;
 			case UPLOAD_FILE_DONE:
-				next=onUploadOK();
+				if(msg.arg1==UploadUtil.UPLOAD_SUCCESS_CODE)
+				{
+					
+					next=onUploadOK(true,msg.obj+"");
+					
+				}else
+				{
+					next=onUploadOK(false,"");
+				}
+				
 				break;
 			default:
 				break;
@@ -339,8 +363,9 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 			{
 				if(next==1)
 				{	
-					Intent intent = new Intent(); 
-					intent.putExtra("pic_path",msg.obj+""); 
+					Intent intent = new Intent(); 					
+					intent.putStringArrayListExtra("pic_path", ap);
+					intent.putStringArrayListExtra("pic_local_path", alp);
 					System.out.println(msg.obj+"");
 					setResult(RESULT_OK, intent); // 设置结果数据  
 					finish();
@@ -353,10 +378,49 @@ public class CameraProActivity extends Activity implements OnClickListener,OnUpl
 		}
 		
 	};
-
-	public int onUploadOK() {
+	public void copyFile(String oldPath, String newPath) {   
+       try {   
+           int bytesum = 0;   
+           int byteread = 0;   
+           File oldfile = new File(oldPath);   
+           if (oldfile.exists()) { //文件存在时   
+               InputStream inStream = new FileInputStream(oldPath); //读入原文件   
+               FileOutputStream fs = new FileOutputStream(newPath);   
+               byte[] buffer = new byte[1444];   
+               int length;   
+               while ( (byteread = inStream.read(buffer)) != -1) {   
+                   bytesum += byteread; //字节数 文件大小   
+                   System.out.println(bytesum);   
+                   fs.write(buffer, 0, byteread);   
+               }   
+               inStream.close();   
+           }   
+       }   
+       catch (Exception e) {   
+           System.out.println("复制单个文件操作出错");   
+           e.printStackTrace();   
+  
+       }   
+  
+   }
+	public int onUploadOK(boolean statu,String url_path) {
 		this.upload_ok_pic++;
-		Toast.makeText(getApplicationContext(), "成功上传"+ upload_ok_pic +"/" + (this.total_pic-1), 0).show();
+		if(statu)
+		{
+			Toast.makeText(getApplicationContext(), "成功上传"+ upload_ok_pic +"/" + (this.total_pic-1), 0).show();
+			String picoldstr=(String)((HashMap<String, Object>)this.meumList.get(0)).get("ItemText");
+			picoldstr=picPath + picoldstr + ".jpg";
+			String picnewstr=(String)((HashMap<String, Object>)this.meumList.get(0)).get("ItemPath");
+			copyFile(picoldstr,picnewstr);
+			alp.add(picnewstr);
+			ap.add(url_path);
+		}
+		else
+		{
+			Toast.makeText(getApplicationContext(), "失败上传"+ upload_ok_pic +"/" + (this.total_pic-1), 0).show();
+			
+			
+		}
 		this.meumList.remove(0);
 		saMenuItem.notifyDataSetChanged();
 		return meumList.size();

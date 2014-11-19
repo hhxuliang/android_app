@@ -12,6 +12,8 @@ public class ChatMsgEntity {
 	private String message;// 消息内容
 	private int img;
 	private boolean isComMeg = true;// 是否为收到的消息
+	private boolean is_pic = false;
+	private String pic_path;
 
 	public ChatMsgEntity() {
 
@@ -27,6 +29,20 @@ public class ChatMsgEntity {
 		this.isComMeg = isComMsg;
 	}
 
+	public boolean get_is_pic() {
+		return is_pic;
+	}
+
+	public void set_is_pic(boolean ispic) {
+		this.is_pic = ispic;
+	}
+	public String getPicPath() {
+		return pic_path;
+	}
+
+	public void setPicPath(String path) {
+		this.pic_path = path;
+	}
 	public String getName() {
 		return name;
 	}

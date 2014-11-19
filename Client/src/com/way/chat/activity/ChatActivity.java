@@ -1,8 +1,15 @@
 package com.way.chat.activity;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +30,12 @@ import com.way.util.SharePreferenceUtil;
 
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -54,6 +65,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private MyApplication application;
 	private ClientOutputThread out;
 	private boolean alreadycreate;
+	private ArrayList<TranObject> msg_list = new ArrayList<TranObject>();;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -161,7 +173,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.chat_send:// 发送按钮点击事件
 			String contString = mEditTextContent.getText().toString();
-			send(contString);
+			send(contString,false,"");
 			mEditTextContent.setText("");// 清空编辑框数据
 			break;
 		case R.id.pic_send:// 发送按钮点击事件
@@ -179,15 +191,17 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	/**
 	 * 发送消息
 	 */
-	private void send(String contString) {
+	private void send(String contString,boolean is_pic,String pic_path_local) {
 		
 		if (contString.length() > 0) {
 			ChatMsgEntity entity = new ChatMsgEntity();
 			entity.setName(util.getName());
 			entity.setDate(MyDate.getDateEN());
+			entity.set_is_pic(is_pic);
 			entity.setMessage(contString);
 			entity.setImg(util.getImg());
 			entity.setMsgType(false);
+			entity.setPicPath(pic_path_local);
 
 			messageDB.saveMsg(user.getId(), entity);
 
@@ -201,6 +215,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 						TranObjectType.MESSAGE);
 				TextMessage message = new TextMessage();
 				message.setMessage(contString);
+				message.set_is_pic(is_pic);
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
 				o.setToUser(user.getId());
@@ -219,36 +234,114 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			application.getmRecentAdapter().notifyDataSetChanged();
 		}
 	}
-
+	private Handler handler = new Handler() {  
+        public void handleMessage (Message msg) {// 此方法在ui线程运行  
+            switch(msg.what) {  
+            case 1: 
+            	try{
+            		HandleMsg hmsg=(HandleMsg)msg.obj;
+            		String strpath=null;
+            		TranObject tobj=null;
+            		for(TranObject to:msg_list){
+            			TextMessage tm = (TextMessage) to.getObject();
+            			if(tm.getMessage().equals(hmsg.mPath)){
+            				tobj=to;
+            			}
+            		}
+            		if(tobj!=null)
+            		{
+            			SimpleDateFormat    sDateFormat    =   new    SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");       
+	            		String    date_str    =    sDateFormat.format(new    java.util.Date()); 
+	            		strpath=application.getPicPath()+"/" + date_str +".jpg";
+	            		saveMyBitmap(strpath,hmsg.mBitmap);
+	            		Receive_message(tobj,true,strpath);
+	            		msg_list.remove(tobj);
+            		}
+            		else
+            			Toast.makeText(ChatActivity.this, "获取图片消息对象失败!", 0)
+    					.show();
+            	}catch (IOException e) {  
+                    e.printStackTrace();  
+                } 
+            	break;   
+            }  
+        }  
+    };
+    public void saveMyBitmap(String bitName,Bitmap mBitmap) throws IOException {  
+        File f = new File(bitName);  
+        f.createNewFile();  
+        FileOutputStream fOut = null;  
+        try {  
+                fOut = new FileOutputStream(f);  
+        } catch (FileNotFoundException e) {  
+                e.printStackTrace();  
+        }  
+        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);  
+        try {  
+                fOut.flush();  
+        } catch (IOException e) {  
+                e.printStackTrace();  
+        }  
+        try {  
+                fOut.close();  
+        } catch (IOException e) {  
+                e.printStackTrace();  
+        }  
+    }  
+    class HandleMsg{
+    	public String mPath;
+    	public Bitmap mBitmap;
+    	public HandleMsg(String path,Bitmap bitmap){
+    		mPath=path;
+    		mBitmap=bitmap;
+    	}
+    }
+	class Download implements Runnable{
+		private String path=null;
+        public Download(String p){
+        	path=p;
+        }
+        
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            
+            try {
+                 
+                //byte[] data = ImageService.getImage(path);
+                URL url = new URL(path);
+                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setRequestMethod("GET");
+                con.connect();
+                if (con.getResponseCode() == 200){          
+                    InputStream is = con.getInputStream();
+                    //byte[] data = StreamTool.readStream(is);
+                    Bitmap bitmap = BitmapFactory.decodeStream(is);//(data, 0, data.length);
+                    handler.obtainMessage(1,new HandleMsg(path,bitmap)).sendToTarget();
+                }
+                //Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                //ImageView iv = (ImageView)con.findViewById(R.id.imageView1);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+             
+        }
+    }
 	@Override
 	public void getMessage(TranObject msg) {
 		// TODO Auto-generated method stub
 		switch (msg.getType()) {
 		case MESSAGE:
 			TextMessage tm = (TextMessage) msg.getObject();
-			String message = tm.getMessage();
-			ChatMsgEntity entity = new ChatMsgEntity(user.getName(),
-					MyDate.getDateEN(), message, user.getImg(), true);// 收到的消息
-			System.out.println("herris ====>"+msg.getFromUser());
-			System.out.println("herris ====>"+user.getId());
-			if (msg.getFromUser() == user.getId() || msg.getFromUser() == 0 || msg.getCrowd() == user.getId()) {// 如果是正在聊天的好友的消息，或者是服务器的消息
-				if(msg.getCrowd() == user.getId())
-				{
-					entity.setName(msg.getFromUserName());
-					entity.setImg(msg.getFromImg());
-				}
-				messageDB.saveMsg(user.getId(), entity);
-
-				mDataArrays.add(entity);
-				mAdapter.notifyDataSetChanged();
-				mListView.setSelection(mListView.getCount() - 1);
-				MediaPlayer.create(this, R.raw.msg).start();
-			} else {
-				messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
-				Toast.makeText(ChatActivity.this,
-						"您有新的消息来自：" + msg.getFromUser() + ":" + message, 0)
-						.show();// 其他好友的消息，就先提示，并保存到数据库
-				MediaPlayer.create(this, R.raw.msg).start();
+			if(!tm.get_is_pic())
+			{
+				Receive_message(msg,false,"");
+			}else
+			{
+				msg_list.add(msg);
+				new Thread(new Download(tm.getMessage())).start();
 			}
 			break;
 		case LOGIN:
@@ -267,7 +360,39 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			break;
 		}
 	}
-	
+	private void Receive_message(TranObject msg,boolean ispic,String path_pic)
+	{
+		TextMessage tm = (TextMessage) msg.getObject();
+		String message = tm.getMessage();
+		ChatMsgEntity entity = new ChatMsgEntity(user.getName(),
+				MyDate.getDateEN(), message, user.getImg(), true);// 收到的消息
+		if(tm.get_is_pic())
+		{
+			entity.set_is_pic(ispic);
+		    entity.setPicPath(path_pic);	
+		}
+		System.out.println("herris ====>"+msg.getFromUser());
+		System.out.println("herris ====>"+user.getId());
+		if (msg.getFromUser() == user.getId() || msg.getFromUser() == 0 || msg.getCrowd() == user.getId()) {// 如果是正在聊天的好友的消息，或者是服务器的消息
+			if(msg.getCrowd() == user.getId())
+			{
+				entity.setName(msg.getFromUserName());
+				entity.setImg(msg.getFromImg());
+			}
+			messageDB.saveMsg(user.getId(), entity);
+
+			mDataArrays.add(entity);
+			mAdapter.notifyDataSetChanged();
+			mListView.setSelection(mListView.getCount() - 1);
+			MediaPlayer.create(this, R.raw.msg).start();
+		} else {
+			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
+			Toast.makeText(ChatActivity.this,
+					"您有新的消息来自：" + msg.getFromUser() + ":" + message, 0)
+					.show();// 其他好友的消息，就先提示，并保存到数据库
+			MediaPlayer.create(this, R.raw.msg).start();
+		}
+	}
 	@Override 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
 	{ 
@@ -275,9 +400,19 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		// resultCode用于区分某种业务的执行情况  
 		if (1 == requestCode && RESULT_OK == resultCode) 
 		{ 
-			String result = data.getStringExtra("pic_path"); 
-			send(result);
-			
+			ArrayList<String> stringList = (ArrayList<String>) data.getStringArrayListExtra("pic_path"); 
+			ArrayList<String> stringList_local = (ArrayList<String>) data.getStringArrayListExtra("pic_local_path");
+			if(stringList.size()!=stringList_local.size())
+			{
+				Toast.makeText(ChatActivity.this, "Error upload path" +stringList.size() + "   "+stringList_local.size(), 0)
+				.show();
+			}
+			for(int i=0;i<stringList.size();i++)
+			{
+				System.out.println("URL is "+ stringList.get(i));
+				System.out.println("local is "+ stringList_local.get(i));
+				send(stringList.get(i),true,stringList_local.get(i));
+			}
 		} 
 		else 
 		{ 

@@ -1,8 +1,19 @@
 package com.way.chat.activity;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.text.Html;
+import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +99,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 					.findViewById(R.id.tv_username);
 			viewHolder.tvContent = (TextView) convertView
 					.findViewById(R.id.tv_chatcontent);
+			viewHolder.tvPicture = (ImageView) convertView
+					.findViewById(R.id.imageView_chat_pic);
 			viewHolder.icon = (ImageView) convertView
 					.findViewById(R.id.iv_userhead);
 			viewHolder.isComMsg = isComMsg;
@@ -98,15 +111,31 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		}
 		viewHolder.tvSendTime.setText(entity.getDate());
 		viewHolder.tvUserName.setText(entity.getName());
-		viewHolder.tvContent.setText(entity.getMessage());
+		if(entity.get_is_pic())
+		{
+			viewHolder.tvContent.setVisibility(View.GONE);
+			viewHolder.tvPicture.setVisibility(View.VISIBLE);
+			viewHolder.tvPicture.setImageBitmap(BitmapFactory.decodeFile(entity.getPicPath())); 
+			viewHolder.tvPicture.invalidate();
+			System.out.println(entity.getPicPath());
+			
+		}
+		else
+		{
+			viewHolder.tvPicture.setVisibility(View.GONE);
+			viewHolder.tvContent.setVisibility(View.VISIBLE);
+			viewHolder.tvContent.setText(entity.getMessage());
+			
+		}
 		viewHolder.icon.setImageResource(imgs[entity.getImg()]);
 		return convertView;
 	}
-
+	
 	static class ViewHolder {
 		public TextView tvSendTime;
 		public TextView tvUserName;
 		public TextView tvContent;
+		public ImageView tvPicture;
 		public ImageView icon;
 		public boolean isComMsg = true;
 	}
