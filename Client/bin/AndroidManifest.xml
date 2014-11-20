@@ -63,7 +63,7 @@
             android:name=".ChatActivity"
             android:windowSoftInputMode="adjustResize" >
         </activity>
-        <activity android:name=".CameraProActivity"></activity>
+        <activity android:name=".CameraProActivity" android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity android:name=".SystemCatalogActivity"></activity>
         <activity android:name=".SelectPicActivity"></activity>
         <activity android:name=".PullToRefreshSampleActivity"></activity>

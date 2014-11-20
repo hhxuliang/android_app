@@ -120,8 +120,9 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
 			viewHolder.tvPicture.setImageBitmap(BitmapFactory.decodeFile(entity.getPicPath())); 
+			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
 			viewHolder.tvPicture.invalidate();
-			viewHolder.tvPicture.setOnClickListener(new OnClickListener() {
+			/*viewHolder.tvPicture.setOnClickListener(new OnClickListener() {
 	            @Override
 	            public void onClick(View v) {
 	                v.setDrawingCacheEnabled(true);
@@ -131,7 +132,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		                zoom.showZoomView();
 	                }
 	            }
-	        });
+	        });*/
 			System.out.println(entity.getPicPath());
 			
 		}
