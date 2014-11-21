@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import com.way.util.ImageProcess;
 import com.zoom.ZoomImageView;
 
 import android.content.Context;
@@ -38,6 +39,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		int IMVT_COM_MSG = 0;// 收到对方的消息
 		int IMVT_TO_MSG = 1;// 自己发送出去的消息
 	}
+
 	private Context mContext = null;
 	private static final int ITEMCOUNT = 2;// 消息类型的总数
 	private List<ChatMsgEntity> coll;// 消息对象数组
@@ -48,7 +50,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 	}
-	
+
 	public int getCount() {
 		return coll.size();
 	}
@@ -115,38 +117,39 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		}
 		viewHolder.tvSendTime.setText(entity.getDate());
 		viewHolder.tvUserName.setText(entity.getName());
-		if(entity.get_is_pic())
-		{
+		if (entity.get_is_pic()) {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
-			viewHolder.tvPicture.setImageBitmap(BitmapFactory.decodeFile(entity.getPicPath())); 
+
+			System.out.println("height is :" + MyApplication.mWindowHeight);
+			System.out.println("width is :" + MyApplication.mWindowWidth);
+			Bitmap bitmap = ImageProcess.GetBitmapByPath(mContext,
+					entity.getPicPath(), MyApplication.mWindowHeight,
+					MyApplication.mWindowWidth, 0.5);
+			viewHolder.tvPicture.setImageBitmap(bitmap);
+
 			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
 			viewHolder.tvPicture.invalidate();
-			/*viewHolder.tvPicture.setOnClickListener(new OnClickListener() {
-	            @Override
-	            public void onClick(View v) {
-	                v.setDrawingCacheEnabled(true);
-	                Bitmap bitmap = v.getDrawingCache();
-	                if(mContext!=null){
-		                ZoomImageView zoom = new ZoomImageView(mContext, bitmap);
-		                zoom.showZoomView();
-	                }
-	            }
-	        });*/
+			/*
+			 * viewHolder.tvPicture.setOnClickListener(new OnClickListener() {
+			 * 
+			 * @Override public void onClick(View v) {
+			 * v.setDrawingCacheEnabled(true); Bitmap bitmap =
+			 * v.getDrawingCache(); if(mContext!=null){ ZoomImageView zoom = new
+			 * ZoomImageView(mContext, bitmap); zoom.showZoomView(); } } });
+			 */
 			System.out.println(entity.getPicPath());
-			
-		}
-		else
-		{
+
+		} else {
 			viewHolder.tvPicture.setVisibility(View.GONE);
 			viewHolder.tvContent.setVisibility(View.VISIBLE);
 			viewHolder.tvContent.setText(entity.getMessage());
-			
+
 		}
 		viewHolder.icon.setImageResource(imgs[entity.getImg()]);
 		return convertView;
 	}
-	
+
 	static class ViewHolder {
 		public TextView tvSendTime;
 		public TextView tvUserName;

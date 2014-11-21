@@ -25,6 +25,8 @@ public class MyApplication extends Application {
 	private String home_path;
 	private String camera_path;
 	private ArrayList<String> offlinemsslist;
+	public static int mWindowHeight = 0;
+	public static int mWindowWidth = 0;
 
 	@Override
 	public void onCreate() {
@@ -38,34 +40,39 @@ public class MyApplication extends Application {
 		userDB = new UserDB(MyApplication.this);// 本地用户数据库
 		super.onCreate();
 	}
-	public ArrayList<String> getOffLineList()
-	{
+
+	public ArrayList<String> getOffLineList() {
 		return offlinemsslist;
 	}
-	public void setOffLineList(ArrayList<String> l)
-	{
+
+	public void setOffLineList(ArrayList<String> l) {
 		offlinemsslist = l;
 	}
-	public String getHomePath(){
+
+	public String getHomePath() {
 		return home_path;
 	}
-	public void setHomePath(String p){
+
+	public void setHomePath(String p) {
 		home_path = p;
 	}
-	public String getCameraPath(){
+
+	public String getCameraPath() {
 		return home_path + "/camerapicpath";
 	}
-	public String getPicPath(){
+
+	public String getPicPath() {
 		return home_path + "/picpath";
 	}
+
 	public UserDB getUserDB() {
 		return userDB;
 	}
-	
+
 	public MessageDB getMessageDB() {
 		return messageDB;
 	}
-	
+
 	public Client getClient() {
 		return client;
 	}
@@ -117,11 +124,11 @@ public class MyApplication extends Application {
 	public void setRecentNum(int recentNum) {
 		this.recentNum = recentNum;
 	}
-	public void clossDB()
-	{
-		
+
+	public void clossDB() {
+
 		if (messageDB != null)
 			messageDB.close();
-		
+
 	}
 }

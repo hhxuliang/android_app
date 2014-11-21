@@ -20,6 +20,8 @@ import com.way.chat.activity.R.id;
 import com.way.chat.activity.R.layout;
 import com.way.chat.common.util.Constants;
 import com.way.util.DialogFactory;
+import com.way.util.ImageProcess;
+import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
 import com.yzi.util.UploadUtil;
 import com.yzi.util.UploadUtil.OnUploadProcessListener;
@@ -182,15 +184,13 @@ public class CameraProActivity extends Activity implements OnClickListener,
 
 					ImageView image = (ImageView) arg1
 							.findViewById(R.id.ItemImage);
-					FileInputStream fis=null;
-					try {
-						fis = new FileInputStream(image.getContentDescription().toString());
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					if(fis!=null){
-						Bitmap bitmap = BitmapFactory.decodeStream(fis);
+
+					String picpath = image.getContentDescription().toString();
+					if (picpath != null) {
+						Bitmap bitmap = ImageProcess.GetBitmapByPath(
+								CameraProActivity.this, picpath,
+								MyApplication.mWindowHeight,
+								MyApplication.mWindowWidth, 2);
 						ZoomImageView zoom = new ZoomImageView(mContext, bitmap);
 						zoom.showZoomView();
 					}
@@ -478,11 +478,11 @@ public class CameraProActivity extends Activity implements OnClickListener,
 
 	public void newPicture(String path) {
 		mGridItemList.remove(mGridItemList.size() - 1);
-		SimpleDateFormat sDateFormat = new SimpleDateFormat(
-				"yyyy_MM_dd_hh_mm_ss_SSS");
-		String date_str = sDateFormat.format(new java.util.Date());
+		String date_str = MyDate.getDateForImageName();
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("ItemImage", BitmapFactory.decodeFile(path));
+		map.put("ItemImage", ImageProcess.GetBitmapByPath(
+				CameraProActivity.this, path, MyApplication.mWindowHeight,
+				MyApplication.mWindowWidth, 0.25));
 		map.put("ItemActualPath", path);
 		map.put("ItemText", "" + pic_NO);
 		map.put("ItemPath", this.pic_path_save + "/" + date_str + ".jpg");
@@ -542,7 +542,7 @@ public class CameraProActivity extends Activity implements OnClickListener,
 		params.put("orderId", "111");
 		String picstr = (String) ((HashMap<String, Object>) this.mGridItemList
 				.get(0)).get("ItemActualPath");
-		
+
 		uploadUtil.uploadFile(picstr, fileKey, requestURL, params);
 	}
 

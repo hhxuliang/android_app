@@ -25,6 +25,7 @@ import com.way.chat.common.util.Constants;
 import com.way.client.Client;
 import com.way.client.ClientOutputThread;
 import com.way.client.Client.ClientThread;
+import com.way.util.ImageProcess;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
@@ -146,20 +147,19 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				ImageView image = (ImageView) arg1.findViewById(R.id.imageView_chat_pic);
-				FileInputStream fis=null;
-				try {
-					fis = new FileInputStream(image.getContentDescription().toString());
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if(fis!=null){
-					Bitmap bitmap = BitmapFactory.decodeStream(fis);
-					ZoomImageView zoom = new ZoomImageView(ChatActivity.this, bitmap);
+				ImageView image = (ImageView) arg1
+						.findViewById(R.id.imageView_chat_pic);
+				String path = image.getContentDescription().toString();
+				if (path != null) {
+					Bitmap bitmap = ImageProcess.GetBitmapByPath(
+							ChatActivity.this, path,
+							MyApplication.mWindowHeight,
+							MyApplication.mWindowWidth, 2);
+					ZoomImageView zoom = new ZoomImageView(ChatActivity.this,
+							bitmap);
 					zoom.showZoomView();
 				}
-				
+
 			}
 		});
 		mBtnSend = (Button) findViewById(R.id.chat_send);
@@ -273,32 +273,20 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		public void handleMessage(Message msg) {// 此方法在ui线程运行
 			switch (msg.what) {
 			case 1:
-				try {
-					HandleMsg hmsg = (HandleMsg) msg.obj;
-					String strpath = null;
-					TranObject tobj = null;
-					for (TranObject to : msg_list) {
-						TextMessage tm = (TextMessage) to.getObject();
-						if (tm.getMessage().equals(hmsg.mPath)) {
-							tobj = to;
-						}
+				HandleMsg hmsg = (HandleMsg) msg.obj;
+				String strpath = null;
+				TranObject tobj = null;
+				for (TranObject to : msg_list) {
+					TextMessage tm = (TextMessage) to.getObject();
+					if (tm.getMessage().equals(hmsg.mPath)) {
+						tobj = to;
 					}
-					if (tobj != null) {
-						SimpleDateFormat sDateFormat = new SimpleDateFormat(
-								"yyyy_MM_dd_hh_mm_ss_SSS");
-						String date_str = sDateFormat
-								.format(new java.util.Date());
-						strpath = application.getPicPath() + "/" + date_str
-								+ ".jpg";
-						saveMyBitmap(strpath, hmsg.mBitmap);
-						Receive_message(tobj, true, strpath);
-						msg_list.remove(tobj);
-					} else
-						Toast.makeText(ChatActivity.this, "获取图片消息对象失败!", 0)
-								.show();
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
+				if (tobj != null) {
+					Receive_message(tobj, true, hmsg.mSavePath);
+					msg_list.remove(tobj);
+				} else
+					Toast.makeText(ChatActivity.this, "获取图片消息对象失败!", 0).show();
 				break;
 			}
 		}
@@ -328,11 +316,11 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 
 	class HandleMsg {
 		public String mPath;
-		public Bitmap mBitmap;
+		public String mSavePath;
 
-		public HandleMsg(String path, Bitmap bitmap) {
+		public HandleMsg(String path, String savepath) {
 			mPath = path;
-			mBitmap = bitmap;
+			mSavePath = savepath;
 		}
 	}
 
@@ -351,6 +339,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 
 				// byte[] data = ImageService.getImage(path);
 				URL url = new URL(path);
+				String savePath = null;
 				HttpURLConnection con = (HttpURLConnection) url
 						.openConnection();
 				con.setConnectTimeout(5000);
@@ -359,9 +348,21 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
 					// byte[] data = StreamTool.readStream(is);
-					Bitmap bitmap = BitmapFactory.decodeStream(is);// (data, 0,
-																	// data.length);
-					handler.obtainMessage(1, new HandleMsg(path, bitmap))
+					// Bitmap bitmap = BitmapFactory.decodeStream(is);// (data,
+					// 0,
+					// data.length);
+					savePath = application.getPicPath() + "/"
+							+ MyDate.getDateForImageName() + ".jpg";
+					FileOutputStream fos = new FileOutputStream(savePath);
+					byte[] buffer = new byte[8192];
+					int count = 0;
+					while ((count = is.read(buffer)) != -1) {
+						fos.write(buffer, 0, count);
+					}
+					fos.close();
+					is.close();
+
+					handler.obtainMessage(1, new HandleMsg(path, savePath))
 							.sendToTarget();
 				}
 				// Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0,

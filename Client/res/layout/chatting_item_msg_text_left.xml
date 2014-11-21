@@ -55,8 +55,13 @@
             android:id="@+id/imageView_chat_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tv_chatcontent"/>
+            android:paddingTop="25px" 
+            android:paddingLeft="25px"  
+            android:layout_toRightOf="@+id/tv_chatcontent"
+            android:adjustViewBounds="true"
+            android:maxHeight="250dp"
+            android:maxWidth="200dp"
+            android:scaleType="fitStart" />
 
     </RelativeLayout>
 

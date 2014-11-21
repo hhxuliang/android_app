@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -69,7 +70,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 	@Override
 	protected void onResume() {// 在onResume方法里面先判断网络是否可用，再启动服务,这样在打开网络连接之后返回当前Activity时，会重新启动服务联网，
 		super.onResume();
-		
+
 	}
 
 	public void initView() {
@@ -160,6 +161,16 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 	 * 提交账号密码信息到服务器
 	 */
 	private void submit() {
+		// 获取Android屏幕的服务
+		WindowManager wm = (WindowManager) LoginActivity.this
+				.getSystemService(LoginActivity.this.WINDOW_SERVICE);
+		// 获取屏幕的分辨率，getHeight()、getWidth已经被废弃掉了
+		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
+		MyApplication.mWindowHeight = wm.getDefaultDisplay().getHeight();
+		MyApplication.mWindowWidth = wm.getDefaultDisplay().getWidth();
+		System.out.println("height is :" + MyApplication.mWindowHeight);
+		System.out.println("width is :" + MyApplication.mWindowWidth);
+
 		String accounts = mAccounts.getText().toString();
 		String password = mPassword.getText().toString();
 		if (accounts.length() == 0 || password.length() == 0) {
@@ -193,11 +204,11 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 			switch (msg.getType()) {
 			case LOGIN:// LoginActivity只处理登录的消息
 				List<User> list = (List<User>) msg.getObject();
-				if (list!=null && list.size() > 0) {
+				if (list != null && list.size() > 0) {
 					// 保存用户信息
 					SharePreferenceUtil util = new SharePreferenceUtil(
 							LoginActivity.this, Constants.SAVE_USER);
-					util.setId(list.get(0).getId()+"");
+					util.setId(list.get(0).getId() + "");
 					util.setPasswd(mPassword.getText().toString());
 					util.setEmail(list.get(0).getEmail());
 					util.setName(list.get(0).getName());
@@ -211,12 +222,14 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 						mDialog.dismiss();
 					finish();
 					Toast.makeText(getApplicationContext(), "登录成功", 0).show();
-					if (list.get(0).getOffLineMessUser()!=null && list.get(0).getOffLineMessUser().size()>0)
-					{
-						Toast.makeText(getApplicationContext(), "你有离线的消息，请查阅！", 0).show();
-						application.setOffLineList(list.get(0).getOffLineMessUser());
+					if (list.get(0).getOffLineMessUser() != null
+							&& list.get(0).getOffLineMessUser().size() > 0) {
+						Toast.makeText(getApplicationContext(), "你有离线的消息，请查阅！",
+								0).show();
+						application.setOffLineList(list.get(0)
+								.getOffLineMessUser());
 					}
-					
+
 				} else {
 					DialogFactory.ToastDialog(LoginActivity.this, "登录",
 							"亲！您的帐号或密码错误哦");
@@ -224,7 +237,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 						mDialog.dismiss();
 				}
 				break;
-			
+
 			default:
 				break;
 			}
@@ -313,7 +326,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 							Toast.makeText(getApplicationContext(),
 									"亲！保存成功，重启生效哦", 0).show();
 							finish();
-						}else{
+						} else {
 							Toast.makeText(getApplicationContext(),
 									"亲！ip和port都不能为空哦", 0).show();
 						}
