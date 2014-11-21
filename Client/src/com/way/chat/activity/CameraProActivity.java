@@ -70,7 +70,7 @@ import android.widget.Toast;
 
 //主要用于选择文件和上传文件操作
 
-public class CameraProActivity extends Activity implements OnClickListener,
+public class CameraProActivity extends MyActivity implements OnClickListener,
 		OnUploadProcessListener {
 	private static final String TAG = "uploadImage";
 	// 去上传文件

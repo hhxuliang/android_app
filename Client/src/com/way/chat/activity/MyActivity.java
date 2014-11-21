@@ -5,10 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.way.chat.common.bean.TextMessage;
+import com.way.chat.common.bean.User;
 import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.util.Constants;
+import com.way.util.MessageDB;
+import com.way.util.MyDate;
 
 /**
  * 自定义一个抽象的MyActivity类，每个Activity都继承他，实现消息的接收（优化性能，减少代码重复）
@@ -41,7 +47,36 @@ public abstract class MyActivity extends Activity {
 	 * @param msg
 	 *            传递给子类的消息对象
 	 */
-	public abstract void getMessage(TranObject msg);
+	public void getMessage(TranObject msg){// 重写父类的方法，处理消息
+		// TODO Auto-generated method stub
+		switch (msg.getType()) {
+		case MESSAGE:
+			TextMessage tm = (TextMessage) msg.getObject();
+			String message = tm.getMessage();
+			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
+					message, -1, true);// 收到的消息
+			MessageDB messageDB = new MessageDB(this);
+			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
+			Toast.makeText(MyActivity.this,
+					"亲！新消息哦 " + msg.getFromUser() + ":" + message, 0).show();// 提示用户
+			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			break;
+		case LOGIN:
+			User loginUser = (User) msg.getObject();
+			Toast.makeText(MyActivity.this,
+					"亲！" + loginUser.getId() + "上线了哦", 0).show();
+			MediaPlayer.create(this, R.raw.msg).start();
+			break;
+		case LOGOUT:
+			User logoutUser = (User) msg.getObject();
+			Toast.makeText(MyActivity.this,
+					"亲！" + logoutUser.getId() + "下线了哦", 0).show();
+			MediaPlayer.create(this, R.raw.msg).start();
+			break;
+		default:
+			break;
+		}
+	}
 
 	/**
 	 * 子类直接调用这个方法关闭应用
