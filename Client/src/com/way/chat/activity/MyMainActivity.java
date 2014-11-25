@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 
 public class MyMainActivity extends MyActivity {
 	/** Called when the activity is first created. */
@@ -47,9 +48,37 @@ public class MyMainActivity extends MyActivity {
 			}
 		});
 	}
-
+	@Override
+	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
 	@Override
 	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
+		Dialog alertDialog = new AlertDialog.Builder(MyMainActivity.this)
+				.setTitle("选择")
+				.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						exitsys();
+					}
+				})
+				.setNegativeButton("后台运行",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method stub
+								backRun();
+							}
+						}).create();
+		alertDialog.show();
+	}
+
+	public void backRun() {
 		// TODO Auto-generated method stub
 		// 发送广播，通知服务，已进入后台运行
 		Intent i = new Intent();
@@ -61,42 +90,15 @@ public class MyMainActivity extends MyActivity {
 		finish();// 再结束自己
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		mi.inflate(R.menu.mymainactivity, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	// 菜单选项添加事件处理
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.exit:
-			exitDialog(MyMainActivity.this, "提示", "亲！您真的要退出吗？");
-			break;
-		default:
-			break;
+	private void exitsys() {
+		// 关闭服务
+		application.clossDB();
+		if (application.isClientStart()) {
+			Intent service = new Intent(MyMainActivity.this,
+					GetMsgService.class);
+			stopService(service);
 		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	// 完全退出提示窗
-	private void exitDialog(Context context, String title, String msg) {
-		new AlertDialog.Builder(context).setTitle(title).setMessage(msg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// 关闭服务
-						application.clossDB();
-						if (application.isClientStart()) {
-							Intent service = new Intent(MyMainActivity.this,
-									GetMsgService.class);
-							stopService(service);
-						}
-						close();// 父类关闭方法
-					}
-				}).setNegativeButton("取消", null).create().show();
+		close();// 父类关闭方法
 	}
 
 }

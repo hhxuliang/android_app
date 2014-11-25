@@ -40,16 +40,20 @@ public abstract class MyActivity extends Activity {
 			if (msg != null) {// 如果不是空，说明是消息广播
 				System.out.println("MyActivity:" + msg.getFromUser());
 				getMessage(msg);// 把收到的消息传递给子类
-			} 
-			if(hm!=null)
-			{
+			} else if (hm != null) {
 				getPicUpdate(hm);
+			} else{
+				unregisterReceiver(this);
+				close();
 			}
+				
 		}
 	};
-	public void getPicUpdate(HandleMsg hm){
-		
+
+	public void getPicUpdate(HandleMsg hm) {
+
 	}
+
 	/**
 	 * 抽象方法，用于子类处理消息，
 	 * 
@@ -92,6 +96,11 @@ public abstract class MyActivity extends Activity {
 			startService(service);
 		}
 		new SharePreferenceUtil(this, Constants.SAVE_USER).setIsStart(false);
+		NotificationManager manager = application.getmNotificationManager();
+		if (manager != null) {
+			manager.cancel(Constants.NOTIFY_ID);
+			application.setNewMsgNum(0);// 把消息数目置0
+		}
 
 	}
 
@@ -106,6 +115,7 @@ public abstract class MyActivity extends Activity {
 		i.setAction(Constants.ACTION);
 		sendBroadcast(i);
 		finish();
+		System.exit(0);
 	}
 
 	@Override

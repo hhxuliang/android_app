@@ -43,7 +43,9 @@ public class MyApplication extends Application {
 		userDB = new UserDB(MyApplication.this);// 本地用户数据库
 		super.onCreate();
 	}
-	
+	public HashMap<String, String> getNeedRefreshMap(){
+		return mNeedRefresh;
+	}
 	public boolean needRefresh(String uidstr){
 		if (mNeedRefresh.get(uidstr)==null)
 		{

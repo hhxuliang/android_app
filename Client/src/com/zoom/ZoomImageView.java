@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
 
 public class ZoomImageView {
 	private PopupWindow popupWindow;
@@ -74,6 +75,12 @@ public class ZoomImageView {
 		popupWindow.setAnimationStyle(R.style.AnimationPop);
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.setOnDismissListener(new OnDismissListener(){
+            @Override
+            public void onDismiss() {
+            	imageView.setImageBitmap(null);
+            }
+        });
 		layout.setFocusable(true);
 		layout.setFocusableInTouchMode(true);
 		layout.setBackgroundColor(Color.BLACK);

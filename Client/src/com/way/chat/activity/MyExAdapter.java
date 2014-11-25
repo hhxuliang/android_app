@@ -1,5 +1,6 @@
 package com.way.chat.activity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -39,9 +40,14 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 		this.offlineuserid = ls;
 	}
 	public void addOffLineUserid(String l){
+		if(offlineuserid==null)
+			offlineuserid= new ArrayList<String>();
 		offlineuserid.add(l);
 	}
-
+	public void removeOffLineUserid(String l){
+		if(offlineuserid!=null)
+			offlineuserid.remove(l);
+	}
 	// 得到大组成员的view
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
@@ -119,7 +125,6 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				if (s.equals(id))
 				{
 					icon_more.setVisibility(View.VISIBLE );
-					icon_more.setImageResource(imgs_more[0]);
 				}
 			}
 		}
@@ -135,6 +140,7 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				u.setImg(img);
 				u.setIsCrowd(iscrowd);
 				System.out.println("asdfasdfasdf:"+iscrowd);
+				removeOffLineUserid(id);
 				Intent intent = new Intent(context, ChatActivity.class);
 				intent.putExtra("user", u);
 				context.startActivity(intent);

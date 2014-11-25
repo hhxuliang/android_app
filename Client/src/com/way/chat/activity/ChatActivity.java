@@ -129,6 +129,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		System.out.println("resume     resume" + user.getId() );
 		if (application.needRefresh(user.getId() + ""))
 			refreshData();
+		mListView.setSelection(mListView.getCount() - 1);
 	}
 
 	public void getOffLineMess() {
@@ -170,7 +171,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 					Bitmap bitmap = ImageProcess.GetBitmapByPath(
 							ChatActivity.this, path,
 							MyApplication.mWindowHeight,
-							MyApplication.mWindowWidth, 2);
+							MyApplication.mWindowWidth, 1.5);
 					int degree = ImageProcess.getBitmapDegree(path);
 					bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
 					ZoomImageView zoom = new ZoomImageView(ChatActivity.this,
@@ -187,7 +188,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		mBtnSendPic = (Button) findViewById(R.id.pic_send);
 		mBtnSendPic.setOnClickListener(this);
 		mFriendName = (TextView) findViewById(R.id.chat_name);
-		mFriendName.setText(util.getName());
+		mFriendName.setText(user.getName());
 		mEditTextContent = (EditText) findViewById(R.id.chat_editmessage);
 	}
 

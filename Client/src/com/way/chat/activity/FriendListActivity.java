@@ -1,8 +1,11 @@
 package com.way.chat.activity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import android.app.AlertDialog;
@@ -60,8 +63,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	private static final int PAGE3 = 2;// 页面3
 	private List<GroupFriend> group;// 需要传递给适配器的数据
 	private List<GroupFriend> group_crowd;
-	//private String[] groupName = { "我的好友", "我的同学", "我的家人" };// 大组成员名
-	//List<String> groupName;
+	// private String[] groupName = { "我的好友", "我的同学", "我的家人" };// 大组成员名
+	// List<String> groupName;
 	private SharePreferenceUtil util;
 	private UserDB userDB;// 保存好友列表数据库对象
 	private MessageDB messageDB;// 消息数据库对象
@@ -113,14 +116,9 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		// TODO Auto-generated method stub
 		super.onResume();
 		newNum = application.getRecentNum();// 从新获取一下全局变量
-		NotificationManager manager = application.getmNotificationManager();
-		if (manager != null) {
-			manager.cancel(Constants.NOTIFY_ID);
-			application.setNewMsgNum(0);// 把消息数目置0
-			application.getmRecentAdapter().notifyDataSetChanged();
-		}
 		
-		
+		application.getmRecentAdapter().notifyDataSetChanged();
+		updateUserState();
 	}
 
 	/**
@@ -131,7 +129,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		messageDB = new MessageDB(this);// 本地消息数据库
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 
-		if (list!=null && list.size()>0) list.clear();
+		if (list != null && list.size() > 0)
+			list.clear();
 		list = userDB.getUser();
 		initListViewData(list);
 	}
@@ -145,70 +144,59 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	private void initListViewData(List<User> list) {
 		group = new ArrayList<GroupFriend>();// 实例化
 		group_crowd = new ArrayList<GroupFriend>();// 实例化
-		
-		GroupFriend g_info=null;
+
+		GroupFriend g_info = null;
 		for (User u : list) {
-			boolean findG=false;
-			if(u.getIsCrowd()==1)
-			{
-				for (GroupFriend g : group_crowd)
-				{	
-					if (u.getGroup().equals(g.getGroupName()))
-					{
+			boolean findG = false;
+			if (u.getIsCrowd() == 1) {
+				for (GroupFriend g : group_crowd) {
+					if (u.getGroup().equals(g.getGroupName())) {
 						g_info = g;
-						findG=true;
+						findG = true;
 						break;
 					}
 				}
-				System.out.println("group_crowd name is " + u.getGroup() + findG);
-				if(findG==false)
-				{
+				System.out.println("group_crowd name is " + u.getGroup()
+						+ findG);
+				if (findG == false) {
 					List<User> child = new ArrayList<User>();// 装小组成员的list
 					child.add(u);
 					GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
 					group_crowd.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
-					//group_crowd.add(groupInfo);
+					// group_crowd.add(groupInfo);
+				} else {
+					if (g_info != null)
+						g_info.getGroupChild().add(u);
 				}
-				else
-				{
-					if(g_info!=null) g_info.getGroupChild().add(u);
-				}
-			}	
-			else
-			{
-				for (GroupFriend g : group)
-				{	
-					if (u.getGroup().equals(g.getGroupName()))
-					{
+			} else {
+				for (GroupFriend g : group) {
+					if (u.getGroup().equals(g.getGroupName())) {
 						g_info = g;
-						findG=true;
+						findG = true;
 						break;
 					}
 				}
 				System.out.println("group name is " + u.getGroup() + findG);
-				if(findG==false)
-				{
+				if (findG == false) {
 					List<User> child = new ArrayList<User>();// 装小组成员的list
 					child.add(u);
 					GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
 					group.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
-					//group_crowd.add(groupInfo);
-				}
-				else
-				{
-					if(g_info!=null) g_info.getGroupChild().add(u);
+					// group_crowd.add(groupInfo);
+				} else {
+					if (g_info != null)
+						g_info.getGroupChild().add(u);
 				}
 			}
 		}
-		
-		
+
 	}
-	
+
 	/**
 	 * 增量添加好友数据，
 	 * 
 	 * @param list
-	 *            
+	 * 
 	 */
 	private void updateListViewData(List<User> list) {
 		initListViewData(list);
@@ -272,7 +260,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		// 下面是处理好友列表界面处理
 		myListView = (MyListView) lay2.findViewById(R.id.tab2_listView);
-		myExAdapter = new MyExAdapter(this, group,application.getOffLineList());
+		myExAdapter = new MyExAdapter(this, group, application.getOffLineList());
 		myListView.setAdapter(myExAdapter);
 		myListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
 		myListView.setDivider(null);// 设置图片可拉伸的
@@ -281,14 +269,15 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		// 下面是群组界面处理
 		mGroupListView = (MyListView) lay3.findViewById(R.id.tab3_listView);
-		
-		myExAdapter_crowd = new MyExAdapter(this, group_crowd,application.getOffLineList());
+
+		myExAdapter_crowd = new MyExAdapter(this, group_crowd,
+				application.getOffLineList());
 		mGroupListView.setAdapter(myExAdapter_crowd);
 		mGroupListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
 		mGroupListView.setDivider(null);// 设置图片可拉伸的
 		mGroupListView.setFocusable(true);// 聚焦才可以下拉刷新
 		mGroupListView.setonRefreshListener(new MyRefreshListener());
-		
+
 	}
 
 	@Override
@@ -320,7 +309,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.friend_menu_add:
-			//Toast.makeText(getApplicationContext(), "亲！此功能暂未实现哦", 0).show();
+			// Toast.makeText(getApplicationContext(), "亲！此功能暂未实现哦", 0).show();
 			goNewFriend();
 			break;
 		default:
@@ -329,41 +318,54 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
-	{ 
-		// requestCode用于区分业务  
-		// resultCode用于区分某种业务的执行情况  
-		if (1 == requestCode && RESULT_OK == resultCode) 
-		{ 
-			List<User> result = (List<User>) data.getSerializableExtra("newfriends"); 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// requestCode用于区分业务
+		// resultCode用于区分某种业务的执行情况
+		if (1 == requestCode && RESULT_OK == resultCode) {
+			List<User> result = (List<User>) data
+					.getSerializableExtra("newfriends");
 			userDB.addUser(result);
 			updateListViewData(result);
 			myExAdapter.notifyDataSetChanged();
 
-			//Toast.makeText(this.getBaseContext(), result, Toast.LENGTH_SHORT).show(); 
-		} 
-		else 
-		{ 
-//			Toast.makeText(this.getBaseContext(), "无返回值", Toast.LENGTH_SHORT).show(); 
-		} 
-	} 
+			// Toast.makeText(this.getBaseContext(), result,
+			// Toast.LENGTH_SHORT).show();
+		} else {
+			// Toast.makeText(this.getBaseContext(), "无返回值",
+			// Toast.LENGTH_SHORT).show();
+		}
+	}
+
 	/**
 	 * 进入登陆界面
 	 */
 	private void goNewFriend() {
 		Intent intent = new Intent();
 		intent.setClass(this, Newfriends.class);
-		startActivityForResult(intent,1);
-		//finish();
+		startActivityForResult(intent, 1);
+		// finish();
 	}
-	
+	public void updateUserState(){
+		HashMap<String, String> map = application.getNeedRefreshMap();
+		
+		Iterator<java.util.Map.Entry<String, String>> ite = map.entrySet()
+                .iterator();
+        java.util.Map.Entry<String, String> entry;
+        while (ite.hasNext()) {
+            entry = ite.next();
+            System.out.println((String)entry.getKey());
+            myExAdapter.addOffLineUserid((String)entry.getKey());
+        }
+        myExAdapter.notifyDataSetChanged();
+	}
 	@Override
 	public void receiveMsg(TranObject msg) {// 重写父类的方法，处理消息
 		// TODO Auto-generated method stub
 		switch (msg.getType()) {
 		case MESSAGE:
 			application.getmRecentAdapter().notifyDataSetChanged();
+			updateUserState();
 			break;
 		default:
 			break;
@@ -374,11 +376,11 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
 		// TODO Auto-generated method stub
 		// 发送广播，通知服务，已进入后台运行
-		//Intent i = new Intent();
-		//i.setAction(Constants.BACKKEY_ACTION);
-		//sendBroadcast(i);
+		// Intent i = new Intent();
+		// i.setAction(Constants.BACKKEY_ACTION);
+		// sendBroadcast(i);
 
-		//util.setIsStart(true);// 设置后台运行标志，正在运行
+		// util.setIsStart(true);// 设置后台运行标志，正在运行
 		finish();// 再结束自己
 	}
 
@@ -442,7 +444,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		@Override
 		public void onRefresh() {
-			AsyncTask<Void, Void, Void> tk=new AsyncTask<Void, Void, Void>() {
+			AsyncTask<Void, Void, Void> tk = new AsyncTask<Void, Void, Void>() {
 				List<User> list;
 
 				protected Void doInBackground(Void... params) {
