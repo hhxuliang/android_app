@@ -1,8 +1,10 @@
 package com.way.chat.activity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
+import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.util.Constants;
 import com.way.client.Client;
 import com.way.util.MessageDB;
@@ -25,6 +27,7 @@ public class MyApplication extends Application {
 	private String home_path;
 	private String camera_path;
 	private ArrayList<String> offlinemsslist;
+	private HashMap<String, String> mNeedRefresh = new HashMap<String, String>();
 	public static int mWindowHeight = 0;
 	public static int mWindowWidth = 0;
 
@@ -40,7 +43,27 @@ public class MyApplication extends Application {
 		userDB = new UserDB(MyApplication.this);// 本地用户数据库
 		super.onCreate();
 	}
-
+	
+	public boolean needRefresh(String uidstr){
+		if (mNeedRefresh.get(uidstr)==null)
+		{
+			return false;
+		}
+		else{
+			removeNeedRefresh(uidstr);
+			return true;
+		}	
+	}
+	public void addNeedRefresh(String uidstr){
+		System.out.println("and uidster      "+uidstr);
+		if (mNeedRefresh.get(uidstr)==null){
+			System.out.println("and uidster"+uidstr);
+			mNeedRefresh.put(uidstr, uidstr);
+		}
+	}
+	public void removeNeedRefresh(String uidstr){
+		mNeedRefresh.remove(uidstr);
+	}
 	public ArrayList<String> getOffLineList() {
 		return offlinemsslist;
 	}

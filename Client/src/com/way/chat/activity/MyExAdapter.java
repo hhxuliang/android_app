@@ -38,6 +38,9 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 		this.group = group;
 		this.offlineuserid = ls;
 	}
+	public void addOffLineUserid(String l){
+		offlineuserid.add(l);
+	}
 
 	// 得到大组成员的view
 	public View getGroupView(int groupPosition, boolean isExpanded,

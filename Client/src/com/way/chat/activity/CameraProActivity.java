@@ -191,6 +191,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 								CameraProActivity.this, picpath,
 								MyApplication.mWindowHeight,
 								MyApplication.mWindowWidth, 2);
+						int degree = ImageProcess.getBitmapDegree(picpath);
+						bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
 						ZoomImageView zoom = new ZoomImageView(mContext, bitmap);
 						zoom.showZoomView();
 					}
@@ -480,9 +482,14 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		mGridItemList.remove(mGridItemList.size() - 1);
 		String date_str = MyDate.getDateForImageName();
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("ItemImage", ImageProcess.GetBitmapByPath(
+		
+		Bitmap bitmap= ImageProcess.GetBitmapByPath(
 				CameraProActivity.this, path, MyApplication.mWindowHeight,
-				MyApplication.mWindowWidth, 0.25));
+				MyApplication.mWindowWidth, 0.25);
+		int degree = ImageProcess.getBitmapDegree(path);
+		bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
+		
+		map.put("ItemImage", bitmap);
 		map.put("ItemActualPath", path);
 		map.put("ItemText", "" + pic_NO);
 		map.put("ItemPath", this.pic_path_save + "/" + date_str + ".jpg");

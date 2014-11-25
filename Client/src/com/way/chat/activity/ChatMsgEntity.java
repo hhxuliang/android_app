@@ -20,13 +20,15 @@ public class ChatMsgEntity {
 	}
 
 	public ChatMsgEntity(String name, String date, String text, int img,
-			boolean isComMsg) {
+			boolean isComMsg, boolean isPic, String picPath) {
 		super();
 		this.name = name;
 		this.date = date;
 		this.message = text;
 		this.img = img;
 		this.isComMeg = isComMsg;
+		this.is_pic = isPic;
+		this.pic_path = picPath;
 	}
 
 	public boolean get_is_pic() {
@@ -36,6 +38,7 @@ public class ChatMsgEntity {
 	public void set_is_pic(boolean ispic) {
 		this.is_pic = ispic;
 	}
+
 	public String getPicPath() {
 		return pic_path;
 	}
@@ -43,6 +46,7 @@ public class ChatMsgEntity {
 	public void setPicPath(String path) {
 		this.pic_path = path;
 	}
+
 	public String getName() {
 		return name;
 	}

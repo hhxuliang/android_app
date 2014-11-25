@@ -1654,7 +1654,8 @@ containing a value of this type.
         public static final int w04=0x7f020096;
         public static final int w05=0x7f020097;
         public static final int w06=0x7f020098;
-        public static final int xlistview_arrow=0x7f020099;
+        public static final int waitloadpic=0x7f020099;
+        public static final int xlistview_arrow=0x7f02009a;
     }
     public static final class id {
         public static final int GridView_upload_pic=0x7f060036;

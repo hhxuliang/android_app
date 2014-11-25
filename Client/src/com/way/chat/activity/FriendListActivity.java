@@ -111,12 +111,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	@Override
 	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
 		// TODO Auto-generated method stub
+		super.onResume();
 		newNum = application.getRecentNum();// 从新获取一下全局变量
-		if (!application.isClientStart()) {
-			Intent service = new Intent(this, GetMsgService.class);
-			startService(service);
-		}
-		new SharePreferenceUtil(this, Constants.SAVE_USER).setIsStart(false);
 		NotificationManager manager = application.getmNotificationManager();
 		if (manager != null) {
 			manager.cancel(Constants.NOTIFY_ID);
@@ -124,7 +120,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 			application.getmRecentAdapter().notifyDataSetChanged();
 		}
 		
-		super.onResume();
+		
 	}
 
 	/**
@@ -363,39 +359,11 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	}
 	
 	@Override
-	public void getMessage(TranObject msg) {// 重写父类的方法，处理消息
+	public void receiveMsg(TranObject msg) {// 重写父类的方法，处理消息
 		// TODO Auto-generated method stub
 		switch (msg.getType()) {
 		case MESSAGE:
-			newNum++;
-			application.setRecentNum(newNum);// 保存到全局变量
-			TextMessage tm = (TextMessage) msg.getObject();
-			String message = tm.getMessage();
-			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
-					message, -1, true);// 收到的消息
-			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
-			Toast.makeText(FriendListActivity.this,
-					"亲！新消息哦 " + msg.getFromUser() + ":" + message, 0).show();// 提示用户
-			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
-			User user2 = userDB.selectInfo(msg.getFromUser());// 通过id查询对应数据库该好友信息
-			RecentChatEntity entity2 = new RecentChatEntity(msg.getFromUser(),
-					user2.getImg(), newNum, user2.getName(), MyDate.getDate(),
-					message);
-			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
-			application.getmRecentList().addFirst(entity2);// 再添加到首部
 			application.getmRecentAdapter().notifyDataSetChanged();
-			break;
-		case LOGIN:
-			User loginUser = (User) msg.getObject();
-			Toast.makeText(FriendListActivity.this,
-					"亲！" + loginUser.getId() + "上线了哦", 0).show();
-			MediaPlayer.create(this, R.raw.msg).start();
-			break;
-		case LOGOUT:
-			User logoutUser = (User) msg.getObject();
-			Toast.makeText(FriendListActivity.this,
-					"亲！" + logoutUser.getId() + "下线了哦", 0).show();
-			MediaPlayer.create(this, R.raw.msg).start();
 			break;
 		default:
 			break;

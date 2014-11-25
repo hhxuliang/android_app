@@ -1,6 +1,7 @@
 package com.way.chat.activity;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,8 @@ import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.util.Constants;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
+import com.way.util.SharePreferenceUtil;
+import com.way.util.UserDB;
 
 /**
  * 自定义一个抽象的MyActivity类，每个Activity都继承他，实现消息的接收（优化性能，减少代码重复）
@@ -32,50 +35,67 @@ public abstract class MyActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			TranObject msg = (TranObject) intent
 					.getSerializableExtra(Constants.MSGKEY);
-			if (msg != null) {//如果不是空，说明是消息广播
+			HandleMsg hm = (HandleMsg) intent
+					.getSerializableExtra(Constants.PICUPDATE);
+			if (msg != null) {// 如果不是空，说明是消息广播
 				System.out.println("MyActivity:" + msg.getFromUser());
 				getMessage(msg);// 把收到的消息传递给子类
-			} else {//如果是空消息，说明是关闭应用的广播
-				close();
+			} 
+			if(hm!=null)
+			{
+				getPicUpdate(hm);
 			}
 		}
 	};
-
+	public void getPicUpdate(HandleMsg hm){
+		
+	}
 	/**
 	 * 抽象方法，用于子类处理消息，
 	 * 
 	 * @param msg
 	 *            传递给子类的消息对象
 	 */
-	public void getMessage(TranObject msg){// 重写父类的方法，处理消息
+	public void getMessage(TranObject msg) {// 重写父类的方法，处理消息
 		// TODO Auto-generated method stub
 		switch (msg.getType()) {
 		case MESSAGE:
 			TextMessage tm = (TextMessage) msg.getObject();
 			String message = tm.getMessage();
-			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
-					message, -1, true);// 收到的消息
-			MessageDB messageDB = new MessageDB(this);
-			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
 			Toast.makeText(MyActivity.this,
 					"亲！新消息哦 " + msg.getFromUser() + ":" + message, 0).show();// 提示用户
-			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			receiveMsg(msg);
 			break;
 		case LOGIN:
 			User loginUser = (User) msg.getObject();
-			Toast.makeText(MyActivity.this,
-					"亲！" + loginUser.getId() + "上线了哦", 0).show();
-			MediaPlayer.create(this, R.raw.msg).start();
+			Toast.makeText(MyActivity.this, "亲！" + loginUser.getId() + "上线了哦",
+					0).show();
 			break;
 		case LOGOUT:
 			User logoutUser = (User) msg.getObject();
-			Toast.makeText(MyActivity.this,
-					"亲！" + logoutUser.getId() + "下线了哦", 0).show();
-			MediaPlayer.create(this, R.raw.msg).start();
+			Toast.makeText(MyActivity.this, "亲！" + logoutUser.getId() + "下线了哦",
+					0).show();
 			break;
 		default:
 			break;
 		}
+	}
+
+	@Override
+	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
+		super.onResume();
+		// TODO Auto-generated method stub
+		MyApplication application = (MyApplication) this
+				.getApplicationContext();
+		if (!application.isClientStart()) {
+			Intent service = new Intent(this, GetMsgService.class);
+			startService(service);
+		}
+		new SharePreferenceUtil(this, Constants.SAVE_USER).setIsStart(false);
+
+	}
+
+	public void receiveMsg(TranObject msg) {
 	}
 
 	/**

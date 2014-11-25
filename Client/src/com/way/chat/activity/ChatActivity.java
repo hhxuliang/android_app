@@ -74,7 +74,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private MyApplication application;
 	private ClientOutputThread out;
 	private boolean alreadycreate;
-	private ArrayList<TranObject> msg_list = new ArrayList<TranObject>();;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -110,9 +109,26 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	}
 
 	@Override
+	public void getPicUpdate(HandleMsg hm) {
+		if (hm.mComefromUid == user.getId()) {
+			for (int i = 0; i < mDataArrays.size(); i++) {
+				ChatMsgEntity cme = mDataArrays.get(i);
+				if (cme.getMessage().equals(hm.mUrl)) {
+					cme.setPicPath(hm.mSavePath);
+					mDataArrays.set(i, cme);
+				}
+			}
+			mAdapter.notifyDataSetChanged();
+		}
+	}
+
+	@Override
 	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
 		alreadycreate = true;
 		super.onResume();
+		System.out.println("resume     resume" + user.getId() );
+		if (application.needRefresh(user.getId() + ""))
+			refreshData();
 	}
 
 	public void getOffLineMess() {
@@ -155,6 +171,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 							ChatActivity.this, path,
 							MyApplication.mWindowHeight,
 							MyApplication.mWindowWidth, 2);
+					int degree = ImageProcess.getBitmapDegree(path);
+					bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
 					ZoomImageView zoom = new ZoomImageView(ChatActivity.this,
 							bitmap);
 					zoom.showZoomView();
@@ -174,10 +192,34 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	}
 
 	/**
+	 * 加载还没有显示的消息，从数据库中读出
+	 */
+	public void refreshData() {
+		ChatMsgEntity cme = mDataArrays.get(mDataArrays.size() - 1);
+		List<ChatMsgEntity> list = messageDB
+				.getMsg(user.getId(), cme.getDate());
+		System.out.println("reflesh date " + list.size());
+		if (list.size() > 0) {
+			for (ChatMsgEntity entity : list) {
+				if (entity.getName().equals("")) {
+					entity.setName(user.getName());
+				}
+				if (entity.getImg() < 0) {
+					entity.setImg(user.getImg());
+				}
+				mDataArrays.add(entity);
+			}
+			//Collections.reverse(mDataArrays);
+			mListView.setSelection(mAdapter.getCount() - 1);
+			mAdapter.notifyDataSetChanged();
+		}
+	}
+
+	/**
 	 * 加载消息历史，从数据库中读出
 	 */
 	public void initData() {
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId());
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "");
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
 				if (entity.getName().equals("")) {
@@ -269,137 +311,14 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		}
 	}
 
-	private Handler handler = new Handler() {
-		public void handleMessage(Message msg) {// 此方法在ui线程运行
-			switch (msg.what) {
-			case 1:
-				HandleMsg hmsg = (HandleMsg) msg.obj;
-				String strpath = null;
-				TranObject tobj = null;
-				for (TranObject to : msg_list) {
-					TextMessage tm = (TextMessage) to.getObject();
-					if (tm.getMessage().equals(hmsg.mPath)) {
-						tobj = to;
-					}
-				}
-				if (tobj != null) {
-					Receive_message(tobj, true, hmsg.mSavePath);
-					msg_list.remove(tobj);
-				} else
-					Toast.makeText(ChatActivity.this, "获取图片消息对象失败!", 0).show();
-				break;
-			}
-		}
-	};
-
-	public void saveMyBitmap(String bitName, Bitmap mBitmap) throws IOException {
-		File f = new File(bitName);
-		f.createNewFile();
-		FileOutputStream fOut = null;
-		try {
-			fOut = new FileOutputStream(f);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-		try {
-			fOut.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			fOut.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	class HandleMsg {
-		public String mPath;
-		public String mSavePath;
-
-		public HandleMsg(String path, String savepath) {
-			mPath = path;
-			mSavePath = savepath;
-		}
-	}
-
-	class Download implements Runnable {
-		private String path = null;
-
-		public Download(String p) {
-			path = p;
-		}
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-
-			try {
-
-				// byte[] data = ImageService.getImage(path);
-				URL url = new URL(path);
-				String savePath = null;
-				HttpURLConnection con = (HttpURLConnection) url
-						.openConnection();
-				con.setConnectTimeout(5000);
-				con.setRequestMethod("GET");
-				con.connect();
-				if (con.getResponseCode() == 200) {
-					InputStream is = con.getInputStream();
-					// byte[] data = StreamTool.readStream(is);
-					// Bitmap bitmap = BitmapFactory.decodeStream(is);// (data,
-					// 0,
-					// data.length);
-					savePath = application.getPicPath() + "/"
-							+ MyDate.getDateForImageName() + ".jpg";
-					FileOutputStream fos = new FileOutputStream(savePath);
-					byte[] buffer = new byte[8192];
-					int count = 0;
-					while ((count = is.read(buffer)) != -1) {
-						fos.write(buffer, 0, count);
-					}
-					fos.close();
-					is.close();
-
-					handler.obtainMessage(1, new HandleMsg(path, savePath))
-							.sendToTarget();
-				}
-				// Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0,
-				// data.length);
-				// ImageView iv = (ImageView)con.findViewById(R.id.imageView1);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-	}
-
 	@Override
-	public void getMessage(TranObject msg) {
+	public void receiveMsg(TranObject msg) {
 		// TODO Auto-generated method stub
 		switch (msg.getType()) {
 		case MESSAGE:
 			TextMessage tm = (TextMessage) msg.getObject();
-			if (!tm.get_is_pic()) {
-				Receive_message(msg, false, "");
-			} else {
-				msg_list.add(msg);
-				new Thread(new Download(tm.getMessage())).start();
-			}
-			break;
-		case LOGIN:
-			User loginUser = (User) msg.getObject();
-			Toast.makeText(ChatActivity.this, loginUser.getId() + "上线了", 0)
-					.show();
-			MediaPlayer.create(this, R.raw.msg).start();
-			break;
-		case LOGOUT:
-			User logoutUser = (User) msg.getObject();
-			Toast.makeText(ChatActivity.this, logoutUser.getId() + "下线了", 0)
-					.show();
-			MediaPlayer.create(this, R.raw.msg).start();
+			application.removeNeedRefresh(user.getId() + "");
+			Receive_message(msg, tm.get_is_pic(), "");
 			break;
 		default:
 			break;
@@ -410,11 +329,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		TextMessage tm = (TextMessage) msg.getObject();
 		String message = tm.getMessage();
 		ChatMsgEntity entity = new ChatMsgEntity(user.getName(),
-				MyDate.getDateEN(), message, user.getImg(), true);// 收到的消息
-		if (tm.get_is_pic()) {
-			entity.set_is_pic(ispic);
-			entity.setPicPath(path_pic);
-		}
+				MyDate.getDateEN(), message, user.getImg(), true, ispic,
+				path_pic);// 收到的消息
 		System.out.println("herris ====>" + msg.getFromUser());
 		System.out.println("herris ====>" + user.getId());
 		if (msg.getFromUser() == user.getId() || msg.getFromUser() == 0
@@ -423,17 +339,10 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				entity.setName(msg.getFromUserName());
 				entity.setImg(msg.getFromImg());
 			}
-			messageDB.saveMsg(user.getId(), entity);
 
 			mDataArrays.add(entity);
 			mAdapter.notifyDataSetChanged();
 			mListView.setSelection(mListView.getCount() - 1);
-			MediaPlayer.create(this, R.raw.msg).start();
-		} else {
-			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
-			Toast.makeText(ChatActivity.this,
-					"您有新的消息来自：" + msg.getFromUser() + ":" + message, 0).show();// 其他好友的消息，就先提示，并保存到数据库
-			MediaPlayer.create(this, R.raw.msg).start();
 		}
 	}
 

@@ -55,13 +55,14 @@
             android:id="@+id/imageView_chat_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="25px" 
-            android:paddingLeft="25px"  
             android:layout_toRightOf="@+id/tv_chatcontent"
             android:adjustViewBounds="true"
             android:maxHeight="250dp"
             android:maxWidth="200dp"
-            android:scaleType="fitStart" />
+            android:paddingLeft="25px"
+            android:paddingTop="25px"
+            android:scaleType="fitStart"
+            android:src="@drawable/waitloadpic" />
 
     </RelativeLayout>
 

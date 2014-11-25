@@ -1,5 +1,16 @@
 package com.way.chat.activity;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,6 +19,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -26,6 +39,7 @@ import com.way.client.MessageListener;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
+import com.way.util.UserDB;
 
 /**
  * 收取消息服务
@@ -35,6 +49,9 @@ import com.way.util.SharePreferenceUtil;
  */
 public class GetMsgService extends Service {
 	private static final int MSG = 0x001;
+	private static final int DOWNLOADPIC_OK = 1;
+	private static final int DOWNLOADPIC_FAULT = 2;
+	
 	private MyApplication application;
 	private Client client;
 	private NotificationManager mNotificationManager;
@@ -43,6 +60,93 @@ public class GetMsgService extends Service {
 	private Context mContext = this;
 	private SharePreferenceUtil util;
 	private MessageDB messageDB;
+	private HashMap<String, TranObject> mMap_Waiting_Download_Pic = new HashMap<String, TranObject>();
+
+	private Handler handler_download_pic = new Handler() {
+		public void handleMessage(Message msg) {
+			HandleMsg hmsg = (HandleMsg) msg.obj;
+			TranObject tobj = mMap_Waiting_Download_Pic.get(hmsg.mUrl);
+			switch (msg.what) {
+			case DOWNLOADPIC_OK:
+				if (tobj != null) {
+					hmsg.mComefromUid=tobj.getFromUser();
+					messageDB.updateMsg(tobj.getFromUser(), hmsg.mSavePath,
+							hmsg.mUrl);
+					Intent broadCast = new Intent();
+					broadCast.setAction(Constants.ACTION);
+					broadCast.putExtra(Constants.PICUPDATE, hmsg);
+					sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
+				} else
+					System.out.println("获取图片消息对象失败!");
+				break;
+			case DOWNLOADPIC_FAULT:
+				System.out.println("获取图片消息对象失败!应该再来一次！");
+				break;
+			}
+			mMap_Waiting_Download_Pic.remove(hmsg.mUrl);
+		}
+	};
+
+	
+	class Download implements Runnable {
+		private String mUrl = null;
+
+		public Download(String p) {
+			mUrl = p;
+		}
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+
+			try {
+				URL url = new URL(mUrl);
+				HttpURLConnection con = (HttpURLConnection) url
+						.openConnection();
+				con.setConnectTimeout(5000);
+				con.setRequestMethod("GET");
+				con.connect();
+				if (con.getResponseCode() == 200) {
+					InputStream is = con.getInputStream();
+					String savePath = application.getPicPath() + "/"
+							+ MyDate.getDateForImageName() + ".jpg";
+					FileOutputStream fos = new FileOutputStream(savePath);
+					byte[] buffer = new byte[8192];
+					int count = 0;
+					while ((count = is.read(buffer)) != -1) {
+						fos.write(buffer, 0, count);
+					}
+					fos.close();
+					is.close();
+
+					handler_download_pic.obtainMessage(DOWNLOADPIC_OK,
+							new HandleMsg(mUrl, savePath)).sendToTarget();
+				} else {
+					handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
+							new HandleMsg(mUrl, "")).sendToTarget();
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+	
+	@Override
+	public void onCreate() {// 在onCreate方法里面注册广播接收者
+		// TODO Auto-generated method stub
+		super.onCreate();
+		messageDB = new MessageDB(this);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Constants.BACKKEY_ACTION);
+		registerReceiver(backKeyReceiver, filter);
+		mNotificationManager = (NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+		application = (MyApplication) this.getApplicationContext();
+		client = application.getClient();
+		application.setmNotificationManager(mNotificationManager);
+	}
 	// 收到用户按返回键发出的广播，就显示通知栏
 	private BroadcastReceiver backKeyReceiver = new BroadcastReceiver() {
 
@@ -69,8 +173,8 @@ public class GetMsgService extends Service {
 					String content = textObject.getObject().getMessage();// 消息内容
 
 					ChatMsgEntity entity = new ChatMsgEntity("",
-							MyDate.getDateEN(), content, -1, true);// 收到的消息
-					messageDB.saveMsg(form, entity);// 保存到数据库
+							MyDate.getDateEN(), content, -1, true, false, "");// 收到的消息
+					//messageDB.saveMsg(form, entity);// 保存到数据库
 
 					// 更新通知栏
 					int icon = R.drawable.notify_newmessage;
@@ -108,20 +212,6 @@ public class GetMsgService extends Service {
 	}
 
 	@Override
-	public void onCreate() {// 在onCreate方法里面注册广播接收者
-		// TODO Auto-generated method stub
-		super.onCreate();
-		messageDB = new MessageDB(this);
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Constants.BACKKEY_ACTION);
-		registerReceiver(backKeyReceiver, filter);
-		mNotificationManager = (NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-		application = (MyApplication) this.getApplicationContext();
-		client = application.getClient();
-		application.setmNotificationManager(mNotificationManager);
-	}
-
-	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 		util = new SharePreferenceUtil(getApplicationContext(),
@@ -139,6 +229,7 @@ public class GetMsgService extends Service {
 					System.out.println("GetMsgService:" + msg.getType());
 					System.out.println("GetMsgService:" + msg.getFromUser());
 					System.out.println("GetMsgService:" + util.getIsStart());
+					preProcess(msg);
 					if (util.getIsStart()) {// 如果 是在后台运行，就更新通知栏，否则就发送广播给Activity
 						if (msg.getType() == TranObjectType.MESSAGE) {// 只处理文本消息类型
 							// System.out.println("收到新消息");
@@ -156,6 +247,52 @@ public class GetMsgService extends Service {
 					}
 				}
 			});
+		}
+	}
+
+	/*
+	 * At here, we need preprocess the msg: 1.save the message into local db and
+	 * update the adapter object 2.media reminder
+	 */
+	public void preProcess(TranObject msg) {
+		// TODO Auto-generated method stub
+		switch (msg.getType()) {
+		case MESSAGE:
+			TextMessage tm = (TextMessage) msg.getObject();
+			String message = tm.getMessage();
+			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
+					message, -1, true, tm.get_is_pic(), "");// 收到的消息
+			/*if (msg.getCrowd() == user.getId()) {
+				entity.setName(msg.getFromUserName());
+				entity.setImg(msg.getFromImg());
+			}*/
+			if (tm.get_is_pic()) {
+				// new thread to download the picture to update the picpath in
+				// local db
+				mMap_Waiting_Download_Pic.put(tm.getMessage(), msg);
+				new Thread(new Download(tm.getMessage())).start();
+			}
+			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
+
+			UserDB userDB = application.getUserDB();
+			User user2 = userDB.selectInfo(msg.getFromUser());// 通过id查询对应数据库该好友信息
+			RecentChatEntity entity2 = new RecentChatEntity(msg.getFromUser(),
+					user2.getImg(), 0, user2.getName(), MyDate.getDate(),
+					message);
+			application.addNeedRefresh(msg.getFromUser()+"");
+			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
+			application.getmRecentList().addFirst(entity2);// 再添加到首部
+
+			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			break;
+		case LOGIN:
+			MediaPlayer.create(this, R.raw.msg).start();
+			break;
+		case LOGOUT:
+			MediaPlayer.create(this, R.raw.msg).start();
+			break;
+		default:
+			break;
 		}
 	}
 
