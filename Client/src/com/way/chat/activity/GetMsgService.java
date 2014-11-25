@@ -283,13 +283,13 @@ public class GetMsgService extends Service {
 			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
 			application.getmRecentList().addFirst(entity2);// 再添加到首部
 
-			//MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
 			break;
 		case LOGIN:
-			//MediaPlayer.create(this, R.raw.msg).start();
+			MediaPlayer.create(this, R.raw.msg).start();
 			break;
 		case LOGOUT:
-			//MediaPlayer.create(this, R.raw.msg).start();
+			MediaPlayer.create(this, R.raw.msg).start();
 			break;
 		default:
 			break;

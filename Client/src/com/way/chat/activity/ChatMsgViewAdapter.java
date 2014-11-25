@@ -127,10 +127,14 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				Bitmap bitmap = ImageProcess.GetBitmapByPath(mContext,
 						entity.getPicPath(), MyApplication.mWindowHeight,
 						MyApplication.mWindowWidth, 0.2);
-				int degree = ImageProcess.getBitmapDegree(entity.getPicPath());
-				bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
+				if (bitmap != null) {
+					int degree = ImageProcess.getBitmapDegree(entity
+							.getPicPath());
+					if(degree!=0)
+						bitmap = ImageProcess.rotateBitmapByDegree(bitmap, degree);
+				}
 				viewHolder.tvPicture.setImageBitmap(bitmap);
-			}else{
+			} else {
 				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
 			}
 			viewHolder.tvPicture.setContentDescription(entity.getPicPath());

@@ -191,10 +191,15 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 								CameraProActivity.this, picpath,
 								MyApplication.mWindowHeight,
 								MyApplication.mWindowWidth, 2);
-						int degree = ImageProcess.getBitmapDegree(picpath);
-						bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
-						ZoomImageView zoom = new ZoomImageView(mContext, bitmap);
-						zoom.showZoomView();
+						if (bitmap != null) {
+							int degree = ImageProcess.getBitmapDegree(picpath);
+							if (degree != 0)
+								bitmap = ImageProcess.rotateBitmapByDegree(
+										bitmap, degree);
+							ZoomImageView zoom = new ZoomImageView(mContext,
+									bitmap);
+							zoom.showZoomView();
+						}
 					}
 				}
 			}
@@ -482,13 +487,15 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		mGridItemList.remove(mGridItemList.size() - 1);
 		String date_str = MyDate.getDateForImageName();
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		
-		Bitmap bitmap= ImageProcess.GetBitmapByPath(
-				CameraProActivity.this, path, MyApplication.mWindowHeight,
-				MyApplication.mWindowWidth, 0.25);
-		int degree = ImageProcess.getBitmapDegree(path);
-		bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
-		
+
+		Bitmap bitmap = ImageProcess.GetBitmapByPath(CameraProActivity.this,
+				path, MyApplication.mWindowHeight, MyApplication.mWindowWidth,
+				0.25);
+		if (bitmap != null) {
+			int degree = ImageProcess.getBitmapDegree(path);
+			if (degree != 0)
+				bitmap = ImageProcess.rotateBitmapByDegree(bitmap, degree);
+		}
 		map.put("ItemImage", bitmap);
 		map.put("ItemActualPath", path);
 		map.put("ItemText", "" + pic_NO);

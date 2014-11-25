@@ -126,7 +126,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
 		alreadycreate = true;
 		super.onResume();
-		System.out.println("resume     resume" + user.getId() );
+		System.out.println("resume     resume" + user.getId());
 		if (application.needRefresh(user.getId() + ""))
 			refreshData();
 		mListView.setSelection(mListView.getCount() - 1);
@@ -172,11 +172,16 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 							ChatActivity.this, path,
 							MyApplication.mWindowHeight,
 							MyApplication.mWindowWidth, 1.5);
-					int degree = ImageProcess.getBitmapDegree(path);
-					bitmap=ImageProcess.rotateBitmapByDegree(bitmap, degree);
-					ZoomImageView zoom = new ZoomImageView(ChatActivity.this,
-							bitmap);
-					zoom.showZoomView();
+					if (bitmap != null) {
+						int degree = ImageProcess.getBitmapDegree(path);
+						if (degree != 0)
+							bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
+									degree);
+
+						ZoomImageView zoom = new ZoomImageView(
+								ChatActivity.this, bitmap);
+						zoom.showZoomView();
+					}
 				}
 
 			}
@@ -210,7 +215,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				}
 				mDataArrays.add(entity);
 			}
-			//Collections.reverse(mDataArrays);
+			// Collections.reverse(mDataArrays);
 			mListView.setSelection(mAdapter.getCount() - 1);
 			mAdapter.notifyDataSetChanged();
 		}
