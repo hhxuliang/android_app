@@ -171,7 +171,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 					Bitmap bitmap = ImageProcess.GetBitmapByPath(
 							ChatActivity.this, path,
 							MyApplication.mWindowHeight,
-							MyApplication.mWindowWidth, 1.5);
+							MyApplication.mWindowWidth, 1);
 					if (bitmap != null) {
 						int degree = ImageProcess.getBitmapDegree(path);
 						if (degree != 0)

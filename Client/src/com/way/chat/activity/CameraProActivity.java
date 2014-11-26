@@ -328,8 +328,41 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 			System.out.println("the path is " + tmp);
 			if (tmp != null)
 				newPicture(tmp);
+
+			Dialog alertDialog = new AlertDialog.Builder(mContext)
+					.setTitle("继续打开相册添加照片吗?")
+					.setPositiveButton("是",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// TODO Auto-generated method stub
+									pickPhoto();
+								}
+							})
+					.setNegativeButton("否",	null).create();
+			alertDialog.show();
 		} else if (requestCode == SELECT_PIC_BY_TACK_PHOTO) {
 			newPicture(picPath + pic_NO + ".jpg");
+			
+			Dialog alertDialog = new AlertDialog.Builder(mContext)
+			.setTitle("继续打开相机添加照片吗?")
+			.setPositiveButton("是",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							// TODO Auto-generated method stub
+							
+							String itemIndex = null;
+							itemIndex = CameraProActivity.this.selItemIndex;
+							takePhoto(picPath + itemIndex + ".jpg");
+						}
+					})
+			.setNegativeButton("否",	null).create();
+			alertDialog.show();
 
 		}
 	}

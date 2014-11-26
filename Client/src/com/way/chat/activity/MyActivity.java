@@ -91,10 +91,10 @@ public abstract class MyActivity extends Activity {
 		// TODO Auto-generated method stub
 		MyApplication application = (MyApplication) this
 				.getApplicationContext();
-		if (!application.isClientStart()) {
+		/*if (!application.isClientStart()) {
 			Intent service = new Intent(this, GetMsgService.class);
 			startService(service);
-		}
+		}*/
 		new SharePreferenceUtil(this, Constants.SAVE_USER).setIsStart(false);
 		NotificationManager manager = application.getmNotificationManager();
 		if (manager != null) {
