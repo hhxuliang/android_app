@@ -65,11 +65,10 @@
         </activity>
         <activity android:name=".CameraProActivity" android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity android:name=".SystemCatalogActivity"></activity>
-        <activity android:name=".SelectPicActivity"></activity>
-        <activity android:name=".PullToRefreshSampleActivity"></activity>
-        <activity android:name=".PullToRefreshSampleActivitySchool"></activity>
-        <activity android:name=".PullToRefreshSampleActivityClass"></activity>
-        <activity android:name=".PullToRefreshSampleActivityMyself"></activity>
+        <activity android:name=".SelectPicActivity">
+        </activity>
+        <activity android:name="com.huewu.pla.sample.PullToRefreshSampleActivity"></activity>
+        <activity android:name="com.huewu.pla.sample.ImageDetailActivity"></activity>
         
         
         

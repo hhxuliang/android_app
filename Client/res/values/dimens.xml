@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<resources>
+
+    <dimen name="image_thumbnail_size">100dp</dimen>
+    <dimen name="image_thumbnail_spacing">1dp</dimen>
+    <dimen name="image_detail_pager_margin">80dp</dimen>
+
+    <dimen name="image_detail_pager">300dp</dimen>
+    <dimen name="image_head_pic">50dp</dimen>
+
+    <dimen name="tv_size10">11sp</dimen>
+    <dimen name="tv_size16">16sp</dimen>
+    <dimen name="tv_size18">18sp</dimen>
+    <dimen name="tv_size20">20sp</dimen>
+    <dimen name="tv_size22">22sp</dimen>
+    <dimen name="tv_size30">30sp</dimen>
+    <dimen name="tv_size40">40sp</dimen>
+    <dimen name="tab_height40">40dp</dimen>
+    <dimen name="toolbar_height36">44dp</dimen>
+    <dimen name="toolbar_address72">72dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="alphabet_text_size">12sp</dimen>
+    <dimen name="title_status_tv_size">20sp</dimen>
+
+    <dimen name="tv_size25">25sp</dimen>
+    <dimen name="padding_left20">20dp</dimen>
+    <dimen name="padding_top2">2dp</dimen>
+    <dimen name="padding_bottom2">2dp</dimen>
+    <dimen name="padding_bottom5">5dp</dimen>
+    <dimen name="padding_right2">2dp</dimen>
+    <dimen name="padding_right20">20dp</dimen>
+    <dimen name="padding_top5">5dp</dimen>
+    <dimen name="padding_top10">10dp</dimen>
+    <dimen name="padding5">5dp</dimen>
+    <dimen name="padding10">10dp</dimen>
+    <dimen name="padding20">20dp</dimen>
+    <dimen name="top_padding_img">10dp</dimen>
+    <dimen name="top_line_margin">10dp</dimen>
+
+    <dimen name="farmer_item_height">40dp</dimen>
+    <dimen name="farmer_item_img_width">34dp</dimen>
+    <dimen name="farmer_item_img_height">40dp</dimen>
+
+    <dimen name="image_thumbnail_bigsize">100dp</dimen>
+
+</resources>
