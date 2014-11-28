@@ -43,6 +43,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -52,6 +53,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Video.Thumbnails;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -87,6 +89,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	public static final int SELECT_PIC_BY_TACK_PHOTO = 1;
 	// 使用相册中的图片
 	public static final int SELECT_PIC_BY_PICK_PHOTO = 2;
+	// 使用相机拍摄视频
+	public static final int SELECT_PIC_BY_TACK_VIDEO = 3;
 
 	private static String requestURL = "";
 	private Button selectButton, back;
@@ -151,8 +155,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 					CameraProActivity.this.selItemIndex = (String) item
 							.get("ItemText");
 					Dialog alertDialog = new AlertDialog.Builder(mContext)
-							.setTitle("选择照片来源")
-							.setPositiveButton("相机",
+							.setTitle("选择")
+							.setPositiveButton("相机拍照",
 									new DialogInterface.OnClickListener() {
 
 										@Override
@@ -166,7 +170,21 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 													+ ".jpg");
 										}
 									})
-							.setNegativeButton("相册",
+							.setNegativeButton("相机录像",
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											// TODO Auto-generated method stub
+											String itemIndex = null;
+											itemIndex = CameraProActivity.this.selItemIndex;
+											takeVideo(picPath + itemIndex
+													+ ".mp4");
+										}
+									})
+							.setNeutralButton("相册",
 									new DialogInterface.OnClickListener() {
 
 										@Override
@@ -180,7 +198,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 					alertDialog.show();
 				}
 				// takePhoto(picPath + (String) item.get("ItemText") + ".jpg");
-				else {
+				else if (((String) item.get("ItemType")).equals("PIC")) {
 
 					ImageView image = (ImageView) arg1
 							.findViewById(R.id.ItemImage);
@@ -201,6 +219,17 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 							zoom.showZoomView();
 						}
 					}
+				} else if (((String) item.get("ItemType")).equals("VIDEO")) {
+
+					ImageView image = (ImageView) arg1
+							.findViewById(R.id.ItemImage);
+
+					String picpath = image.getContentDescription().toString();
+					if (picpath != null) {
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+		                intent.setDataAndType(Uri.parse(picpath), "video/mp4");
+		                startActivity(intent);
+					}
 				}
 			}
 		});
@@ -212,9 +241,26 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		map.put("ItemActualPath", "");
 		map.put("ItemText", "" + pic_NO);
 		map.put("ItemPath", "");
+		map.put("ItemType", "");
 		mGridItemList.add(map);
 
 		mGridAdapter.notifyDataSetChanged();
+	}
+
+	private void takeVideo(String videopath) {
+		String SDState = Environment.getExternalStorageState();
+		if (SDState.equals(Environment.MEDIA_MOUNTED)) {
+			File file = new File(videopath);
+
+			Intent recordintent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+			photoUri = Uri.fromFile(file);
+			recordintent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT,
+					photoUri);
+			recordintent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+			startActivityForResult(recordintent, SELECT_PIC_BY_TACK_VIDEO);
+		} else {
+			Toast.makeText(this, "内存卡不存在", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	private void takePhoto(String picpathstr) {
@@ -340,28 +386,31 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 									// TODO Auto-generated method stub
 									pickPhoto();
 								}
-							})
-					.setNegativeButton("否",	null).create();
+							}).setNegativeButton("否", null).create();
 			alertDialog.show();
+		} else if (requestCode == SELECT_PIC_BY_TACK_VIDEO) {
+			String str_v_path = picPath + pic_NO + ".mp4";
+			Bitmap bt = ThumbnailUtils.createVideoThumbnail(str_v_path,
+					Thumbnails.MINI_KIND);
+			addIntoList(bt, str_v_path, "VIDEO");
 		} else if (requestCode == SELECT_PIC_BY_TACK_PHOTO) {
 			newPicture(picPath + pic_NO + ".jpg");
-			
-			Dialog alertDialog = new AlertDialog.Builder(mContext)
-			.setTitle("继续打开相机添加照片吗?")
-			.setPositiveButton("是",
-					new DialogInterface.OnClickListener() {
 
-						@Override
-						public void onClick(DialogInterface dialog,
-								int which) {
-							// TODO Auto-generated method stub
-							
-							String itemIndex = null;
-							itemIndex = CameraProActivity.this.selItemIndex;
-							takePhoto(picPath + itemIndex + ".jpg");
-						}
-					})
-			.setNegativeButton("否",	null).create();
+			Dialog alertDialog = new AlertDialog.Builder(mContext)
+					.setTitle("继续打开相机添加照片吗?")
+					.setPositiveButton("是",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// TODO Auto-generated method stub
+
+									String itemIndex = null;
+									itemIndex = CameraProActivity.this.selItemIndex;
+									takePhoto(picPath + itemIndex + ".jpg");
+								}
+							}).setNegativeButton("否", null).create();
 			alertDialog.show();
 
 		}
@@ -517,9 +566,6 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	}
 
 	public void newPicture(String path) {
-		mGridItemList.remove(mGridItemList.size() - 1);
-		String date_str = MyDate.getDateForImageName();
-		HashMap<String, Object> map = new HashMap<String, Object>();
 
 		Bitmap bitmap = ImageProcess.GetBitmapByPath(CameraProActivity.this,
 				path, MyApplication.mWindowHeight, MyApplication.mWindowWidth,
@@ -529,10 +575,19 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 			if (degree != 0)
 				bitmap = ImageProcess.rotateBitmapByDegree(bitmap, degree);
 		}
+		addIntoList(bitmap, path, "PIC");
+	}
+
+	private void addIntoList(Bitmap bitmap, String path, String itemtype) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		String prefix = path.substring(path.lastIndexOf("."));
+		String date_str = MyDate.getDateForImageName();
+		mGridItemList.remove(mGridItemList.size() - 1);
 		map.put("ItemImage", bitmap);
 		map.put("ItemActualPath", path);
 		map.put("ItemText", "" + pic_NO);
-		map.put("ItemPath", this.pic_path_save + "/" + date_str + ".jpg");
+		map.put("ItemPath", this.pic_path_save + "/" + date_str + prefix);
+		map.put("ItemType", itemtype);
 		pic_NO++;
 		mGridItemList.add(map);
 
@@ -543,6 +598,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		map.put("ItemActualPath", "");
 		map.put("ItemText", "" + pic_NO);
 		map.put("ItemPath", "");
+		map.put("ItemType", "");
 		mGridItemList.add(map);
 
 		mGridAdapter.notifyDataSetChanged();
