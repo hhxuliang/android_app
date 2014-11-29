@@ -3,6 +3,7 @@ package com.way.util;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.way.chat.activity.MyApplication;
 
@@ -175,6 +176,23 @@ public class ImageProcess {
 			bm.recycle();
 		}
 		return returnBm;
+	}
+
+	public static ArrayList<String> ListFile(String path) {
+
+		File file = new File(path);
+		File[] f = file.listFiles();
+		ArrayList<String> Path = new ArrayList<String>();
+
+		for (int i = 0; i < f.length; i++)
+
+		{
+
+			Path.add(f[i].getPath());
+		}
+
+		return Path;
+
 	}
 
 }
