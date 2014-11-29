@@ -65,6 +65,19 @@ public class MyMainActivity extends MyActivity {
 						// TODO Auto-generated method stub
 						exitsys();
 					}
+				}).setNeutralButton("注销",
+						new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						// TODO Auto-generated method stub
+						SharePreferenceUtil util = new SharePreferenceUtil(
+								MyMainActivity.this, Constants.SAVE_USER);
+						util.setPasswd("");
+						util.setName("");
+						exitsys();
+					}
 				})
 				.setNegativeButton("后台运行",
 						new DialogInterface.OnClickListener() {

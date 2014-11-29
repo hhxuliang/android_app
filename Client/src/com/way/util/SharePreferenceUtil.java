@@ -64,6 +64,16 @@ public class SharePreferenceUtil {
 		editor.commit();
 	}
 
+	// version
+	public String getVer() {
+		return sp.getString("version", "");
+	}
+
+	public void setVer(String v) {
+		editor.putString("version", v);
+		editor.commit();
+	}
+
 	// ip
 	public void setIp(String ip) {
 		editor.putString("ip", ip);

@@ -8,7 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -40,6 +45,12 @@ public class WelcomeActivity extends Activity {
 		}
 		initView();
 		initEnv();
+		if (isNetworkAvailable()) {
+			Intent service = new Intent(this, GetMsgService.class);
+			startService(service);
+		} else {
+			toast(this);
+		}
 	}
 
 	public void initEnv() {
@@ -74,7 +85,6 @@ public class WelcomeActivity extends Activity {
 			return;
 
 		}
-		
 
 	}
 
@@ -157,5 +167,41 @@ public class WelcomeActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 判断手机网络是否可用
+	 * 
+	 * @param context
+	 * @return
+	 */
+	private boolean isNetworkAvailable() {
+		ConnectivityManager mgr = (ConnectivityManager) getApplicationContext()
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo[] info = mgr.getAllNetworkInfo();
+		if (info != null) {
+			for (int i = 0; i < info.length; i++) {
+				if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private void toast(Context context) {
+		new AlertDialog.Builder(context)
+				.setTitle("温馨提示")
+				.setMessage("亲！您的网络连接未打开哦")
+				.setPositiveButton("前往打开",
+						new DialogInterface.OnClickListener() {
+
+							public void onClick(DialogInterface dialog,
+									int which) {
+								Intent intent = new Intent(
+										android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+								startActivity(intent);
+							}
+						}).setNegativeButton("取消", null).create().show();
 	}
 }
