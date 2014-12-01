@@ -40,6 +40,7 @@ import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
 import com.way.util.UserDB;
+import com.way.util.ZipUtil;
 
 /**
  * 收取消息服务
@@ -51,7 +52,7 @@ public class GetMsgService extends Service {
 	private static final int MSG = 0x001;
 	private static final int DOWNLOADPIC_OK = 1;
 	private static final int DOWNLOADPIC_FAULT = 2;
-	
+
 	private MyApplication application;
 	private Client client;
 	private NotificationManager mNotificationManager;
@@ -69,7 +70,7 @@ public class GetMsgService extends Service {
 			switch (msg.what) {
 			case DOWNLOADPIC_OK:
 				if (tobj != null) {
-					hmsg.mComefromUid=tobj.getFromUser();
+					hmsg.mComefromUid = tobj.getFromUser();
 					messageDB.updateMsg(tobj.getFromUser(), hmsg.mSavePath,
 							hmsg.mUrl);
 					Intent broadCast = new Intent();
@@ -87,7 +88,6 @@ public class GetMsgService extends Service {
 		}
 	};
 
-	
 	class Download implements Runnable {
 		private String mUrl = null;
 
@@ -106,10 +106,16 @@ public class GetMsgService extends Service {
 				con.setConnectTimeout(5000);
 				con.setRequestMethod("GET");
 				con.connect();
+				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
+				if (prefix.substring(0, 4).equals(".mp4"))
+					prefix = ".mp4";// i don't know why need this it is like
+									// some network tranfer error,the prefix is
+									// ".mp4_" if not this
+
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
 					String savePath = application.getPicPath() + "/"
-							+ MyDate.getDateForImageName() + ".jpg";
+							+ MyDate.getDateForImageName() + prefix;
 					FileOutputStream fos = new FileOutputStream(savePath);
 					byte[] buffer = new byte[8192];
 					int count = 0;
@@ -133,7 +139,7 @@ public class GetMsgService extends Service {
 
 		}
 	}
-	
+
 	@Override
 	public void onCreate() {// 在onCreate方法里面注册广播接收者
 		// TODO Auto-generated method stub
@@ -147,6 +153,7 @@ public class GetMsgService extends Service {
 		client = application.getClient();
 		application.setmNotificationManager(mNotificationManager);
 	}
+
 	// 收到用户按返回键发出的广播，就显示通知栏
 	private BroadcastReceiver backKeyReceiver = new BroadcastReceiver() {
 
@@ -174,7 +181,7 @@ public class GetMsgService extends Service {
 
 					ChatMsgEntity entity = new ChatMsgEntity("",
 							MyDate.getDateEN(), content, -1, true, false, "");// 收到的消息
-					//messageDB.saveMsg(form, entity);// 保存到数据库
+					// messageDB.saveMsg(form, entity);// 保存到数据库
 
 					// 更新通知栏
 					int icon = R.drawable.notify_newmessage;
@@ -262,10 +269,11 @@ public class GetMsgService extends Service {
 			String message = tm.getMessage();
 			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
 					message, -1, true, tm.get_is_pic(), "");// 收到的消息
-			/*if (msg.getCrowd() == user.getId()) {
-				entity.setName(msg.getFromUserName());
-				entity.setImg(msg.getFromImg());
-			}*/
+			/*
+			 * if (msg.getCrowd() == user.getId()) {
+			 * entity.setName(msg.getFromUserName());
+			 * entity.setImg(msg.getFromImg()); }
+			 */
 			if (tm.get_is_pic()) {
 				// new thread to download the picture to update the picpath in
 				// local db
@@ -279,7 +287,7 @@ public class GetMsgService extends Service {
 			RecentChatEntity entity2 = new RecentChatEntity(msg.getFromUser(),
 					user2.getImg(), 0, user2.getName(), MyDate.getDate(),
 					message);
-			application.addNeedRefresh(msg.getFromUser()+"");
+			application.addNeedRefresh(msg.getFromUser() + "");
 			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
 			application.getmRecentList().addFirst(entity2);// 再添加到首部
 

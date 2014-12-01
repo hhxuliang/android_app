@@ -23,6 +23,7 @@ import com.way.util.DialogFactory;
 import com.way.util.ImageProcess;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
+import com.way.util.ZipUtil;
 import com.yzi.util.UploadUtil;
 import com.yzi.util.UploadUtil.OnUploadProcessListener;
 import com.zoom.ZoomImageView;
@@ -250,6 +251,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	private void takeVideo(String videopath) {
 		String SDState = Environment.getExternalStorageState();
 		if (SDState.equals(Environment.MEDIA_MOUNTED)) {
+			ImageProcess.deleteFile(videopath);
 			File file = new File(videopath);
 
 			Intent recordintent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -268,6 +270,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 		String SDState = Environment.getExternalStorageState();
 		if (SDState.equals(Environment.MEDIA_MOUNTED)) {
+			ImageProcess.deleteFile(picpathstr);
 			File file = new File(picpathstr);
 
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);// "android.media.action.IMAGE_CAPTURE"
@@ -645,7 +648,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		params.put("orderId", "111");
 		String picstr = (String) ((HashMap<String, Object>) this.mGridItemList
 				.get(0)).get("ItemActualPath");
-
+		fileKey = picstr.substring(picstr.lastIndexOf("."));
 		uploadUtil.uploadFile(picstr, fileKey, requestURL, params);
 	}
 
@@ -708,7 +711,6 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 				int length;
 				while ((byteread = inStream.read(buffer)) != -1) {
 					bytesum += byteread; // 字节数 文件大小
-					System.out.println(bytesum);
 					fs.write(buffer, 0, byteread);
 				}
 				inStream.close();

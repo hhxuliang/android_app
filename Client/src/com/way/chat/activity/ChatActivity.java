@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -168,19 +169,26 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 						.findViewById(R.id.imageView_chat_pic);
 				String path = image.getContentDescription().toString();
 				if (path != null) {
-					Bitmap bitmap = ImageProcess.GetBitmapByPath(
-							ChatActivity.this, path,
-							MyApplication.mWindowHeight,
-							MyApplication.mWindowWidth, 1);
-					if (bitmap != null) {
-						int degree = ImageProcess.getBitmapDegree(path);
-						if (degree != 0)
-							bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
-									degree);
+					String prefix = path.substring(path.lastIndexOf("."));
+					if (prefix.equals(".mp4")) {
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						intent.setDataAndType(Uri.parse(path), "video/mp4");
+						startActivity(intent);
+					} else {
+						Bitmap bitmap = ImageProcess.GetBitmapByPath(
+								ChatActivity.this, path,
+								MyApplication.mWindowHeight,
+								MyApplication.mWindowWidth, 1);
+						if (bitmap != null) {
+							int degree = ImageProcess.getBitmapDegree(path);
+							if (degree != 0)
+								bitmap = ImageProcess.rotateBitmapByDegree(
+										bitmap, degree);
 
-						ZoomImageView zoom = new ZoomImageView(
-								ChatActivity.this, bitmap);
-						zoom.showZoomView();
+							ZoomImageView zoom = new ZoomImageView(
+									ChatActivity.this, bitmap);
+							zoom.showZoomView();
+						}
 					}
 				}
 
@@ -368,8 +376,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 								+ stringList_local.size(), 0).show();
 			}
 			for (int i = 0; i < stringList.size(); i++) {
-				System.out.println("URL is " + stringList.get(i));
-				System.out.println("local is " + stringList_local.get(i));
 				send(stringList.get(i), true, stringList_local.get(i));
 			}
 		} else {

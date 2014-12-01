@@ -14,7 +14,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
+import android.provider.MediaStore.Video.Thumbnails;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
@@ -124,14 +126,23 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			System.out.println("height is :" + MyApplication.mWindowHeight);
 			System.out.println("width is :" + MyApplication.mWindowWidth);
 			if (!entity.getPicPath().equals("")) {
-				Bitmap bitmap = ImageProcess.GetBitmapByPath(mContext,
-						entity.getPicPath(), MyApplication.mWindowHeight,
-						MyApplication.mWindowWidth, 0.2);
-				if (bitmap != null) {
-					int degree = ImageProcess.getBitmapDegree(entity
-							.getPicPath());
-					if(degree!=0)
-						bitmap = ImageProcess.rotateBitmapByDegree(bitmap, degree);
+				String path = entity.getPicPath();
+				String prefix = path.substring(path.lastIndexOf("."));
+				Bitmap bitmap = null;
+				if (prefix.equals(".mp4")) {
+					bitmap = ThumbnailUtils.createVideoThumbnail(path,
+							Thumbnails.MINI_KIND);
+				} else {
+					bitmap = ImageProcess.GetBitmapByPath(mContext,
+							entity.getPicPath(), MyApplication.mWindowHeight,
+							MyApplication.mWindowWidth, 0.2);
+					if (bitmap != null) {
+						int degree = ImageProcess.getBitmapDegree(entity
+								.getPicPath());
+						if (degree != 0)
+							bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
+									degree);
+					}
 				}
 				viewHolder.tvPicture.setImageBitmap(bitmap);
 			} else {

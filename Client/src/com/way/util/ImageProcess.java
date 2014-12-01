@@ -16,6 +16,17 @@ import android.media.ExifInterface;
 import android.view.WindowManager;
 
 public class ImageProcess {
+	 /**
+     * 删除单个文件
+     * @param   filePath    被删除文件的文件名
+     * @return 文件删除成功返回true，否则返回false
+     */
+    public static void deleteFile(String filePath) {
+    File file = new File(filePath);
+        if (file.isFile() && file.exists()) {
+        	file.delete();
+        }
+    }
 	public static Bitmap GetBitmapByPath(Context context, String pic_path,
 			int winHeight, int winWidth, double myscale) {
 		// Bitmap bitmap=BitmapFactory.decodeFile("/sdcard/a.jpg");
@@ -147,7 +158,7 @@ public class ImageProcess {
 		}
 		return degree;
 	}
-
+	
 	/**
 	 * 将图片按照某个角度进行旋转
 	 * 
