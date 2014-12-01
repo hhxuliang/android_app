@@ -62,44 +62,32 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	private static final int PAGE2 = 1;// 页面2
 	private static final int PAGE3 = 2;// 页面3
 	private List<GroupFriend> group;// 需要传递给适配器的数据
-	private List<GroupFriend> group_crowd;
-	// private String[] groupName = { "我的好友", "我的同学", "我的家人" };// 大组成员名
-	// List<String> groupName;
 	private SharePreferenceUtil util;
 	private UserDB userDB;// 保存好友列表数据库对象
 	private MessageDB messageDB;// 消息数据库对象
-
 	private MyListView myListView;// 好友列表自定义listView
 	private MyExAdapter myExAdapter;// 好
-	private MyExAdapter myExAdapter_crowd;
-
 	private ListView mRecentListView;// 最近会话的listView
 	private int newNum = 0;
-
-	private MyListView mGroupListView;// 群组listView
-
 	private ViewPager mPager;
 	private List<View> mListViews;// Tab页面
 	private LinearLayout layout_body_activity;
 	private ImageView img_recent_chat;// 最近会话
 	private ImageView img_friend_list;// 好友列表
 	private ImageView img_group_friend;// 群组
-
 	private ImageView myHeadImage;// 头像
 	private TextView myName;// 名字
-
 	private ImageView cursor;// 标题背景图片
-
 	private int currentIndex = PAGE2; // 默认选中第2个，可以动态的改变此参数值
 	private int offset = 0;// 动画图片偏移量
 	private int bmpW;// 动画图片宽度
-
 	private List<User> list;
 	private MenuInflater mi;// 菜单
+	private MyApplication application;
 	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
 			R.drawable.f3, R.drawable.f4, R.drawable.f5, R.drawable.f6,
 			R.drawable.f7, R.drawable.f8, R.drawable.f9 };// 头像资源
-	private MyApplication application;
+	
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -116,7 +104,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		// TODO Auto-generated method stub
 		super.onResume();
 		newNum = application.getRecentNum();// 从新获取一下全局变量
-		
+
 		application.getmRecentAdapter().notifyDataSetChanged();
 		updateUserState();
 	}
@@ -143,51 +131,28 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 */
 	private void initListViewData(List<User> list) {
 		group = new ArrayList<GroupFriend>();// 实例化
-		group_crowd = new ArrayList<GroupFriend>();// 实例化
 
 		GroupFriend g_info = null;
 		for (User u : list) {
 			boolean findG = false;
-			if (u.getIsCrowd() == 1) {
-				for (GroupFriend g : group_crowd) {
-					if (u.getGroup().equals(g.getGroupName())) {
-						g_info = g;
-						findG = true;
-						break;
-					}
-				}
-				System.out.println("group_crowd name is " + u.getGroup()
-						+ findG);
-				if (findG == false) {
-					List<User> child = new ArrayList<User>();// 装小组成员的list
-					child.add(u);
-					GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
-					group_crowd.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
-					// group_crowd.add(groupInfo);
-				} else {
-					if (g_info != null)
-						g_info.getGroupChild().add(u);
-				}
-			} else {
-				for (GroupFriend g : group) {
-					if (u.getGroup().equals(g.getGroupName())) {
-						g_info = g;
-						findG = true;
-						break;
-					}
-				}
-				System.out.println("group name is " + u.getGroup() + findG);
-				if (findG == false) {
-					List<User> child = new ArrayList<User>();// 装小组成员的list
-					child.add(u);
-					GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
-					group.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
-					// group_crowd.add(groupInfo);
-				} else {
-					if (g_info != null)
-						g_info.getGroupChild().add(u);
+			for (GroupFriend g : group) {
+				if (u.getGroup().equals(g.getGroupName())) {
+					g_info = g;
+					findG = true;
+					break;
 				}
 			}
+			if (findG == false) {
+				List<User> child = new ArrayList<User>();// 装小组成员的list
+				child.add(u);
+				GroupFriend groupInfo = new GroupFriend(u.getGroup(), child);// 我们自定义的大组成员对象
+				group.add(groupInfo);// 把自定义大组成员对象放入一个list中，传递给适配器
+
+			} else {
+				if (g_info != null)
+					g_info.getGroupChild().add(u);
+			}
+
 		}
 
 	}
@@ -267,17 +232,6 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		myListView.setFocusable(true);// 聚焦才可以下拉刷新
 		myListView.setonRefreshListener(new MyRefreshListener());
 
-		// 下面是群组界面处理
-		mGroupListView = (MyListView) lay3.findViewById(R.id.tab3_listView);
-
-		myExAdapter_crowd = new MyExAdapter(this, group_crowd,
-				application.getOffLineList());
-		mGroupListView.setAdapter(myExAdapter_crowd);
-		mGroupListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
-		mGroupListView.setDivider(null);// 设置图片可拉伸的
-		mGroupListView.setFocusable(true);// 聚焦才可以下拉刷新
-		mGroupListView.setonRefreshListener(new MyRefreshListener());
-
 	}
 
 	@Override
@@ -346,19 +300,21 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		startActivityForResult(intent, 1);
 		// finish();
 	}
-	public void updateUserState(){
+
+	public void updateUserState() {
 		HashMap<String, String> map = application.getNeedRefreshMap();
-		
+
 		Iterator<java.util.Map.Entry<String, String>> ite = map.entrySet()
-                .iterator();
-        java.util.Map.Entry<String, String> entry;
-        while (ite.hasNext()) {
-            entry = ite.next();
-            System.out.println((String)entry.getKey());
-            myExAdapter.addOffLineUserid((String)entry.getKey());
-        }
-        myExAdapter.notifyDataSetChanged();
+				.iterator();
+		java.util.Map.Entry<String, String> entry;
+		while (ite.hasNext()) {
+			entry = ite.next();
+			System.out.println((String) entry.getKey());
+			myExAdapter.addOffLineUserid((String) entry.getKey());
+		}
+		myExAdapter.notifyDataSetChanged();
 	}
+
 	@Override
 	public void receiveMsg(TranObject msg) {// 重写父类的方法，处理消息
 		// TODO Auto-generated method stub
