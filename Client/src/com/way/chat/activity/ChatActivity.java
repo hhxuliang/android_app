@@ -102,7 +102,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if (alreadycreate)
+				if (alreadycreate && out != null)
 					getOffLineMess();
 			}
 		};
@@ -282,7 +282,10 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 * 发送消息
 	 */
 	private void send(String contString, boolean is_pic, String pic_path_local) {
-
+		if(out==null){
+			Toast.makeText(ChatActivity.this,"网络连接异常！请连接网络后再试！", 0).show();// 提示用户
+			return;
+		}
 		if (contString.length() > 0) {
 			ChatMsgEntity entity = new ChatMsgEntity();
 			entity.setName(util.getName());
@@ -314,6 +317,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				else
 					o.setCrowd(0);
 				out.setMsg(o);
+			} else {
+				Toast.makeText(ChatActivity.this,"网络连接异常！", 0).show();// 提示用户
 			}
 			// 下面是添加到最近会话列表的处理，在按发送键之后
 			RecentChatEntity entity1 = new RecentChatEntity(user.getId(),

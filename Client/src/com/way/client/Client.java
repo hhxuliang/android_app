@@ -13,7 +13,7 @@ import java.net.Socket;
 public class Client {
 
 	private Socket client;
-	private ClientThread clientThread;
+	private ClientThread clientThread = null;
 	private String ip;
 	private int port;
 
@@ -23,41 +23,34 @@ public class Client {
 	}
 
 	public boolean start() {
-		new Thread(runnable).start();
-		try{
-			Thread.sleep(5000);
-		}catch(InterruptedException e)
-		{
-			System.out.println("Network connect runnable thread execute error!");
-			return false;
+		try {
+			client = new Socket();
+			// client.connect(new InetSocketAddress(Constants.SERVER_IP,
+			// Constants.SERVER_PORT), 3000);
+			client.connect(new InetSocketAddress(ip, port), 5000);
+			if (client.isConnected()) {
+				// System.out.println("Connected..");
+				clientThread = new ClientThread(client);
+				clientThread.start();
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return true;
+		return false;
 	}
-	Runnable runnable = new Runnable(){
-		public void run(){
-			try {
-				client = new Socket();
-				// client.connect(new InetSocketAddress(Constants.SERVER_IP,
-				// Constants.SERVER_PORT), 3000);
-				client.connect(new InetSocketAddress(ip, port), 5000);
-				if (client.isConnected()) {
-					// System.out.println("Connected..");
-					clientThread = new ClientThread(client);
-					clientThread.start();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();				
-			}			
-		}
-	};
 
 	// 直接通过client得到读线程
 	public ClientInputThread getClientInputThread() {
+		if (clientThread == null)
+			return null;
 		return clientThread.getIn();
 	}
 
 	// 直接通过client得到写线程
 	public ClientOutputThread getClientOutputThread() {
+		if (clientThread == null)
+			return null;
 		return clientThread.getOut();
 	}
 
@@ -66,7 +59,7 @@ public class Client {
 		clientThread.getIn().setStart(isStart);
 		clientThread.getOut().setStart(isStart);
 	}
-	
+
 	public class ClientThread extends Thread {
 
 		private ClientInputThread in;

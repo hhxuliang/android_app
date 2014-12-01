@@ -45,12 +45,9 @@ public class WelcomeActivity extends Activity {
 		}
 		initView();
 		initEnv();
-		if (isNetworkAvailable()) {
-			Intent service = new Intent(this, GetMsgService.class);
-			startService(service);
-		} else {
-			toast(this);
-		}
+		Intent service = new Intent(this, GetMsgService.class);
+		startService(service);
+		
 	}
 
 	public void initEnv() {

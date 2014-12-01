@@ -31,6 +31,7 @@ import com.way.client.Client;
 import com.way.client.ClientOutputThread;
 import com.way.util.DialogFactory;
 import com.way.util.Encode;
+import com.way.util.MyUtils;
 import com.way.util.SharePreferenceUtil;
 import com.way.util.UserDB;
 
@@ -61,8 +62,15 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 		mi = new MenuInflater(this);
 		if (!mAccounts.getText().toString().equals("")
 				&& !mPassword.getText().toString().equals("")) {
-			submit();
+			// submit();
+			gotoMain();
 		}
+	}
+
+	public void gotoMain() {
+		Intent i = new Intent(LoginActivity.this, MyMainActivity.class);
+		startActivity(i);
+		finish();
 	}
 
 	@Override
@@ -178,14 +186,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 			showRequestDialog();
 			// 通过Socket验证信息
 			if (application.isClientStart()) {
-				Client client = application.getClient();
-				ClientOutputThread out = client.getClientOutputThread();
-				TranObject<User> o = new TranObject<User>(TranObjectType.LOGIN);
-				User u = new User();
-				u.setLoginAccount(accounts);
-				u.setPassword(Encode.getEncode("MD5", password));
-				o.setObject(u);
-				out.setMsg(o);
+				MyUtils.login(accounts, password, application);
 			} else {
 				if (mDialog.isShowing())
 					mDialog.dismiss();
@@ -212,14 +213,11 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 					util.setEmail(list.get(0).getEmail());
 					util.setName(list.get(0).getName());
 					util.setImg(list.get(0).getImg());
-					application.getUserDB().updateUser(list);
-					Intent i = new Intent(LoginActivity.this,
-							MyMainActivity.class);
-					startActivity(i);
+					gotoMain();
 
 					if (mDialog.isShowing())
 						mDialog.dismiss();
-					finish();
+					
 					Toast.makeText(getApplicationContext(), "登录成功", 0).show();
 					if (list.get(0).getOffLineMessUser() != null
 							&& list.get(0).getOffLineMessUser().size() > 0) {

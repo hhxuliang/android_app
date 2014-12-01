@@ -139,7 +139,6 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				u.setId(Integer.parseInt(id));
 				u.setImg(img);
 				u.setIsCrowd(iscrowd);
-				System.out.println("asdfasdfasdf:"+iscrowd);
 				removeOffLineUserid(id);
 				Intent intent = new Intent(context, ChatActivity.class);
 				intent.putExtra("user", u);

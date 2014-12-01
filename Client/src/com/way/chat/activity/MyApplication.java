@@ -30,7 +30,14 @@ public class MyApplication extends Application {
 	private HashMap<String, String> mNeedRefresh = new HashMap<String, String>();
 	public static int mWindowHeight = 0;
 	public static int mWindowWidth = 0;
+	private boolean IsLogin = false;
 
+	public boolean isIsLogin() {
+		return IsLogin;
+	}
+	public void setIsLogin(boolean isLogin) {
+		IsLogin = isLogin;
+	}
 	@Override
 	public void onCreate() {
 		SharePreferenceUtil util = new SharePreferenceUtil(this,

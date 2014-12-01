@@ -10,6 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -24,6 +27,7 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -36,8 +40,11 @@ import com.way.client.Client;
 import com.way.client.ClientInputThread;
 import com.way.client.ClientOutputThread;
 import com.way.client.MessageListener;
+import com.way.util.DialogFactory;
+import com.way.util.Encode;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
+import com.way.util.MyUtils;
 import com.way.util.SharePreferenceUtil;
 import com.way.util.UserDB;
 import com.way.util.ZipUtil;
@@ -62,7 +69,9 @@ public class GetMsgService extends Service {
 	private SharePreferenceUtil util;
 	private MessageDB messageDB;
 	private HashMap<String, TranObject> mMap_Waiting_Download_Pic = new HashMap<String, TranObject>();
-
+	private final Timer timer = new Timer();
+	private TimerTask task;
+	
 	private Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
@@ -221,6 +230,22 @@ public class GetMsgService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
+		task = new TimerTask() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				if (application.isClientStart()) {
+					timer.cancel();
+					timer.purge();
+				}else
+					start_client_socket();
+			}
+		};
+		timer.schedule(task, 500, 30000);
+	}
+
+
+	public void start_client_socket() {
 		util = new SharePreferenceUtil(getApplicationContext(),
 				Constants.SAVE_USER);
 		isStart = client.start();
@@ -232,10 +257,6 @@ public class GetMsgService extends Service {
 
 				@Override
 				public void Message(TranObject msg) {
-					System.out.println("GetMsgService:" + msg);
-					System.out.println("GetMsgService:" + msg.getType());
-					System.out.println("GetMsgService:" + msg.getFromUser());
-					System.out.println("GetMsgService:" + util.getIsStart());
 					preProcess(msg);
 					if (util.getIsStart()) {// 如果 是在后台运行，就更新通知栏，否则就发送广播给Activity
 						if (msg.getType() == TranObjectType.MESSAGE) {// 只处理文本消息类型
@@ -254,6 +275,7 @@ public class GetMsgService extends Service {
 					}
 				}
 			});
+			MyUtils.login(util.getName(), util.getPasswd(), application);
 		}
 	}
 
@@ -294,7 +316,12 @@ public class GetMsgService extends Service {
 			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
 			break;
 		case LOGIN:
-			MediaPlayer.create(this, R.raw.msg).start();
+			List<User> list = (List<User>) msg.getObject();
+			if (list != null && list.size() > 0) {
+				// 保存用户信息
+				application.getUserDB().updateUser(list);
+				application.setIsLogin(true);
+			}
 			break;
 		case LOGOUT:
 			MediaPlayer.create(this, R.raw.msg).start();

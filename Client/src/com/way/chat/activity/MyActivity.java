@@ -71,9 +71,6 @@ public abstract class MyActivity extends Activity {
 			receiveMsg(msg);
 			break;
 		case LOGIN:
-			User loginUser = (User) msg.getObject();
-			Toast.makeText(MyActivity.this, "亲！" + loginUser.getId() + "上线了哦",
-					0).show();
 			break;
 		case LOGOUT:
 			User logoutUser = (User) msg.getObject();
