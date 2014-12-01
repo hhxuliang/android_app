@@ -29,9 +29,9 @@ import com.way.chat.activity.R.id;
 import com.way.chat.activity.R.layout;
 
 public class ChildAdapter extends BaseAdapter {
-	private Point mPoint = new Point(0, 0);//������װImageView�Ŀ�͸ߵĶ���
+	private Point mPoint = new Point(0, 0);//用来封装ImageView的宽和高的对象
 	/**
-	 * �����洢ͼƬ��ѡ�����
+	 * 用来存储图片的选中情况
 	 */
 	private HashMap<Integer, Boolean> mSelectMap = new HashMap<Integer, Boolean>();
 	private GridView mGridView;
@@ -71,7 +71,7 @@ public class ChildAdapter extends BaseAdapter {
 			viewHolder.mImageView = (MyImageView) convertView.findViewById(R.id.child_image);
 			viewHolder.mCheckBox = (CheckBox) convertView.findViewById(R.id.child_checkbox);
 			
-			//��������ImageView�Ŀ�͸�
+			//用来监听ImageView的宽和高
 			viewHolder.mImageView.setOnMeasureListener(new OnMeasureListener() {
 				
 				@Override
@@ -90,7 +90,7 @@ public class ChildAdapter extends BaseAdapter {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				//�����δѡ�е�CheckBox,����Ӷ���
+				//如果是未选中的CheckBox,则添加动画
 				if(!mSelectMap.containsKey(position) || !mSelectMap.get(position)){
 					addAnimation(viewHolder.mCheckBox);
 				}
@@ -100,7 +100,7 @@ public class ChildAdapter extends BaseAdapter {
 		
 		viewHolder.mCheckBox.setChecked(mSelectMap.containsKey(position) ? mSelectMap.get(position) : false);
 		
-		//����NativeImageLoader����ر���ͼƬ
+		//利用NativeImageLoader类加载本地图片
 		Bitmap bitmap = NativeImageLoader.getInstance().loadNativeImage(path, mPoint, new NativeImageCallBack() {
 			
 			@Override
@@ -122,7 +122,7 @@ public class ChildAdapter extends BaseAdapter {
 	}
 	
 	/**
-	 * ��CheckBox�ӵ�����������ÿ�Դ��nineoldandroids���ö��� 
+	 * 给CheckBox加点击动画，利用开源库nineoldandroids设置动画 
 	 * @param view
 	 */
 	private void addAnimation(View view){
@@ -136,7 +136,7 @@ public class ChildAdapter extends BaseAdapter {
 	
 	
 	/**
-	 * ��ȡѡ�е�Item��position
+	 * 获取选中的Item的position
 	 * @return
 	 */
 	public List<Integer> getSelectItems(){

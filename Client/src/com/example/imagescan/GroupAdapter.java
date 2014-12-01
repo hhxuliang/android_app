@@ -19,9 +19,10 @@ import com.example.imagescan.NativeImageLoader.NativeImageCallBack;
 import com.way.chat.activity.R;
 import com.way.chat.activity.R.id;
 import com.way.chat.activity.R.layout;
+
 public class GroupAdapter extends BaseAdapter{
 	private List<ImageBean> list;
-	private Point mPoint = new Point(0, 0);//������װImageView�Ŀ�͸ߵĶ���
+	private Point mPoint = new Point(0, 0);//用来封装ImageView的宽和高的对象
 	private GridView mGridView;
 	protected LayoutInflater mInflater;
 	
@@ -60,7 +61,7 @@ public class GroupAdapter extends BaseAdapter{
 			viewHolder.mTextViewTitle = (TextView) convertView.findViewById(R.id.group_title);
 			viewHolder.mTextViewCounts = (TextView) convertView.findViewById(R.id.group_count);
 			
-			//��������ImageView�Ŀ�͸�
+			//用来监听ImageView的宽和高
 			viewHolder.mImageView.setOnMeasureListener(new OnMeasureListener() {
 				
 				@Override
@@ -77,11 +78,11 @@ public class GroupAdapter extends BaseAdapter{
 		
 		viewHolder.mTextViewTitle.setText(mImageBean.getFolderName());
 		viewHolder.mTextViewCounts.setText(Integer.toString(mImageBean.getImageCounts()));
-		//��ImageView����·��Tag,�����첽����ͼƬ��С����
+		//给ImageView设置路径Tag,这是异步加载图片的小技巧
 		viewHolder.mImageView.setTag(path);
 		
 		
-		//����NativeImageLoader����ر���ͼƬ
+		//利用NativeImageLoader类加载本地图片
 		Bitmap bitmap = NativeImageLoader.getInstance().loadNativeImage(path, mPoint, new NativeImageCallBack() {
 			
 			@Override

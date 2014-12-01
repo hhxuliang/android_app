@@ -11,8 +11,8 @@ import android.os.Message;
 import android.support.v4.util.LruCache;
 
 /**
- * ±¾µØÍ¼Æ¬¼ÓÔØÆ÷,²ÉÓÃµÄÊÇÒì²½½âÎö±¾µØÍ¼Æ¬£¬µ¥ÀıÄ£Ê½ÀûÓÃgetInstance()»ñÈ¡NativeImageLoaderÊµÀı
- * µ÷ÓÃloadNativeImage()·½·¨¼ÓÔØ±¾µØÍ¼Æ¬£¬´ËÀà¿É×÷ÎªÒ»¸ö¼ÓÔØ±¾µØÍ¼Æ¬µÄ¹¤¾ßÀà
+ * æœ¬åœ°å›¾ç‰‡åŠ è½½å™¨,é‡‡ç”¨çš„æ˜¯å¼‚æ­¥è§£ææœ¬åœ°å›¾ç‰‡ï¼Œå•ä¾‹æ¨¡å¼åˆ©ç”¨getInstance()è·å–NativeImageLoaderå®ä¾‹
+ * è°ƒç”¨loadNativeImage()æ–¹æ³•åŠ è½½æœ¬åœ°å›¾ç‰‡ï¼Œæ­¤ç±»å¯ä½œä¸ºä¸€ä¸ªåŠ è½½æœ¬åœ°å›¾ç‰‡çš„å·¥å…·ç±»
  * 
  * @blog http://blog.csdn.net/xiaanming
  * 
@@ -27,14 +27,14 @@ public class NativeImageLoader {
 	
 	
 	private NativeImageLoader(){
-		//»ñÈ¡Ó¦ÓÃ³ÌĞòµÄ×î´óÄÚ´æ
+		//è·å–åº”ç”¨ç¨‹åºçš„æœ€å¤§å†…å­˜
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
-		//ÓÃ×î´óÄÚ´æµÄ1/4À´´æ´¢Í¼Æ¬
+		//ç”¨æœ€å¤§å†…å­˜çš„1/4æ¥å­˜å‚¨å›¾ç‰‡
 		final int cacheSize = maxMemory / 4;
 		mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 			
-			//»ñÈ¡Ã¿ÕÅÍ¼Æ¬µÄ´óĞ¡
+			//è·å–æ¯å¼ å›¾ç‰‡çš„å¤§å°
 			@Override
 			protected int sizeOf(String key, Bitmap bitmap) {
 				return bitmap.getRowBytes() * bitmap.getHeight() / 1024;
@@ -43,7 +43,7 @@ public class NativeImageLoader {
 	}
 	
 	/**
-	 * Í¨¹ı´Ë·½·¨À´»ñÈ¡NativeImageLoaderµÄÊµÀı
+	 * é€šè¿‡æ­¤æ–¹æ³•æ¥è·å–NativeImageLoaderçš„å®ä¾‹
 	 * @return
 	 */
 	public static NativeImageLoader getInstance(){
@@ -52,7 +52,7 @@ public class NativeImageLoader {
 	
 	
 	/**
-	 * ¼ÓÔØ±¾µØÍ¼Æ¬£¬¶ÔÍ¼Æ¬²»½øĞĞ²Ã¼ô
+	 * åŠ è½½æœ¬åœ°å›¾ç‰‡ï¼Œå¯¹å›¾ç‰‡ä¸è¿›è¡Œè£å‰ª
 	 * @param path
 	 * @param mCallBack
 	 * @return
@@ -62,15 +62,15 @@ public class NativeImageLoader {
 	}
 	
 	/**
-	 * ´Ë·½·¨À´¼ÓÔØ±¾µØÍ¼Æ¬£¬ÕâÀïµÄmPointÊÇÓÃÀ´·â×°ImageViewµÄ¿íºÍ¸ß£¬ÎÒÃÇ»á¸ù¾İImageView¿Ø¼şµÄ´óĞ¡À´²Ã¼ôBitmap
-	 * Èç¹ûÄã²»Ïë²Ã¼ôÍ¼Æ¬£¬µ÷ÓÃloadNativeImage(final String path, final NativeImageCallBack mCallBack)À´¼ÓÔØ
+	 * æ­¤æ–¹æ³•æ¥åŠ è½½æœ¬åœ°å›¾ç‰‡ï¼Œè¿™é‡Œçš„mPointæ˜¯ç”¨æ¥å°è£…ImageViewçš„å®½å’Œé«˜ï¼Œæˆ‘ä»¬ä¼šæ ¹æ®ImageViewæ§ä»¶çš„å¤§å°æ¥è£å‰ªBitmap
+	 * å¦‚æœä½ ä¸æƒ³è£å‰ªå›¾ç‰‡ï¼Œè°ƒç”¨loadNativeImage(final String path, final NativeImageCallBack mCallBack)æ¥åŠ è½½
 	 * @param path
 	 * @param mPoint
 	 * @param mCallBack
 	 * @return
 	 */
 	public Bitmap loadNativeImage(final String path, final Point mPoint, final NativeImageCallBack mCallBack){
-		//ÏÈ»ñÈ¡ÄÚ´æÖĞµÄBitmap
+		//å…ˆè·å–å†…å­˜ä¸­çš„Bitmap
 		Bitmap bitmap = getBitmapFromMemCache(path);
 		
 		final Handler mHander = new Handler(){
@@ -83,19 +83,19 @@ public class NativeImageLoader {
 			
 		};
 		
-		//Èô¸ÃBitmap²»ÔÚÄÚ´æ»º´æÖĞ£¬ÔòÆôÓÃÏß³ÌÈ¥¼ÓÔØ±¾µØµÄÍ¼Æ¬£¬²¢½«Bitmap¼ÓÈëµ½mMemoryCacheÖĞ
+		//è‹¥è¯¥Bitmapä¸åœ¨å†…å­˜ç¼“å­˜ä¸­ï¼Œåˆ™å¯ç”¨çº¿ç¨‹å»åŠ è½½æœ¬åœ°çš„å›¾ç‰‡ï¼Œå¹¶å°†BitmapåŠ å…¥åˆ°mMemoryCacheä¸­
 		if(bitmap == null){
 			mImageThreadPool.execute(new Runnable() {
 				
 				@Override
 				public void run() {
-					//ÏÈ»ñÈ¡Í¼Æ¬µÄËõÂÔÍ¼
+					//å…ˆè·å–å›¾ç‰‡çš„ç¼©ç•¥å›¾
 					Bitmap mBitmap = decodeThumbBitmapForFile(path, mPoint == null ? 0: mPoint.x, mPoint == null ? 0: mPoint.y);
 					Message msg = mHander.obtainMessage();
 					msg.obj = mBitmap;
 					mHander.sendMessage(msg);
 					
-					//½«Í¼Æ¬¼ÓÈëµ½ÄÚ´æ»º´æ
+					//å°†å›¾ç‰‡åŠ å…¥åˆ°å†…å­˜ç¼“å­˜
 					addBitmapToMemoryCache(path, mBitmap);
 				}
 			});
@@ -107,7 +107,7 @@ public class NativeImageLoader {
 	
 	
 	/**
-	 * ÍùÄÚ´æ»º´æÖĞÌí¼ÓBitmap
+	 * å¾€å†…å­˜ç¼“å­˜ä¸­æ·»åŠ Bitmap
 	 * 
 	 * @param key
 	 * @param bitmap
@@ -119,7 +119,7 @@ public class NativeImageLoader {
 	}
 
 	/**
-	 * ¸ù¾İkeyÀ´»ñÈ¡ÄÚ´æÖĞµÄÍ¼Æ¬
+	 * æ ¹æ®keyæ¥è·å–å†…å­˜ä¸­çš„å›¾ç‰‡
 	 * @param key
 	 * @return
 	 */
@@ -129,7 +129,7 @@ public class NativeImageLoader {
 	
 	
 	/**
-	 * ¸ù¾İView(Ö÷ÒªÊÇImageView)µÄ¿íºÍ¸ßÀ´»ñÈ¡Í¼Æ¬µÄËõÂÔÍ¼
+	 * æ ¹æ®View(ä¸»è¦æ˜¯ImageView)çš„å®½å’Œé«˜æ¥è·å–å›¾ç‰‡çš„ç¼©ç•¥å›¾
 	 * @param path
 	 * @param viewWidth
 	 * @param viewHeight
@@ -137,13 +137,13 @@ public class NativeImageLoader {
 	 */
 	private Bitmap decodeThumbBitmapForFile(String path, int viewWidth, int viewHeight){
 		BitmapFactory.Options options = new BitmapFactory.Options();
-		//ÉèÖÃÎªtrue,±íÊ¾½âÎöBitmap¶ÔÏó£¬¸Ã¶ÔÏó²»Õ¼ÄÚ´æ
+		//è®¾ç½®ä¸ºtrue,è¡¨ç¤ºè§£æBitmapå¯¹è±¡ï¼Œè¯¥å¯¹è±¡ä¸å å†…å­˜
 		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeFile(path, options);
-		//ÉèÖÃËõ·Å±ÈÀı
+		//è®¾ç½®ç¼©æ”¾æ¯”ä¾‹
 		options.inSampleSize = computeScale(options, viewWidth, viewHeight);
 		
-		//ÉèÖÃÎªfalse,½âÎöBitmap¶ÔÏó¼ÓÈëµ½ÄÚ´æÖĞ
+		//è®¾ç½®ä¸ºfalse,è§£æBitmapå¯¹è±¡åŠ å…¥åˆ°å†…å­˜ä¸­
 		options.inJustDecodeBounds = false;
 		
 		return BitmapFactory.decodeFile(path, options);
@@ -151,7 +151,7 @@ public class NativeImageLoader {
 	
 	
 	/**
-	 * ¸ù¾İView(Ö÷ÒªÊÇImageView)µÄ¿íºÍ¸ßÀ´¼ÆËãBitmapËõ·Å±ÈÀı¡£Ä¬ÈÏ²»Ëõ·Å
+	 * æ ¹æ®View(ä¸»è¦æ˜¯ImageView)çš„å®½å’Œé«˜æ¥è®¡ç®—Bitmapç¼©æ”¾æ¯”ä¾‹ã€‚é»˜è®¤ä¸ç¼©æ”¾
 	 * @param options
 	 * @param width
 	 * @param height
@@ -164,12 +164,12 @@ public class NativeImageLoader {
 		int bitmapWidth = options.outWidth;
 		int bitmapHeight = options.outHeight;
 		
-		//¼ÙÈçBitmapµÄ¿í¶È»ò¸ß¶È´óÓÚÎÒÃÇÉè¶¨Í¼Æ¬µÄViewµÄ¿í¸ß£¬Ôò¼ÆËãËõ·Å±ÈÀı
+		//å‡å¦‚Bitmapçš„å®½åº¦æˆ–é«˜åº¦å¤§äºæˆ‘ä»¬è®¾å®šå›¾ç‰‡çš„Viewçš„å®½é«˜ï¼Œåˆ™è®¡ç®—ç¼©æ”¾æ¯”ä¾‹
 		if(bitmapWidth > viewWidth || bitmapHeight > viewWidth){
 			int widthScale = Math.round((float) bitmapWidth / (float) viewWidth);
 			int heightScale = Math.round((float) bitmapHeight / (float) viewWidth);
 			
-			//ÎªÁË±£Ö¤Í¼Æ¬²»Ëõ·Å±äĞÎ£¬ÎÒÃÇÈ¡¿í¸ß±ÈÀı×îĞ¡µÄÄÇ¸ö
+			//ä¸ºäº†ä¿è¯å›¾ç‰‡ä¸ç¼©æ”¾å˜å½¢ï¼Œæˆ‘ä»¬å–å®½é«˜æ¯”ä¾‹æœ€å°çš„é‚£ä¸ª
 			inSampleSize = widthScale < heightScale ? widthScale : heightScale;
 		}
 		return inSampleSize;
@@ -177,14 +177,14 @@ public class NativeImageLoader {
 	
 	
 	/**
-	 * ¼ÓÔØ±¾µØÍ¼Æ¬µÄ»Øµ÷½Ó¿Ú
+	 * åŠ è½½æœ¬åœ°å›¾ç‰‡çš„å›è°ƒæ¥å£
 	 * 
 	 * @author xiaanming
 	 *
 	 */
 	public interface NativeImageCallBack{
 		/**
-		 * µ±×ÓÏß³Ì¼ÓÔØÍêÁË±¾µØµÄÍ¼Æ¬£¬½«BitmapºÍÍ¼Æ¬Â·¾¶»Øµ÷ÔÚ´Ë·½·¨ÖĞ
+		 * å½“å­çº¿ç¨‹åŠ è½½å®Œäº†æœ¬åœ°çš„å›¾ç‰‡ï¼Œå°†Bitmapå’Œå›¾ç‰‡è·¯å¾„å›è°ƒåœ¨æ­¤æ–¹æ³•ä¸­
 		 * @param bitmap
 		 * @param path
 		 */

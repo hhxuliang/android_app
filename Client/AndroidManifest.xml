@@ -69,6 +69,7 @@
         </activity>
         <activity android:name="com.huewu.pla.sample.PullToRefreshSampleActivity"></activity>
         <activity android:name="com.huewu.pla.sample.ImageDetailActivity"></activity>
+        <activity android:name="com.example.imagescan.ShowImageActivity"></activity>
         
         
         
