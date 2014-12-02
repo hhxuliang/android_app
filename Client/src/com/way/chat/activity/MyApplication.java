@@ -93,8 +93,11 @@ public class MyApplication extends Application {
 		return home_path + "/camerapicpath";
 	}
 
-	public String getPicPath() {
-		return home_path + "/picpath";
+	public String getMyUploadPicPath() {
+		return home_path + "/picpath/MyUpload";
+	}
+	public String getDownloadPicPath() {
+		return home_path + "/picpath/ClassSharing";
 	}
 
 	public UserDB getUserDB() {

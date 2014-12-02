@@ -123,7 +123,7 @@ public class GetMsgService extends Service {
 
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
-					String savePath = application.getPicPath() + "/"
+					String savePath = application.getDownloadPicPath() + "/"
 							+ MyDate.getDateForImageName() + prefix;
 					FileOutputStream fos = new FileOutputStream(savePath);
 					byte[] buffer = new byte[8192];

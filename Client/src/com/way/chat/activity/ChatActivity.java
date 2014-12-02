@@ -116,6 +116,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				ChatMsgEntity cme = mDataArrays.get(i);
 				if (cme.getMessage().equals(hm.mUrl)) {
 					cme.setPicPath(hm.mSavePath);
+					System.out.println("fffffffffffffffff"+hm.mSavePath);
 					mDataArrays.set(i, cme);
 				}
 			}

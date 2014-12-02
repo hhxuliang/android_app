@@ -4,29 +4,42 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import com.way.chat.activity.FriendListActivity;
 import com.way.chat.activity.MyApplication;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.WindowManager;
 
 public class ImageProcess {
-	 /**
-     * 删除单个文件
-     * @param   filePath    被删除文件的文件名
-     * @return 文件删除成功返回true，否则返回false
-     */
-    public static void deleteFile(String filePath) {
-    File file = new File(filePath);
-        if (file.isFile() && file.exists()) {
-        	file.delete();
-        }
-    }
+	public enum FileType {
+		IMAGE, VIDEO, UNKNOW
+	};
+
+	/**
+	 * 删除单个文件
+	 * 
+	 * @param filePath
+	 *            被删除文件的文件名
+	 * @return 文件删除成功返回true，否则返回false
+	 */
+	public static void deleteFile(String filePath) {
+		File file = new File(filePath);
+		if (file.isFile() && file.exists()) {
+			file.delete();
+		}
+	}
+
 	public static Bitmap GetBitmapByPath(Context context, String pic_path,
 			int winHeight, int winWidth, double myscale) {
 		// Bitmap bitmap=BitmapFactory.decodeFile("/sdcard/a.jpg");
@@ -158,7 +171,7 @@ public class ImageProcess {
 		}
 		return degree;
 	}
-	
+
 	/**
 	 * 将图片按照某个角度进行旋转
 	 * 
@@ -194,16 +207,67 @@ public class ImageProcess {
 		File file = new File(path);
 		File[] f = file.listFiles();
 		ArrayList<String> Path = new ArrayList<String>();
-
-		for (int i = 0; i < f.length; i++)
-
-		{
-
-			Path.add(f[i].getPath());
+		if (f != null) {
+			for (int i = 0; i < f.length; i++) {
+				if (f[i].isFile())
+					Path.add(f[i].getPath());
+			}
 		}
-
 		return Path;
 
+	}
+
+	// 检查扩展名，得到图片格式的文件
+	public static FileType checkFileType(String fName) {
+		FileType isImageFile = ImageProcess.FileType.UNKNOW;
+		// 获取扩展名
+		String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
+				fName.length()).toLowerCase();
+		if (FileEnd.equals("jpg") || FileEnd.equals("gif")
+				|| FileEnd.equals("png") || FileEnd.equals("jpeg")
+				|| FileEnd.equals("bmp")) {
+			isImageFile = ImageProcess.FileType.IMAGE;
+		} else if (FileEnd.equals("mp4")) {
+			isImageFile = ImageProcess.FileType.VIDEO;
+		}
+		return isImageFile;
+	}
+
+	private void backcode() {
+		// Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+		// ContentResolver mContentResolver = FriendListActivity.this
+		// .getContentResolver();
+		//
+		// // 只查询jpeg和png的图片
+		// Cursor mCursor = mContentResolver.query(mImageUri, null,
+		// MediaStore.Images.Media.MIME_TYPE + "=? or "
+		// + MediaStore.Images.Media.MIME_TYPE + "=? or "
+		// + MediaStore.Images.Media.MIME_TYPE + "=?",
+		// new String[] { "image/jpeg", "image/png", "image/jpg" },
+		// MediaStore.Images.Media.DATE_MODIFIED);
+		//
+		// while (mCursor.moveToNext()) {
+		// // 获取图片的路径
+		// String path = mCursor.getString(mCursor
+		// .getColumnIndex(MediaStore.Images.Media.DATA));
+		//
+		// // 获取该图片的父路径名
+		// String parentName = new File(path).getParentFile().getName();
+		//
+		// // 根据父路径名将图片放入到mGruopMap中
+		// if (!mGruopMap.containsKey(parentName)) {
+		// List<String> chileList = new ArrayList<String>();
+		// chileList.add(path);
+		// mGruopMap.put(parentName, chileList);
+		// } else {
+		// mGruopMap.get(parentName).add(path);
+		// }
+		// }
+		//
+		// mCursor.close();
+		//
+		// // 通知Handler扫描图片完成
+		// mHandler.sendEmptyMessage(SCAN_OK);
 	}
 
 }

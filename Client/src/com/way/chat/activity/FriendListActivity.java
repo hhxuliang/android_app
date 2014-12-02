@@ -60,6 +60,7 @@ import com.way.client.ClientInputThread;
 import com.way.client.ClientOutputThread;
 import com.way.client.MessageListener;
 import com.way.util.GroupFriend;
+import com.way.util.ImageProcess;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
@@ -136,7 +137,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		initData();// 初始化数据
 		initImageView();// 初始化动画
 		initUI();// 初始化界面
-		getImages();
+
 	}
 
 	@Override
@@ -147,6 +148,11 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		application.getmRecentAdapter().notifyDataSetChanged();
 		updateUserState();
+		if (mGroupGridView != null && mGroupGridView.getAdapter() != null){
+			((GroupAdapter) mGroupGridView.getAdapter()).resetList();			
+		}
+
+		getImages();
 	}
 
 	/**
@@ -510,12 +516,6 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 * 利用ContentProvider扫描手机中的图片，此方法在运行在子线程中
 	 */
 	private void getImages() {
-		if (!Environment.getExternalStorageState().equals(
-				Environment.MEDIA_MOUNTED)) {
-			Toast.makeText(this, "暂无外部存储", Toast.LENGTH_SHORT).show();
-			return;
-		}
-
 		// 显示进度条
 		mProgressDialog = ProgressDialog.show(this, null, "正在加载...");
 
@@ -523,38 +523,26 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 			@Override
 			public void run() {
-				Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-				ContentResolver mContentResolver = FriendListActivity.this
-						.getContentResolver();
+				ArrayList<String> childpath = new ArrayList<String>();
+				childpath.add(application.getDownloadPicPath());
+				childpath.add(application.getMyUploadPicPath());
+				mGruopMap.clear();
+				for (String parentN : childpath) {
+					ArrayList<String> pathstr = ImageProcess.ListFile(parentN);
 
-				// 只查询jpeg和png的图片
-				Cursor mCursor = mContentResolver.query(mImageUri, null,
-						MediaStore.Images.Media.MIME_TYPE + "=? or "
-								+ MediaStore.Images.Media.MIME_TYPE + "=?",
-						new String[] { "image/jpeg", "image/png" },
-						MediaStore.Images.Media.DATE_MODIFIED);
-
-				while (mCursor.moveToNext()) {
-					// 获取图片的路径
-					String path = mCursor.getString(mCursor
-							.getColumnIndex(MediaStore.Images.Media.DATA));
-
-					// 获取该图片的父路径名
-					String parentName = new File(path).getParentFile()
-							.getName();
-
-					// 根据父路径名将图片放入到mGruopMap中
-					if (!mGruopMap.containsKey(parentName)) {
-						List<String> chileList = new ArrayList<String>();
-						chileList.add(path);
-						mGruopMap.put(parentName, chileList);
-					} else {
-						mGruopMap.get(parentName).add(path);
+					File file = new File(parentN);
+					String parentName = file.getName();
+					for (String path : pathstr) {
+						// 根据父路径名将图片放入到mGruopMap中
+						if (!mGruopMap.containsKey(parentName)) {
+							List<String> chileList = new ArrayList<String>();
+							chileList.add(path);
+							mGruopMap.put(parentName, chileList);
+						} else {
+							mGruopMap.get(parentName).add(path);
+						}
 					}
 				}
-
-				mCursor.close();
-
 				// 通知Handler扫描图片完成
 				mHandler.sendEmptyMessage(SCAN_OK);
 
@@ -571,9 +559,6 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 */
 	private List<ImageBean> subGroupOfImage(
 			HashMap<String, List<String>> mGruopMap) {
-		if (mGruopMap.size() == 0) {
-			return null;
-		}
 		List<ImageBean> list = new ArrayList<ImageBean>();
 
 		Iterator<Map.Entry<String, List<String>>> it = mGruopMap.entrySet()

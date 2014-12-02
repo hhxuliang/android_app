@@ -168,16 +168,7 @@ public class LoginActivity extends MyActivity implements OnClickListener {
 	 * 提交账号密码信息到服务器
 	 */
 	private void submit() {
-		// 获取Android屏幕的服务
-		WindowManager wm = (WindowManager) LoginActivity.this
-				.getSystemService(LoginActivity.this.WINDOW_SERVICE);
-		// 获取屏幕的分辨率，getHeight()、getWidth已经被废弃掉了
-		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
-		MyApplication.mWindowHeight = wm.getDefaultDisplay().getHeight();
-		MyApplication.mWindowWidth = wm.getDefaultDisplay().getWidth();
-		System.out.println("height is :" + MyApplication.mWindowHeight);
-		System.out.println("width is :" + MyApplication.mWindowWidth);
-
+		
 		String accounts = mAccounts.getText().toString();
 		String password = mPassword.getText().toString();
 		if (accounts.length() == 0 || password.length() == 0) {

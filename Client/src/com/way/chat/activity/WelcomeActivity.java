@@ -47,6 +47,14 @@ public class WelcomeActivity extends Activity {
 		initEnv();
 		Intent service = new Intent(this, GetMsgService.class);
 		startService(service);
+		// 获取Android屏幕的服务
+		WindowManager wm = (WindowManager) WelcomeActivity.this
+				.getSystemService(WelcomeActivity.this.WINDOW_SERVICE);
+		// 获取屏幕的分辨率，getHeight()、getWidth已经被废弃掉了
+		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
+		
+		MyApplication.mWindowHeight = wm.getDefaultDisplay().getHeight();
+		MyApplication.mWindowWidth = wm.getDefaultDisplay().getWidth();
 		
 	}
 
@@ -59,23 +67,32 @@ public class WelcomeActivity extends Activity {
 			File sdcardDir = Environment.getExternalStorageDirectory();
 			// 得到一个路径，内容是sdcard的文件夹路径和名字
 			String path = sdcardDir.getPath() + "/children";
+			application.setHomePath(path);
+			
 			File path1 = new File(path);
 			if (!path1.exists()) {
 				// 若不存在，创建目录，可以在应用启动的时候创建
 				path1.mkdirs();
 			}
-			application.setHomePath(path);
+			
 			String path_camera = application.getCameraPath();
 			File path_camera_f = new File(path_camera);
 			if (!path_camera_f.exists()) {
 				// 若不存在，创建目录，可以在应用启动的时候创建
 				path_camera_f.mkdirs();
 			}
-			String path_pic = application.getPicPath();
+			String path_pic = application.getMyUploadPicPath();
 			File path_pic_f = new File(path_pic);
 			if (!path_pic_f.exists()) {
 				// 若不存在，创建目录，可以在应用启动的时候创建
 				path_pic_f.mkdirs();
+			}
+			
+			String path_pic_1 = application.getDownloadPicPath();
+			File path_pic_f_1 = new File(path_pic_1);
+			if (!path_pic_f_1.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path_pic_f_1.mkdirs();
 			}
 		} else {
 			Toast.makeText(this, "内存卡不存在...", Toast.LENGTH_LONG).show();

@@ -126,7 +126,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		progressDialog = new ProgressDialog(this);
 		application = (MyApplication) this.getApplicationContext();
 		picPath = application.getCameraPath() + "/upload";
-		pic_path_save = application.getPicPath();
+		pic_path_save = application.getMyUploadPicPath();
 		// picPath = "/mnt/sdcard/children/camerapicpath/upload";
 		requestURL = "http://" + Constants.SERVER_IP + ":8080"
 				+ "/Server/UploadFile";
