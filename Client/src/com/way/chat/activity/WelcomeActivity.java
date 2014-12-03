@@ -48,8 +48,7 @@ public class WelcomeActivity extends Activity {
 		Intent service = new Intent(this, GetMsgService.class);
 		startService(service);
 		// 获取Android屏幕的服务
-		WindowManager wm = (WindowManager) WelcomeActivity.this
-				.getSystemService(WelcomeActivity.this.WINDOW_SERVICE);
+		WindowManager wm = this.getWindowManager();
 		// 获取屏幕的分辨率，getHeight()、getWidth已经被废弃掉了
 		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
 		

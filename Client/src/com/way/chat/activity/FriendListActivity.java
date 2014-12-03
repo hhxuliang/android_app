@@ -160,7 +160,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	 */
 	private void initData() {
 		userDB = application.getUserDB();// 本地用户数据库
-		messageDB = new MessageDB(this);// 本地消息数据库
+		messageDB = application.getMessageDB();// 本地消息数据库
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 
 		if (list != null && list.size() > 0)
@@ -256,8 +256,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		View lay1 = inflater.inflate(R.layout.tab1, null);
 		View lay2 = inflater.inflate(R.layout.tab2, null);
 		View lay3 = inflater.inflate(R.layout.tab3, null);
-		mListViews.add(lay1);
 		mListViews.add(lay2);
+		mListViews.add(lay1);
 		mListViews.add(lay3);
 		mPager.setAdapter(new MyPagerAdapter(mListViews));
 		mPager.setCurrentItem(PAGE2);

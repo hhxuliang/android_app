@@ -153,12 +153,13 @@ public class GetMsgService extends Service {
 	public void onCreate() {// 在onCreate方法里面注册广播接收者
 		// TODO Auto-generated method stub
 		super.onCreate();
-		messageDB = new MessageDB(this);
+		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Constants.BACKKEY_ACTION);
 		registerReceiver(backKeyReceiver, filter);
 		mNotificationManager = (NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 		application = (MyApplication) this.getApplicationContext();
+		messageDB = application.getMessageDB();
 		client = application.getClient();
 		application.setmNotificationManager(mNotificationManager);
 	}
@@ -335,8 +336,6 @@ public class GetMsgService extends Service {
 	// 在服务被摧毁时，做一些事情
 	public void onDestroy() {
 		super.onDestroy();
-		if (messageDB != null)
-			messageDB.close();
 		unregisterReceiver(backKeyReceiver);
 		mNotificationManager.cancel(Constants.NOTIFY_ID);
 		// 给服务器发送下线消息

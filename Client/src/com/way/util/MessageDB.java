@@ -43,7 +43,7 @@ public class MessageDB {
 				new Object[] { setStr_path, whereStr_msg });
 	}
 
-	public List<ChatMsgEntity> getMsg(int id, String whereStr_time) {
+	public List<ChatMsgEntity> getMsg(int id, String whereStr_time, int limit) {
 		List<ChatMsgEntity> list = new ArrayList<ChatMsgEntity>();
 		db.execSQL("CREATE table IF NOT EXISTS _"
 				+ id
@@ -51,10 +51,10 @@ public class MessageDB {
 		Cursor c;
 		if(whereStr_time.equals("")){
 			c= db.rawQuery("SELECT * from _" + id
-				+ " ORDER BY _id DESC LIMIT 10", null);
+				+ " ORDER BY _id DESC LIMIT " + limit, null);
 		}else{
 			c= db.rawQuery("SELECT * from _" + id
-					+ " where date > ? ORDER BY _id DESC LIMIT 10", new String[]{whereStr_time});
+					+ " where date > ? ORDER BY _id DESC LIMIT " + limit, new String[]{whereStr_time});
 		}
 			
 		while (c.moveToNext()) {

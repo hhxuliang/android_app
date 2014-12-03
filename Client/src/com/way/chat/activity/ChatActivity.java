@@ -81,7 +81,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
 		setContentView(R.layout.chat);
 		application = (MyApplication) getApplicationContext();
-		messageDB = new MessageDB(this);
+		messageDB = application.getMessageDB();
 		user = (User) getIntent().getSerializableExtra("user");
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 		Client client = application.getClient();
@@ -212,7 +212,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	public void refreshData() {
 		ChatMsgEntity cme = mDataArrays.get(mDataArrays.size() - 1);
 		List<ChatMsgEntity> list = messageDB
-				.getMsg(user.getId(), cme.getDate());
+				.getMsg(user.getId(), cme.getDate(),10);
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
@@ -234,7 +234,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 * 加载消息历史，从数据库中读出
 	 */
 	public void initData() {
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "");
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "",10);
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
 				if (entity.getName().equals("")) {
@@ -255,7 +255,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		messageDB.close();
 	}
 
 	@Override
