@@ -69,6 +69,7 @@
         </activity>
         <activity android:name="com.example.imagescan.ShowImageActivity"></activity>
         <activity android:name="com.example.imagescan.MultiSelImageActivity"></activity>
+        <activity android:name=".MoreActionActivity"></activity>
         
         
         

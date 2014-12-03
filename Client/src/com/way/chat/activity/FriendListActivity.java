@@ -267,7 +267,9 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		mRecentListView = (ListView) lay1.findViewById(R.id.tab1_listView);
 		// mRecentAdapter = new RecentChatAdapter(FriendListActivity.this,
 		// application.getmRecentList());// 从全局变量中获取最近聊天对象数组
+		
 		mRecentListView.setAdapter(application.getmRecentAdapter());// 先设置空对象，要么从数据库中读出
+		
 
 		// 下面是处理好友列表界面处理
 		myListView = (MyListView) lay2.findViewById(R.id.tab2_listView);
@@ -291,6 +293,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 						ShowImageActivity.class);
 				mIntent.putStringArrayListExtra("data",
 						(ArrayList<String>) childList);
+				mIntent.putExtra("fun", "DELETE");
 				startActivity(mIntent);
 
 			}

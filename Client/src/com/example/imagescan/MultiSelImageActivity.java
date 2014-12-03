@@ -23,9 +23,12 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+
+import com.way.chat.activity.MyActivity;
 import com.way.chat.activity.R;
 import com.way.chat.activity.R.id;
 import com.way.chat.activity.R.layout;
+import com.way.chat.common.bean.User;
 
 /**
  * @blog http://blog.csdn.net/xiaanming
@@ -34,14 +37,14 @@ import com.way.chat.activity.R.layout;
  * 
  *
  */
-public class MultiSelImageActivity extends Activity {
+public class MultiSelImageActivity extends MyActivity {
 	private HashMap<String, List<String>> mGruopMap = new HashMap<String, List<String>>();
 	private List<ImageBean> list = new ArrayList<ImageBean>();
 	private final static int SCAN_OK = 1;
 	private ProgressDialog mProgressDialog;
 	private GroupAdapter adapter;
 	private GridView mGroupGridView;
-	
+	private User user=null;
 	private Handler mHandler = new Handler(){
 
 		@Override
@@ -64,7 +67,7 @@ public class MultiSelImageActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		user = (User) getIntent().getSerializableExtra("user");
 		mGroupGridView = (GridView) findViewById(R.id.main_grid);
 		
 		getImages();
@@ -78,6 +81,8 @@ public class MultiSelImageActivity extends Activity {
 				
 				Intent mIntent = new Intent(MultiSelImageActivity.this, ShowImageActivity.class);
 				mIntent.putStringArrayListExtra("data", (ArrayList<String>)childList);
+				mIntent.putExtra("fun", "SEND");
+				mIntent.putExtra("user", user);
 				startActivity(mIntent);
 				
 			}
@@ -96,7 +101,7 @@ public class MultiSelImageActivity extends Activity {
 		}
 		
 		//��ʾ������
-		mProgressDialog = ProgressDialog.show(this, null, "���ڼ���...");
+		mProgressDialog = ProgressDialog.show(this, null, "图片加载...");
 		
 		new Thread(new Runnable() {
 			

@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.way.chat.common.bean.TextMessage;
 import com.way.chat.common.bean.User;
 import com.way.chat.common.tran.bean.TranObject;
+import com.way.chat.common.tran.bean.TranObjectType;
 import com.way.chat.common.util.Constants;
 import com.way.client.Client;
+import com.way.client.ClientOutputThread;
 import com.way.util.MessageDB;
 import com.way.util.MyDate;
 import com.way.util.SharePreferenceUtil;
@@ -191,5 +194,52 @@ public class MyApplication extends Application {
 		if (messageDB != null)
 			messageDB.close();
 
+	}
+	public int send(String contString, boolean is_pic, String pic_path_local,User user) {
+		ClientOutputThread out = client.getClientOutputThread();
+		if (!isClientStart()  || out == null) {
+			return -1;
+		}
+		SharePreferenceUtil util = new SharePreferenceUtil(getApplicationContext(),
+				Constants.SAVE_USER);
+		if (contString.length() > 0) {
+			ChatMsgEntity entity = new ChatMsgEntity();
+			entity.setName(util.getName());
+			entity.setDate(MyDate.getDateEN());
+			entity.set_is_pic(is_pic);
+			entity.setMessage(contString);
+			entity.setImg(util.getImg());
+			entity.setMsgType(false);
+			entity.setPicPath(pic_path_local);
+
+			messageDB.saveMsg(user.getId(), entity);
+			addNeedRefresh(user.getId()+"");
+			
+
+			if (out != null) {
+				TranObject<TextMessage> o = new TranObject<TextMessage>(
+						TranObjectType.MESSAGE);
+				TextMessage message = new TextMessage();
+				message.setMessage(contString);
+				message.set_is_pic(is_pic);
+				o.setObject(message);
+				o.setFromUser(Integer.parseInt(util.getId()));
+				o.setToUser(user.getId());
+				if (user.getIsCrowd() == 1)
+					o.setCrowd(user.getId());
+				else
+					o.setCrowd(0);
+				out.setMsg(o);
+			} 
+			
+			// 下面是添加到最近会话列表的处理，在按发送键之后
+			RecentChatEntity entity1 = new RecentChatEntity(user.getId(),
+					user.getImg(), 0, user.getName(), MyDate.getDate(),
+					contString);
+			getmRecentList().remove(entity1);
+			getmRecentList().addFirst(entity1);
+			getmRecentAdapter().notifyDataSetChanged();
+		}
+		return 0;
 	}
 }

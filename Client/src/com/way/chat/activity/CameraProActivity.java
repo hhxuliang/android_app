@@ -18,6 +18,7 @@ import java.util.Map;
 import com.way.chat.activity.R;
 import com.way.chat.activity.R.id;
 import com.way.chat.activity.R.layout;
+import com.way.chat.common.bean.User;
 import com.way.chat.common.util.Constants;
 import com.way.util.DialogFactory;
 import com.way.util.ImageProcess;
@@ -93,7 +94,6 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	// 使用相机拍摄视频
 	public static final int SELECT_PIC_BY_TACK_VIDEO = 3;
 
-	private static String requestURL = "";
 	private Button selectButton, back;
 	private EditText progressText;
 	private ProgressBar progressBar;
@@ -109,6 +109,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	private int total_pic = 0;
 	private int upload_ok_pic = 0;
 	public String selItemIndex;
+	private User user=null;
 	ArrayList<String> ap;
 	ArrayList<String> alp;
 
@@ -117,6 +118,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.camer);
+		user = (User) getIntent().getSerializableExtra("user");
 		progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 		progressText = (EditText) findViewById(R.id.progressText);
 		selectButton = (Button) findViewById(R.id.uploadImage);
@@ -128,8 +130,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		picPath = application.getCameraPath() + "/upload";
 		pic_path_save = application.getMyUploadPicPath();
 		// picPath = "/mnt/sdcard/children/camerapicpath/upload";
-		requestURL = "http://" + Constants.SERVER_IP + ":8080"
-				+ "/Server/UploadFile";
+		
 		ap = new ArrayList<String>();
 		alp = new ArrayList<String>();
 		mContext = this;
@@ -183,17 +184,6 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 											itemIndex = CameraProActivity.this.selItemIndex;
 											takeVideo(picPath + itemIndex
 													+ ".mp4");
-										}
-									})
-							.setNeutralButton("相册",
-									new DialogInterface.OnClickListener() {
-
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											// TODO Auto-generated method stub
-											pickPhoto();
 										}
 									}).create();
 					alertDialog.show();
@@ -649,7 +639,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		String picstr = (String) ((HashMap<String, Object>) this.mGridItemList
 				.get(0)).get("ItemActualPath");
 		fileKey = picstr.substring(picstr.lastIndexOf("."));
-		uploadUtil.uploadFile(picstr, fileKey, requestURL, params);
+		uploadUtil.uploadFile(picstr, fileKey, Constants.REQUESTURL, params);
 	}
 
 	private Handler handler = new Handler() {
@@ -683,11 +673,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 			if (msg.what == UPLOAD_FILE_DONE
 					&& msg.arg1 == UploadUtil.UPLOAD_SUCCESS_CODE) {
 				if (next == 1) {
-					Intent intent = new Intent();
-					intent.putStringArrayListExtra("pic_path", ap);
-					intent.putStringArrayListExtra("pic_local_path", alp);
-					System.out.println(msg.obj + "");
-					setResult(RESULT_OK, intent); // 设置结果数据
+					
 					Toast.makeText(getApplicationContext(), "发送完成！", 0).show();
 					finish();
 				} else if (next > 1) {
@@ -735,6 +721,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 			copyFile(picoldstr, picnewstr);
 			alp.add(picnewstr);
 			ap.add(url_path);
+			application.send(url_path, true, picnewstr, user);
 		} else {
 			Toast.makeText(getApplicationContext(),
 					"失败上传" + upload_ok_pic + "/" + (this.total_pic - 1), 0)

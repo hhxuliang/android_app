@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.imagescan.MultiSelImageActivity;
 import com.way.chat.common.bean.CommonMsg;
 import com.way.chat.common.bean.TextMessage;
 import com.way.chat.common.bean.User;
@@ -116,7 +117,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				ChatMsgEntity cme = mDataArrays.get(i);
 				if (cme.getMessage().equals(hm.mUrl)) {
 					cme.setPicPath(hm.mSavePath);
-					System.out.println("fffffffffffffffff"+hm.mSavePath);
+					System.out.println("fffffffffffffffff" + hm.mSavePath);
 					mDataArrays.set(i, cme);
 				}
 			}
@@ -128,10 +129,9 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	protected void onResume() {// 如果从后台恢复，服务被系统干掉，就重启一下服务
 		alreadycreate = true;
 		super.onResume();
-		System.out.println("resume     resume" + user.getId());
 		if (application.needRefresh(user.getId() + ""))
 			refreshData();
-		mListView.setSelection(mListView.getCount() - 1);
+
 	}
 
 	public void getOffLineMess() {
@@ -211,9 +211,15 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 * 加载还没有显示的消息，从数据库中读出
 	 */
 	public void refreshData() {
-		ChatMsgEntity cme = mDataArrays.get(mDataArrays.size() - 1);
-		List<ChatMsgEntity> list = messageDB
-				.getMsg(user.getId(), cme.getDate(),10);
+		ChatMsgEntity cme = null;
+		String datestr="";
+		if (mDataArrays.size() > 0) {
+			cme = mDataArrays.get(mDataArrays.size() - 1);
+			datestr=cme.getDate();
+		}
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(),
+				datestr, 10);
+		List<ChatMsgEntity> mDataArrays_tmp = new ArrayList<ChatMsgEntity>();
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
@@ -223,9 +229,11 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				if (entity.getImg() < 0) {
 					entity.setImg(user.getImg());
 				}
-				mDataArrays.add(entity);
+				mDataArrays_tmp.add(entity);
 			}
-			// Collections.reverse(mDataArrays);
+			Collections.reverse(mDataArrays_tmp);
+			mDataArrays.addAll(mDataArrays_tmp);
+			
 			mListView.setSelection(mAdapter.getCount() - 1);
 			mAdapter.notifyDataSetChanged();
 		}
@@ -235,7 +243,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 * 加载消息历史，从数据库中读出
 	 */
 	public void initData() {
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "",10);
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "", 10);
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
 				if (entity.getName().equals("")) {
@@ -267,11 +275,38 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			mEditTextContent.setText("");// 清空编辑框数据
 			break;
 		case R.id.pic_send:// 发送按钮点击事件
-			Intent intent = new Intent(ChatActivity.this,
-					CameraProActivity.class);
-			startActivityForResult(intent, 1);
-			// finish();
-			// send_pic();
+			/*
+			 * Intent intent = new Intent(ChatActivity.this,
+			 * CameraProActivity.class); startActivityForResult(intent, 1);
+			 */
+			new AlertDialog.Builder(ChatActivity.this)
+					.setTitle("发送")
+					.setIcon(android.R.drawable.ic_dialog_info)
+					.setItems(new String[] { "相机拍照/视频", "本地相册", "请假事件" },
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									Intent intent = null;
+									switch (which) {
+									case 0:
+										intent = new Intent(ChatActivity.this,
+												CameraProActivity.class);
+										intent.putExtra("user", user);
+										startActivityForResult(intent, 1);
+
+										break;
+									case 1:
+										intent = new Intent(ChatActivity.this,
+												MultiSelImageActivity.class);
+										intent.putExtra("user", user);
+										startActivityForResult(intent, 1);
+										break;
+									case 3:
+										break;
+									}
+									dialog.cancel();
+								}
+							}).setNegativeButton("取消", null).show();
 			break;
 		case R.id.chat_back:// 返回按钮点击事件
 			finish();// 结束,实际开发中，可以返回主界面
@@ -283,11 +318,9 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 * 发送消息
 	 */
 	private void send(String contString, boolean is_pic, String pic_path_local) {
-		if(out==null){
-			Toast.makeText(ChatActivity.this,"网络连接异常！请连接网络后再试！", 0).show();// 提示用户
-			return;
-		}
+
 		if (contString.length() > 0) {
+			application.send(contString, is_pic, pic_path_local, user);
 			ChatMsgEntity entity = new ChatMsgEntity();
 			entity.setName(util.getName());
 			entity.setDate(MyDate.getDateEN());
@@ -297,37 +330,11 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			entity.setMsgType(false);
 			entity.setPicPath(pic_path_local);
 
-			messageDB.saveMsg(user.getId(), entity);
-
 			mDataArrays.add(entity);
 			mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
 
 			mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项
 
-			if (out != null) {
-				TranObject<TextMessage> o = new TranObject<TextMessage>(
-						TranObjectType.MESSAGE);
-				TextMessage message = new TextMessage();
-				message.setMessage(contString);
-				message.set_is_pic(is_pic);
-				o.setObject(message);
-				o.setFromUser(Integer.parseInt(util.getId()));
-				o.setToUser(user.getId());
-				if (user.getIsCrowd() == 1)
-					o.setCrowd(user.getId());
-				else
-					o.setCrowd(0);
-				out.setMsg(o);
-			} else {
-				Toast.makeText(ChatActivity.this,"网络连接异常！", 0).show();// 提示用户
-			}
-			// 下面是添加到最近会话列表的处理，在按发送键之后
-			RecentChatEntity entity1 = new RecentChatEntity(user.getId(),
-					user.getImg(), 0, user.getName(), MyDate.getDate(),
-					contString);
-			application.getmRecentList().remove(entity1);
-			application.getmRecentList().addFirst(entity1);
-			application.getmRecentAdapter().notifyDataSetChanged();
 		}
 	}
 

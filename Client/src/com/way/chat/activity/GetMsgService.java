@@ -381,4 +381,5 @@ public class GetMsgService extends Service {
 		mNotification.contentIntent = contentIntent;
 		mNotificationManager.notify(Constants.NOTIFY_ID, mNotification);
 	}
+	
 }

@@ -62,7 +62,7 @@
 		    android:layout_centerVertical="true"
 		    android:layout_marginRight="10dp"
 		    android:background="@drawable/chat_send_button_bg"
-		    android:text="图片"
+		    android:text="其他"
 		    android:textSize="20sp" />
 
         <Button
