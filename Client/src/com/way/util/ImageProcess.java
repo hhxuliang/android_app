@@ -44,6 +44,8 @@ public class ImageProcess {
 			int winHeight, int winWidth, double myscale) {
 		// Bitmap bitmap=BitmapFactory.decodeFile("/sdcard/a.jpg");
 		// iv_bigimage.setImageBitmap(bitmap);
+		if (winWidth == 0 || winHeight == 0)
+			return null;
 		try {
 			File f = new File(pic_path);
 			if (!f.exists()) {
@@ -67,6 +69,8 @@ public class ImageProcess {
 		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
 		int windowHeight = (int) (winHeight * myscale);
 		int windowWidth = (int) (winWidth * myscale);
+		if (windowWidth == 0)
+			return null;
 		// 计算采样率
 		int scaleX = imageWidth / windowWidth;
 		int scale = 1;

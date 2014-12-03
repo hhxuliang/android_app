@@ -169,7 +169,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				ImageView image = (ImageView) arg1
 						.findViewById(R.id.imageView_chat_pic);
 				String path = image.getContentDescription().toString();
-				if (path != null) {
+				if (path != null && !path.equals("")) {
+					System.out.println("path path   pppp" + path);
 					String prefix = path.substring(path.lastIndexOf("."));
 					if (prefix.equals(".mp4")) {
 						Intent intent = new Intent(Intent.ACTION_VIEW);
