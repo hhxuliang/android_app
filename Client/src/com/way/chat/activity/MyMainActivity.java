@@ -1,6 +1,6 @@
 package com.way.chat.activity;
 
-import com.huewu.pla.sample.PullToRefreshSampleActivity;
+
 import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.util.Constants;
 import com.way.util.SharePreferenceUtil;
