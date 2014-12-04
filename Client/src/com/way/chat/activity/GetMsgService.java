@@ -350,6 +350,8 @@ public class GetMsgService extends Service {
 			out.setStart(false);
 			client.getClientInputThread().setStart(false);
 		}
+		timer.cancel();
+		timer.purge();
 		// Intent intent = new Intent(this, GetMsgService.class);
 		// startService(intent);
 	}

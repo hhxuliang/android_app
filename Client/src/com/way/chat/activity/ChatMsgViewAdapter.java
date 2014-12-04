@@ -146,6 +146,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				}
 				if (bitmap != null)
 					viewHolder.tvPicture.setImageBitmap(bitmap);
+				else
+					viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
 			} else {
 				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
 			}

@@ -43,9 +43,9 @@ public class MyMainActivity extends MyActivity {
 		picture.setOnClickIntent(new MyImageView.OnViewClick() {
 			@Override
 			public void onClick() {
-				Intent i = new Intent(MyMainActivity.this,
-						PullToRefreshSampleActivity.class);
-				startActivity(i);
+				//Intent i = new Intent(MyMainActivity.this,
+//						PullToRefreshSampleActivity.class);
+//				startActivity(i);
 			}
 		});
 	}
