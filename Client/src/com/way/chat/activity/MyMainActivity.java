@@ -1,6 +1,8 @@
 package com.way.chat.activity;
 
 
+import tk.sweetvvck.calender.activity.ClassCalenderActivity;
+
 import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.util.Constants;
 import com.way.util.SharePreferenceUtil;
@@ -43,9 +45,9 @@ public class MyMainActivity extends MyActivity {
 		picture.setOnClickIntent(new MyImageView.OnViewClick() {
 			@Override
 			public void onClick() {
-				//Intent i = new Intent(MyMainActivity.this,
-//						PullToRefreshSampleActivity.class);
-//				startActivity(i);
+				Intent i = new Intent(MyMainActivity.this,
+						ClassCalenderActivity.class);
+				startActivity(i);
 			}
 		});
 	}
