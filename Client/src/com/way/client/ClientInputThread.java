@@ -16,6 +16,10 @@ public class ClientInputThread extends Thread {
 	private Socket socket;
 	private TranObject msg;
 	private boolean isStart = true;
+	public boolean isStart() {
+		return isStart;
+	}
+
 	private ObjectInputStream ois;
 	private MessageListener messageListener;// 消息监听接口对象
 
@@ -27,7 +31,16 @@ public class ClientInputThread extends Thread {
 			e.printStackTrace();
 		}
 	}
-
+	public void stopNet(){
+		isStart=false;
+		try {
+			ois.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	/**
 	 * 提供给外部的消息监听方法
 	 * 
@@ -51,13 +64,21 @@ public class ClientInputThread extends Thread {
 				// 我不知道我有说明白没有？
 				messageListener.Message(msg);
 			}
-			ois.close();
-			if (socket != null)
-				socket.close();
+
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		try {
+			ois.close();
+			if (socket != null)
+				socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isStart = false;
 	}
 }

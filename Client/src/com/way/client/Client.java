@@ -22,6 +22,18 @@ public class Client {
 		this.port = port;
 	}
 
+	public void stopNet() {
+		if(clientThread==null || client==null)
+			return;
+		clientThread.stopNet();
+		try {
+			client.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public boolean start() {
 		try {
 			client = new Socket();
@@ -60,6 +72,20 @@ public class Client {
 		clientThread.getOut().setStart(isStart);
 	}
 
+	public boolean testNet() {
+		try {
+			if (client != null && client.isConnected()) {
+				client.sendUrgentData(0xFF);
+				return true;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// 网络断开
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	public class ClientThread extends Thread {
 
 		private ClientInputThread in;
@@ -85,6 +111,12 @@ public class Client {
 		// 得到写消息线程
 		public ClientOutputThread getOut() {
 			return out;
+		}
+
+		public void stopNet() {
+			in.stopNet();
+			out.stopNet();
+
 		}
 	}
 }

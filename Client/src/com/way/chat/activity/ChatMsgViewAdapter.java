@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import com.way.chat.common.bean.User;
 import com.way.util.ImageProcess;
 import com.zoom.ZoomImageView;
 
@@ -26,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 消息ListView的Adapter
@@ -46,11 +48,13 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 	private static final int ITEMCOUNT = 2;// 消息类型的总数
 	private List<ChatMsgEntity> coll;// 消息对象数组
 	private LayoutInflater mInflater;
+	private User user = null;
 
-	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll) {
+	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u) {
 		this.coll = coll;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
+		user = u;
 	}
 
 	public int getCount() {
@@ -112,6 +116,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			viewHolder.icon = (ImageView) convertView
 					.findViewById(R.id.iv_userhead);
 			viewHolder.isComMsg = isComMsg;
+			viewHolder.tvReflesh = (ImageView) convertView
+					.findViewById(R.id.imageView_reflesh);
 
 			convertView.setTag(viewHolder);
 		} else {
@@ -147,7 +153,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				if (bitmap != null)
 					viewHolder.tvPicture.setImageBitmap(bitmap);
 				else
-					viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
+					viewHolder.tvPicture
+							.setImageResource(R.drawable.waitloadpic);
 			} else {
 				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
 			}
@@ -169,7 +176,27 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			viewHolder.tvContent.setText(entity.getMessage());
 
 		}
-		viewHolder.icon.setImageResource(imgs[entity.getImg()]);
+		viewHolder.tvReflesh.setVisibility(View.GONE);
+		if (entity.getSendSta() != 1 && !isComMsg) {
+			viewHolder.tvReflesh.setVisibility(View.VISIBLE);
+			viewHolder.tvReflesh.setContentDescription(position + "");
+			viewHolder.tvReflesh.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					String p = v.getContentDescription().toString();
+					if (p != null) {
+						int position=Integer.parseInt(p);
+						ChatMsgEntity entity = coll.get(position);
+						if (-1 == GetMsgService.application.Resend(
+								entity.getMessage(), entity.get_is_pic(),
+								entity.getPicPath(), user)) {
+							Toast.makeText(mContext, "网络连接异常", 0).show();
+						}
+					}
+				}
+			});
+		}
+		viewHolder.icon.setImageResource(imgs[entity.getImg()]);		
 		return convertView;
 	}
 
@@ -179,6 +206,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		public TextView tvContent;
 		public ImageView tvPicture;
 		public ImageView icon;
+		public ImageView tvReflesh;
 		public boolean isComMsg = true;
 	}
 

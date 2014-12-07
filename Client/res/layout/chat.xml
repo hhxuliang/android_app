@@ -20,7 +20,7 @@
             android:layout_marginLeft="10dp"
             android:background="@drawable/selector_btn_back"
             android:paddingLeft="10dp"
-            android:text="会话"
+            android:text="返回"
             android:textColor="#ffffff"
             android:textSize="18sp" />
 

@@ -75,6 +75,14 @@
             android:scaleType="fitEnd"
             android:src="@drawable/waitloadpic" />
 
+        <ImageView
+            android:id="@+id/imageView_reflesh"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignBottom="@+id/tv_chatcontent"
+            android:layout_toLeftOf="@+id/imageView_chat_pic"
+            android:src="@drawable/agt" />
+
     </RelativeLayout>
 
 </LinearLayout>

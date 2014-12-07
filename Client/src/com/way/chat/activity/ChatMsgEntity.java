@@ -14,6 +14,15 @@ public class ChatMsgEntity {
 	private boolean isComMeg = true;// 是否为收到的消息
 	private boolean is_pic = false;
 	private String pic_path;
+	private int sendSta;
+
+	public int getSendSta() {
+		return sendSta;
+	}
+
+	public void setSendSta(int sendSta) {
+		this.sendSta = sendSta;
+	}
 
 	public ChatMsgEntity() {
 

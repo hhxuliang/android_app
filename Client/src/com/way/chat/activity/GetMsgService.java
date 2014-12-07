@@ -60,7 +60,7 @@ public class GetMsgService extends Service {
 	private static final int DOWNLOADPIC_OK = 1;
 	private static final int DOWNLOADPIC_FAULT = 2;
 
-	private MyApplication application;
+	public static MyApplication application;
 	private Client client;
 	private NotificationManager mNotificationManager;
 	private boolean isStart = false;// 是否与服务器连接上
@@ -71,7 +71,7 @@ public class GetMsgService extends Service {
 	private HashMap<String, TranObject> mMap_Waiting_Download_Pic = new HashMap<String, TranObject>();
 	private final Timer timer = new Timer();
 	private TimerTask task;
-	
+
 	private Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
@@ -153,7 +153,7 @@ public class GetMsgService extends Service {
 	public void onCreate() {// 在onCreate方法里面注册广播接收者
 		// TODO Auto-generated method stub
 		super.onCreate();
-		
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Constants.BACKKEY_ACTION);
 		registerReceiver(backKeyReceiver, filter);
@@ -162,6 +162,8 @@ public class GetMsgService extends Service {
 		messageDB = application.getMessageDB();
 		client = application.getClient();
 		application.setmNotificationManager(mNotificationManager);
+		util = new SharePreferenceUtil(getApplicationContext(),
+				Constants.SAVE_USER);
 	}
 
 	// 收到用户按返回键发出的广播，就显示通知栏
@@ -235,23 +237,25 @@ public class GetMsgService extends Service {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				if (application.isClientStart()) {
-					timer.cancel();
-					timer.purge();
-				}else
+				if (client.testNet()
+						&& client.getClientOutputThread().isStart()
+						&& client.getClientInputThread().isStart()) {
+					isStart = true;
+					application.setClientStart(isStart);
+				} else {
+					application.setClientStart(false);
+					client.stopNet();
 					start_client_socket();
+				}
 			}
 		};
-		timer.schedule(task, 500, 30000);
+		timer.schedule(task, 500, 15000);
 	}
 
-
 	public void start_client_socket() {
-		util = new SharePreferenceUtil(getApplicationContext(),
-				Constants.SAVE_USER);
+
 		isStart = client.start();
 		application.setClientStart(isStart);
-		System.out.println("client start:" + isStart);
 		if (isStart) {
 			ClientInputThread in = client.getClientInputThread();
 			in.setMessageListener(new MessageListener() {
@@ -383,5 +387,5 @@ public class GetMsgService extends Service {
 		mNotification.contentIntent = contentIntent;
 		mNotificationManager.notify(Constants.NOTIFY_ID, mNotification);
 	}
-	
+
 }

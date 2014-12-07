@@ -10,14 +10,26 @@
         android:layout_width="fill_parent"
         android:layout_height="60dp"
         android:background="@drawable/title_bar" >
+		<Button
+            android:id="@+id/back"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/selector_btn_back"
+            android:paddingLeft="10dp"
+            android:text="返回"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
 
+      
         <ImageView
             android:id="@+id/friend_list_myImg"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1.0"
             android:background="@drawable/img_select"
             android:src="@drawable/icon" />
@@ -27,8 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/friend_list_myImg"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/friend_list_myImg"
             android:layout_weight="1.0"
             android:gravity="center"
             android:text="way"
@@ -40,8 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/friend_list_myName"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/friend_list_myName"
             android:src="@drawable/account_current" />
     </RelativeLayout>
 
@@ -63,21 +75,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/tab1" />
+                android:src="@drawable/tab3" />
 
             <ImageView
                 android:id="@+id/tab2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/tab2" />
+                android:src="@drawable/tab1" />
 
             <ImageView
                 android:id="@+id/tab3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/tab3" />
+                android:src="@drawable/tab2" />
         </LinearLayout>
 
         <ImageView

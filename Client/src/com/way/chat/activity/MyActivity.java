@@ -37,19 +37,27 @@ public abstract class MyActivity extends Activity {
 					.getSerializableExtra(Constants.MSGKEY);
 			HandleMsg hm = (HandleMsg) intent
 					.getSerializableExtra(Constants.PICUPDATE);
+
+			String msgs = (String) intent.getSerializableExtra("MSG");
+			String id =(String)  intent.getSerializableExtra("SENDSTA");
+
 			if (msg != null) {// 如果不是空，说明是消息广播
 				System.out.println("MyActivity:" + msg.getFromUser());
 				getMessage(msg);// 把收到的消息传递给子类
 			} else if (hm != null) {
 				getPicUpdate(hm);
-			} else{
+			} else if (msgs != null && id!=null) {
+				msgsendok(msgs,id);
+			} else {
 				unregisterReceiver(this);
 				close();
 			}
-				
+
 		}
 	};
+	public void msgsendok(String msgs,String id) {
 
+	}
 	public void getPicUpdate(HandleMsg hm) {
 
 	}
@@ -88,10 +96,10 @@ public abstract class MyActivity extends Activity {
 		// TODO Auto-generated method stub
 		MyApplication application = (MyApplication) this
 				.getApplicationContext();
-		/*if (!application.isClientStart()) {
-			Intent service = new Intent(this, GetMsgService.class);
-			startService(service);
-		}*/
+		/*
+		 * if (!application.isClientStart()) { Intent service = new Intent(this,
+		 * GetMsgService.class); startService(service); }
+		 */
 		new SharePreferenceUtil(this, Constants.SAVE_USER).setIsStart(false);
 		NotificationManager manager = application.getmNotificationManager();
 		if (manager != null) {

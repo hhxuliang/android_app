@@ -19,6 +19,7 @@ import com.way.util.UserDB;
 
 import android.app.Application;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.util.DisplayMetrics;
 
 public class MyApplication extends Application {
@@ -79,7 +80,14 @@ public class MyApplication extends Application {
 	public HashMap<String, String> getNeedRefreshMap() {
 		return mNeedRefresh;
 	}
-
+	public void updateDBbyMsgOk(String msg, int id) {
+		messageDB.updateDBbyMsgOk(msg, id);
+		Intent broadCast = new Intent();
+		broadCast.setAction(Constants.ACTION);
+		broadCast.putExtra("MSG", msg);
+		broadCast.putExtra("SENDSTA", id+"");
+		sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
+	}
 	public boolean needRefresh(String uidstr) {
 		if (mNeedRefresh.get(uidstr) == null) {
 			return false;
@@ -211,7 +219,7 @@ public class MyApplication extends Application {
 			entity.setImg(util.getImg());
 			entity.setMsgType(false);
 			entity.setPicPath(pic_path_local);
-
+			entity.setSendSta(-1);
 			messageDB.saveMsg(user.getId(), entity);
 			addNeedRefresh(user.getId()+"");
 			
@@ -239,6 +247,33 @@ public class MyApplication extends Application {
 			getmRecentList().remove(entity1);
 			getmRecentList().addFirst(entity1);
 			getmRecentAdapter().notifyDataSetChanged();
+		}
+		return 0;
+	}
+	
+	public int Resend(String contString, boolean is_pic, String pic_path_local,User user) {
+		ClientOutputThread out = client.getClientOutputThread();
+		if (!isClientStart()  || out == null) {
+			return -1;
+		}
+		SharePreferenceUtil util = new SharePreferenceUtil(getApplicationContext(),
+				Constants.SAVE_USER);
+		if (contString.length() > 0) {
+			if (out != null) {
+				TranObject<TextMessage> o = new TranObject<TextMessage>(
+						TranObjectType.MESSAGE);
+				TextMessage message = new TextMessage();
+				message.setMessage(contString);
+				message.set_is_pic(is_pic);
+				o.setObject(message);
+				o.setFromUser(Integer.parseInt(util.getId()));
+				o.setToUser(user.getId());
+				if (user.getIsCrowd() == 1)
+					o.setCrowd(user.getId());
+				else
+					o.setCrowd(0);
+				out.setMsg(o);
+			} 
 		}
 		return 0;
 	}

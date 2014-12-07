@@ -20,6 +20,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -85,6 +86,12 @@ public class MultiSelImageActivity extends MyActivity {
 				mIntent.putExtra("user", user);
 				startActivity(mIntent);
 				
+			}
+		});
+		Button back = (Button) findViewById(R.id.back);
+		back.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				finish();
 			}
 		});
 		

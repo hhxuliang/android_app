@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import com.way.chat.activity.GetMsgService;
+import com.way.chat.common.bean.TextMessage;
 import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.tran.bean.TranObjectType;
 
@@ -17,6 +19,11 @@ public class ClientOutputThread extends Thread {
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private boolean isStart = true;
+
+	public boolean isStart() {
+		return isStart;
+	}
+
 	private TranObject msg;
 
 	public ClientOutputThread(Socket socket) {
@@ -40,6 +47,17 @@ public class ClientOutputThread extends Thread {
 		}
 	}
 
+	public void stopNet() {
+		isStart = false;
+		try {
+			oos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -50,19 +68,31 @@ public class ClientOutputThread extends Thread {
 					if (msg.getType() == TranObjectType.LOGOUT) {// 如果是发送下线的消息，就直接跳出循环
 						break;
 					}
+					if (msg.getType() == TranObjectType.MESSAGE) {// 如果是发送下线的消息，就直接跳出循环
+						GetMsgService.application.updateDBbyMsgOk(
+								((TextMessage) msg.getObject()).getMessage(),
+								msg.getToUser());
+					}
 					synchronized (this) {
 						wait();// 发送完消息后，线程进入等待状态
 					}
 				}
 			}
-			oos.close();// 循环结束后，关闭输出流和socket
-			if (socket != null)
-				socket.close();
+
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		try {
+			oos.close();// 循环结束后，关闭输出流和socket
+			if (socket != null)
+				socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		isStart = false;
 	}
 
 }

@@ -40,6 +40,7 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -134,6 +135,12 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
 		setContentView(R.layout.friend_list);
 		application = (MyApplication) this.getApplicationContext();
+		Button back = (Button) findViewById(R.id.back);
+		back.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				finish();
+			}
+		});
 		initData();// 初始化数据
 		initImageView();// 初始化动画
 		initUI();// 初始化界面

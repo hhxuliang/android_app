@@ -117,7 +117,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 				ChatMsgEntity cme = mDataArrays.get(i);
 				if (cme.getMessage().equals(hm.mUrl)) {
 					cme.setPicPath(hm.mSavePath);
-					System.out.println("fffffffffffffffff" + hm.mSavePath);
 					mDataArrays.set(i, cme);
 				}
 			}
@@ -212,13 +211,12 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 */
 	public void refreshData() {
 		ChatMsgEntity cme = null;
-		String datestr="";
+		String datestr = "";
 		if (mDataArrays.size() > 0) {
 			cme = mDataArrays.get(mDataArrays.size() - 1);
-			datestr=cme.getDate();
+			datestr = cme.getDate();
 		}
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(),
-				datestr, 10);
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), datestr, 10);
 		List<ChatMsgEntity> mDataArrays_tmp = new ArrayList<ChatMsgEntity>();
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
@@ -233,9 +231,18 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			}
 			Collections.reverse(mDataArrays_tmp);
 			mDataArrays.addAll(mDataArrays_tmp);
-			
+
 			mListView.setSelection(mAdapter.getCount() - 1);
 			mAdapter.notifyDataSetChanged();
+			mListView.post(new Runnable() {
+				@Override
+				public void run() {
+
+					mListView.setSelection(mAdapter.getCount() - 1);
+
+				}
+
+			});
 		}
 	}
 
@@ -256,7 +263,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			}
 			Collections.reverse(mDataArrays);
 		}
-		mAdapter = new ChatMsgViewAdapter(this, mDataArrays);
+		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelection(mAdapter.getCount() - 1);
 	}
@@ -312,6 +319,17 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			finish();// 结束,实际开发中，可以返回主界面
 			break;
 		}
+	}
+
+	public void msgsendok(String msgs, String id) {
+		for (ChatMsgEntity cme : mDataArrays) {
+			if (cme.getMessage().equals(msgs) && id.equals(user.getId() + "")) {
+				cme.setSendSta(1);
+				mAdapter.notifyDataSetChanged();
+				// break;
+			}
+		}
+
 	}
 
 	/**
