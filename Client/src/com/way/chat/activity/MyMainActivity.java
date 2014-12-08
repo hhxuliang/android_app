@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.Toast;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,6 +30,8 @@ public class MyMainActivity extends MyActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);// 去掉状态栏
 		setContentView(R.layout.main_home);
 		mi = new MenuInflater(this);
 		message = (MyImageView) findViewById(R.id.c_joke);

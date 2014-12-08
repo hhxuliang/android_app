@@ -35,8 +35,7 @@ public class WelcomeActivity extends Activity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);// 去掉状态栏
+		
 		setContentView(R.layout.main);
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 		if (util.getisFirst()) {

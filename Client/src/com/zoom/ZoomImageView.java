@@ -78,6 +78,12 @@ public class ZoomImageView {
         popupWindow.setOnDismissListener(new OnDismissListener(){
             @Override
             public void onDismiss() {
+            	BitmapDrawable drawable = (BitmapDrawable)imageView.getDrawable();
+            	Bitmap bmp = drawable.getBitmap();
+            	if (null != bmp && !bmp.isRecycled()){
+            		bmp.recycle();
+            		bmp = null;
+            	}
             	imageView.setImageBitmap(null);
             }
         });
