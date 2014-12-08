@@ -26,8 +26,8 @@ public class RegisterActivity extends MyActivity implements OnClickListener {
 	private EditText mEmailEt, mNameEt, mPasswdEt, mPasswdEt2;
 	
 	private MyApplication application;
-
-	protected void onCreate(Bundle savedInstanceState) {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.register);

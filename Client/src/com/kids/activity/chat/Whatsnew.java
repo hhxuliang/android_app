@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
@@ -36,6 +37,7 @@ public class Whatsnew extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
 		setContentView(R.layout.whatsnew_viewpager);
 		mViewPager = (ViewPager) findViewById(R.id.whatsnew_viewpager);
 		mViewPager.setOnPageChangeListener(new MyOnPageChangeListener());

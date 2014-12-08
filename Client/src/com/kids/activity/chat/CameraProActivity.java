@@ -639,7 +639,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		String picstr = (String) ((HashMap<String, Object>) this.mGridItemList
 				.get(0)).get("ItemActualPath");
 		fileKey = picstr.substring(picstr.lastIndexOf("."));
-		uploadUtil.uploadFile(picstr, fileKey, Constants.REQUESTURL, params);
+		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL, params);
 	}
 
 	private Handler handler = new Handler() {

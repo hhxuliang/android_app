@@ -81,7 +81,7 @@ public class ShowImageActivity extends MyActivity implements
 	private User user = null;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_image_activity);
 		user = (User) getIntent().getSerializableExtra("user");
@@ -239,7 +239,7 @@ public class ShowImageActivity extends MyActivity implements
 		params.put("orderId", "111");
 		String picstr = (String) pathl.get(0);
 		fileKey = picstr.substring(picstr.lastIndexOf("."));
-		uploadUtil.uploadFile(picstr, fileKey, Constants.REQUESTURL, params);
+		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL, params);
 	}
 
 	private Handler handler = new Handler() {

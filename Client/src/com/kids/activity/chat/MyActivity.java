@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.kids.util.MessageDB;
@@ -26,6 +27,12 @@ import com.way.chat.common.util.Constants;
  * 
  */
 public abstract class MyActivity extends Activity {
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
+	}
 	/**
 	 * 广播接收者，接收GetMsgService发送过来的消息
 	 */
