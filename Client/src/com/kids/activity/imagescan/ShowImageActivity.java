@@ -132,7 +132,7 @@ public class ShowImageActivity extends MyActivity implements
 						Bitmap bitmap = ImageProcess.GetBitmapByPath(
 								ShowImageActivity.this, picpath,
 								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 1.3);
+								MyApplication.mWindowWidth, 1);
 						if (bitmap != null) {
 							int degree = ImageProcess.getBitmapDegree(picpath);
 							if (degree != 0)

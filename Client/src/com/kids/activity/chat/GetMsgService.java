@@ -100,9 +100,11 @@ public class GetMsgService extends Service {
 
 	class Download implements Runnable {
 		private String mUrl = null;
+		private int mUid;
 
-		public Download(String p) {
+		public Download(String p,int uid) {
 			mUrl = p;
+			mUid = uid;
 		}
 
 		@Override
@@ -117,14 +119,10 @@ public class GetMsgService extends Service {
 				con.setRequestMethod("GET");
 				con.connect();
 				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-				if (prefix.substring(0, 4).equals(".mp4"))
-					prefix = ".mp4";// i don't know why need this it is like
-									// some network tranfer error,the prefix is
-									// ".mp4_" if not this
-
+				
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
-					String savePath = application.getDownloadPicPath() + "/"
+					String savePath = application.getDownloadPicPath() + "/" + mUid + "_kids_"
 							+ MyDate.getDateForImageName() + prefix;
 					FileOutputStream fos = new FileOutputStream(savePath);
 					byte[] buffer = new byte[8192];
@@ -306,7 +304,7 @@ public class GetMsgService extends Service {
 				// new thread to download the picture to update the picpath in
 				// local db
 				mMap_Waiting_Download_Pic.put(tm.getMessage(), msg);
-				new Thread(new Download(tm.getMessage())).start();
+				new Thread(new Download(tm.getMessage(),msg.getFromUser())).start();
 			}
 			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
 

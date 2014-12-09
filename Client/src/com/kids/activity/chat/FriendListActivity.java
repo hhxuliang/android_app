@@ -542,9 +542,24 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 					ArrayList<String> pathstr = ImageProcess.ListFile(parentN);
 
 					File file = new File(parentN);
-					String parentName = file.getName();
+					//String parentName = file.getName();
 					for (String path : pathstr) {
 						// 根据父路径名将图片放入到mGruopMap中
+						String parentName = "其他";
+						int id=0;
+						if (path.lastIndexOf("/")>0 && path.lastIndexOf("_kids_")>0)
+						{	
+							parentName = path.substring(path.lastIndexOf("/")+1, path.lastIndexOf("_kids_"));
+							System.out.println("usid is :" + parentName);					
+							try{
+								id = Integer.parseInt(parentName);
+								UserDB userDB = application.getUserDB();
+								User user2 = userDB.selectInfo(id);// 通过id查询对应数据库该好友信息
+								parentName = user2.getName();
+							}catch(Exception e){
+								parentName = "其他";
+							}
+						}
 						if (!mGruopMap.containsKey(parentName)) {
 							List<String> chileList = new ArrayList<String>();
 							chileList.add(path);
