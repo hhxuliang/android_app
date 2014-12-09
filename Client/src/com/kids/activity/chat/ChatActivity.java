@@ -75,9 +75,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private User user;
 	private MessageDB messageDB;
 	private MyApplication application;
-	private ClientOutputThread out;
 	private boolean alreadycreate;
-
+	private Client client;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
@@ -86,8 +85,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		messageDB = application.getMessageDB();
 		user = (User) getIntent().getSerializableExtra("user");
 		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
-		Client client = application.getClient();
-		out = client.getClientOutputThread();
+		client = application.getClient();
 		initView();// 初始化view
 		initData();// 初始化数据
 		alreadycreate = false;
@@ -104,7 +102,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if (alreadycreate && out != null)
+				if (alreadycreate && client.getClientOutputThread() != null)
 					getOffLineMess();
 			}
 		};
@@ -143,7 +141,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		TranObject<CommonMsg> msg2Object = new TranObject<CommonMsg>(
 				TranObjectType.OFFLINEMESS);
 		msg2Object.setObject(cm);
-		out.setMsg(msg2Object);
+		client.getClientOutputThread().setMsg(msg2Object);
 		if (application.getOffLineList() != null) {
 			for (String s : application.getOffLineList())
 

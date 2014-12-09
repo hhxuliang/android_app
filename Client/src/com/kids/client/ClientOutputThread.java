@@ -65,6 +65,7 @@ public class ClientOutputThread extends Thread {
 				if (msg != null) {
 					oos.writeObject(msg);
 					oos.flush();
+					oos.reset();
 					if (msg.getType() == TranObjectType.LOGOUT) {// 如果是发送下线的消息，就直接跳出循环
 						break;
 					}

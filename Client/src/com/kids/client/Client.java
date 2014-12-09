@@ -73,17 +73,20 @@ public class Client {
 	}
 
 	public boolean testNet() {
-		try {
-			if (client != null && client.isConnected()) {
-				client.sendUrgentData(0xFF);
-				return true;
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			// 网络断开
-			e.printStackTrace();
-		}
+		if(client!=null)
+			return client.isConnected();
 		return false;
+//		try {
+//			if (client != null && client.isConnected()) {
+//				client.sendUrgentData(0xFF);
+//				return true;
+//			}
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			// 网络断开
+//			e.printStackTrace();
+//		}
+//		return false;
 	}
 
 	public class ClientThread extends Thread {
