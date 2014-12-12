@@ -186,18 +186,22 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					String p = v.getContentDescription().toString();
 					if (p != null) {
-						int position=Integer.parseInt(p);
+						int position = Integer.parseInt(p);
 						ChatMsgEntity entity = coll.get(position);
-						if (-1 == GetMsgService.application.Resend(
-								entity.getMessage(), entity.get_is_pic(),
-								entity.getPicPath(), user)) {
-							Toast.makeText(mContext, "网络连接异常", 0).show();
-						}
+						if (GetMsgService.application != null) {
+							if (-1 == GetMsgService.application.Resend(
+									entity.getMessage(), entity.get_is_pic(),
+									entity.getPicPath(), user,entity.getDatekey())) {
+								Toast.makeText(mContext, "网络连接异常", 0).show();
+							}
+						}else
+							Toast.makeText(mContext, "服务异常，请重新启动", 0).show();
+							
 					}
 				}
 			});
 		}
-		viewHolder.icon.setImageResource(imgs[entity.getImg()]);		
+		viewHolder.icon.setImageResource(imgs[entity.getImg()]);
 		return convertView;
 	}
 

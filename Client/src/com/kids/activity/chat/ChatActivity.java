@@ -77,6 +77,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private MyApplication application;
 	private boolean alreadycreate;
 	private Client client;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
@@ -89,24 +90,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		initView();// 初始化view
 		initData();// 初始化数据
 		alreadycreate = false;
-		Runnable runnable = new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(5000);// we need to wait 10s for
-										// friendActivity not receive the
-										// message,
-										// that will cause duplicate message
-										// save in DB
-										// maybe other good solution
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if (alreadycreate && client.getClientOutputThread() != null)
-					getOffLineMess();
-			}
-		};
-		new Thread(runnable).start();
+
 	}
 
 	@Override
@@ -131,29 +115,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			refreshData();
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
-
-	}
-
-	public void getOffLineMess() {
-		/**/
-		CommonMsg cm = new CommonMsg();
-		cm.setarg1(user.getId() + "");
-		cm.setarg2(util.getId());
-		cm.setarg3(user.getIsCrowd() + "");
-		TranObject<CommonMsg> msg2Object = new TranObject<CommonMsg>(
-				TranObjectType.OFFLINEMESS);
-		msg2Object.setObject(cm);
-		client.getClientOutputThread().setMsg(msg2Object);
-		if (application.getOffLineList() != null) {
-			for (String s : application.getOffLineList())
-
-			{
-				if (s.equals(util.getId())) {
-					application.getOffLineList().remove(s);
-					break;
-				}
-			}
-		}
 
 	}
 
@@ -274,7 +235,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		super.onDestroy();
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
-		
+
 	}
 
 	@Override
@@ -342,12 +303,14 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private void send(String contString, boolean is_pic, String pic_path_local) {
 
 		if (contString.length() > 0) {
-			ChatMsgEntity entity=application.send(contString, is_pic, pic_path_local, user);
-						mDataArrays.add(entity);
-			mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
+			ChatMsgEntity entity = application.send(contString, is_pic,
+					pic_path_local, user);
+			if (entity != null) {
+				mDataArrays.add(entity);
+				mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
 
-			mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项
-
+				mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项
+			}
 		}
 	}
 

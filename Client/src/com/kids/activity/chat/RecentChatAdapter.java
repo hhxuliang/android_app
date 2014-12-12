@@ -1,5 +1,6 @@
 package com.kids.activity.chat;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import android.content.Context;
@@ -111,16 +112,6 @@ public class RecentChatAdapter extends BaseAdapter {
 		});
 		
 		holder.icon_more.setVisibility(View.INVISIBLE );
-		if(application.getOffLineList()!=null)
-		{
-			for(String s:application.getOffLineList())
-			{
-				if (s.equals(entity.getId()+""))
-				{
-					holder.icon_more.setVisibility(View.VISIBLE );
-				}
-			}
-		}
 		if(application.getNotReadmsslist() !=null)
 		{
 			for(String s:application.getNotReadmsslist())

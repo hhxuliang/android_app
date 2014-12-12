@@ -125,8 +125,7 @@ public class GetMsgService extends Service {
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
 					String savePath = application.getDownloadPicPath() + "/"
-							+ mUid + "_kids_" + MyDate.getDateMillis()
-							+ prefix;
+							+ mUid + "_kids_" + MyDate.getDateMillis() + prefix;
 					FileOutputStream fos = new FileOutputStream(savePath);
 					byte[] buffer = new byte[8192];
 					int count = 0;
@@ -254,10 +253,10 @@ public class GetMsgService extends Service {
 					client.stopNet();
 					start_client_socket();
 				}
-				
+
 			}
 		};
-		timer.schedule(task, 500, 15000);
+		timer.schedule(task, 500, 60000);
 	}
 
 	public void start_client_socket() {
@@ -340,21 +339,18 @@ public class GetMsgService extends Service {
 				application.getUserDB().updateUser(list);
 				application.setIsLogin(true);
 			}
-			if (list.get(0).getOffLineMessUser() != null
-					&& list.get(0).getOffLineMessUser().size() > 0) {
-				application.setOffLineList(list.get(0)
-						.getOffLineMessUser());
-			}
 			break;
 		case LOGOUT:
 			// MediaPlayer.create(this, R.raw.msg).start();
 			break;
 		case HEARTBEAT:
-			this.mHeartBeat=2;
+			this.mHeartBeat = 2;
 			break;
 		case ACKMSG:
 			CommonMsg cm = (CommonMsg) msg.getObject();
-			application.updateDBbyMsgOk(cm.getarg1(), cm.getarg2());
+			if ((cm.getarg1() != null && cm.getarg1().length() > 0)
+					|| (cm.getarg2() != null && cm.getarg2().length() > 0))
+				application.updateDBbyMsgOk(cm.getarg1(), cm.getarg2());
 			break;
 		default:
 			break;

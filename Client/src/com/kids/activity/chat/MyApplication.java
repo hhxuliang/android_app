@@ -34,7 +34,6 @@ public class MyApplication extends Application {
 	private MessageDB messageDB;
 	private String home_path;
 	private String camera_path;
-	private ArrayList<String> offlinemsslist = new ArrayList<String>();
 	private ArrayList<String> notReadmsslist = new ArrayList<String>();
 	private HashMap<String, String> mNeedRefresh = new HashMap<String, String>();
 	public static int mWindowHeight = 0;
@@ -118,13 +117,7 @@ public class MyApplication extends Application {
 		mNeedRefresh.remove(uidstr);
 	}
 
-	public ArrayList<String> getOffLineList() {
-		return offlinemsslist;
-	}
-
-	public void setOffLineList(ArrayList<String> l) {
-		offlinemsslist.addAll(l);
-	}
+	
 
 	public String getHomePath() {
 		return home_path;
@@ -215,9 +208,7 @@ public class MyApplication extends Application {
 	public ChatMsgEntity send(String contString, boolean is_pic, String pic_path_local,User user) {
 		ClientOutputThread out = client.getClientOutputThread();
 		ChatMsgEntity entity=null;
-		if (!isClientStart()  || out == null) {
-			return null;
-		}
+		
 		SharePreferenceUtil util = new SharePreferenceUtil(getApplicationContext(),
 				Constants.SAVE_USER);
 		if (contString.length() > 0) {
@@ -235,7 +226,7 @@ public class MyApplication extends Application {
 			addNeedRefresh(user.getId()+"");
 			
 
-			if (out != null) {
+			if (isClientStart() && out != null) {
 				TranObject<TextMessage> o = new TranObject<TextMessage>(
 						TranObjectType.MESSAGE);
 				TextMessage message = new TextMessage();
@@ -263,7 +254,7 @@ public class MyApplication extends Application {
 		return  entity;
 	}
 	
-	public int Resend(String contString, boolean is_pic, String pic_path_local,User user) {
+	public int Resend(String contString, boolean is_pic, String pic_path_local,User user,String datekey) {
 		ClientOutputThread out = client.getClientOutputThread();
 		if (!isClientStart()  || out == null) {
 			return -1;
@@ -277,6 +268,7 @@ public class MyApplication extends Application {
 				TextMessage message = new TextMessage();
 				message.setMessage(contString);
 				message.set_is_pic(is_pic);
+				message.setDatekey(datekey);
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
 				o.setToUser(user.getId());

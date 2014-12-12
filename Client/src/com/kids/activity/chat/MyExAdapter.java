@@ -111,16 +111,6 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 		title2.setText(id);// 小标题
 		icon.setImageResource(imgs[img]);
 		icon_more.setVisibility(View.INVISIBLE );
-		if(application.getOffLineList() !=null)
-		{
-			for(String s:application.getOffLineList())
-			{
-				if (s.equals(id))
-				{
-					icon_more.setVisibility(View.VISIBLE );
-				}
-			}
-		}
 		if(application.getNotReadmsslist() !=null)
 		{
 			for(String s:application.getNotReadmsslist())
