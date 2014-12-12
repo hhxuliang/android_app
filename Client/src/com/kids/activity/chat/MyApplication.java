@@ -34,12 +34,19 @@ public class MyApplication extends Application {
 	private MessageDB messageDB;
 	private String home_path;
 	private String camera_path;
-	private ArrayList<String> offlinemsslist;
+	private ArrayList<String> offlinemsslist = new ArrayList<String>();
+	private ArrayList<String> notReadmsslist = new ArrayList<String>();
 	private HashMap<String, String> mNeedRefresh = new HashMap<String, String>();
 	public static int mWindowHeight = 0;
 	public static int mWindowWidth = 0;
 	private boolean IsLogin = false;
+	public ArrayList<String> getNotReadmsslist() {
+		return notReadmsslist;
+	}
 
+	public void setNotReadmsslist(ArrayList<String> notReadmsslist) {
+		this.notReadmsslist.addAll(notReadmsslist);
+	}
 	public boolean isIsLogin() {
 		return IsLogin;
 	}
@@ -72,6 +79,8 @@ public class MyApplication extends Application {
 						msg.getMessage());
 				mRecentList.add(entity);
 			}
+			if(messageDB.GetMsgReadSta(u.getId()))
+				notReadmsslist.add(u.getId()+"");
 		}
 		mRecentAdapter = new RecentChatAdapter(getApplicationContext(),
 				mRecentList);
@@ -114,7 +123,7 @@ public class MyApplication extends Application {
 	}
 
 	public void setOffLineList(ArrayList<String> l) {
-		offlinemsslist = l;
+		offlinemsslist.addAll(l);
 	}
 
 	public String getHomePath() {

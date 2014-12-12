@@ -65,6 +65,8 @@ public class RecentChatAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.icon = (ImageView) convertView
 					.findViewById(R.id.recent_userhead);
+			holder.icon_more = (ImageView) convertView
+					.findViewById(R.id.imageView_item_more_msg);
 			holder.name = (TextView) convertView.findViewById(R.id.recent_name);
 			holder.date = (TextView) convertView.findViewById(R.id.recent_time);
 			holder.msg = (TextView) convertView.findViewById(R.id.recent_msg);
@@ -107,6 +109,28 @@ public class RecentChatAdapter extends BaseAdapter {
 
 			}
 		});
+		
+		holder.icon_more.setVisibility(View.INVISIBLE );
+		if(application.getOffLineList()!=null)
+		{
+			for(String s:application.getOffLineList())
+			{
+				if (s.equals(entity.getId()+""))
+				{
+					holder.icon_more.setVisibility(View.VISIBLE );
+				}
+			}
+		}
+		if(application.getNotReadmsslist() !=null)
+		{
+			for(String s:application.getNotReadmsslist())
+			{
+				if (s.equals(entity.getId()+""))
+				{
+					holder.icon_more.setVisibility(View.VISIBLE );
+				}
+			}
+		}
 		return convertView;
 	}
 
@@ -116,5 +140,6 @@ public class RecentChatAdapter extends BaseAdapter {
 		public TextView date;
 		public TextView msg;
 		public TextView count;
+		public ImageView icon_more;
 	}
 }

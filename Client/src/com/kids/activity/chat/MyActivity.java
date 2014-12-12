@@ -1,6 +1,9 @@
 package com.kids.activity.chat;
 
+import java.util.List;
+
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,12 +30,25 @@ import com.way.chat.common.util.Constants;
  * 
  */
 public abstract class MyActivity extends Activity {
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
+
+		ActivityManager mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+
+		List<ActivityManager.RunningServiceInfo> mServiceList = mActivityManager
+				.getRunningServices(30);
+		final String mClassName = GetMsgService.getMyName();
+
+		boolean b = ServiceIsStart(mServiceList, mClassName);
+		if (b == false) {
+			Intent service = new Intent(this, GetMsgService.class);
+			startService(service);
+		}
 	}
+
 	/**
 	 * 广播接收者，接收GetMsgService发送过来的消息
 	 */
@@ -46,15 +62,15 @@ public abstract class MyActivity extends Activity {
 					.getSerializableExtra(Constants.PICUPDATE);
 
 			String msgs = (String) intent.getSerializableExtra("MSG");
-			String id =(String)  intent.getSerializableExtra("SENDSTA");
+			String id = (String) intent.getSerializableExtra("SENDSTA");
 
 			if (msg != null) {// 如果不是空，说明是消息广播
 				System.out.println("MyActivity:" + msg.getFromUser());
 				getMessage(msg);// 把收到的消息传递给子类
 			} else if (hm != null) {
 				getPicUpdate(hm);
-			} else if (msgs != null && id!=null) {
-				msgsendok(msgs,id);
+			} else if (msgs != null && id != null) {
+				msgsendok(msgs, id);
 			} else {
 				unregisterReceiver(this);
 				close();
@@ -62,9 +78,11 @@ public abstract class MyActivity extends Activity {
 
 		}
 	};
-	public void msgsendok(String msgs,String id) {
+
+	public void msgsendok(String msgs, String id) {
 
 	}
+
 	public void getPicUpdate(HandleMsg hm) {
 
 	}
@@ -95,6 +113,19 @@ public abstract class MyActivity extends Activity {
 		default:
 			break;
 		}
+	}
+
+	// 通过Service的类名来判断是否启动某个服务
+	private boolean ServiceIsStart(
+			List<ActivityManager.RunningServiceInfo> mServiceList,
+			String className) {
+
+		for (int i = 0; i < mServiceList.size(); i++) {
+			if (className.equals(mServiceList.get(i).service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

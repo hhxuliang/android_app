@@ -15,6 +15,15 @@ public class ChatMsgEntity {
 	private boolean is_pic = false;
 	private String pic_path;
 	private int sendSta;
+	private int readSta;
+
+	public int getReadSta() {
+		return readSta;
+	}
+
+	public void setReadSta(int readSta) {
+		this.readSta = readSta;
+	}
 
 	public int getSendSta() {
 		return sendSta;
@@ -38,6 +47,7 @@ public class ChatMsgEntity {
 		this.isComMeg = isComMsg;
 		this.is_pic = isPic;
 		this.pic_path = picPath;
+		this.readSta = 1;
 	}
 
 	public boolean get_is_pic() {

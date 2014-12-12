@@ -129,6 +129,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		super.onResume();
 		if (application.needRefresh(user.getId() + ""))
 			refreshData();
+		application.getNotReadmsslist().remove(user.getId() + "");
+		messageDB.updateReadsta(user.getId());
 
 	}
 

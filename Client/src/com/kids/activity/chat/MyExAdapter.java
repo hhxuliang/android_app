@@ -32,23 +32,16 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 	private int[] imgs_more = { R.drawable.page_indicator_focused};// 头像资源数组
 	private Context context;
 	private List<GroupFriend> group;// 传递过来的经过处理的总数据
-	private List<String> offlineuserid;
-
-	public MyExAdapter(Context context, List<GroupFriend> group,List<String> ls) {
+	private MyApplication application;
+	
+	public MyExAdapter(Context context, List<GroupFriend> group) {
 		super();
 		this.context = context;
 		this.group = group;
-		this.offlineuserid = ls;
+		
+		application = (MyApplication) context.getApplicationContext();
 	}
-	public void addOffLineUserid(String l){
-		if(offlineuserid==null)
-			offlineuserid= new ArrayList<String>();
-		offlineuserid.add(l);
-	}
-	public void removeOffLineUserid(String l){
-		if(offlineuserid!=null)
-			offlineuserid.remove(l);
-	}
+	
 	// 得到大组成员的view
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
@@ -118,10 +111,19 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 		title2.setText(id);// 小标题
 		icon.setImageResource(imgs[img]);
 		icon_more.setVisibility(View.INVISIBLE );
-		System.out.println("asdfasdfasdf:"+iscrowd);
-		if(offlineuserid!=null)
+		if(application.getOffLineList() !=null)
 		{
-			for(String s:offlineuserid)
+			for(String s:application.getOffLineList())
+			{
+				if (s.equals(id))
+				{
+					icon_more.setVisibility(View.VISIBLE );
+				}
+			}
+		}
+		if(application.getNotReadmsslist() !=null)
+		{
+			for(String s:application.getNotReadmsslist())
 			{
 				if (s.equals(id))
 				{
@@ -140,7 +142,6 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				u.setId(Integer.parseInt(id));
 				u.setImg(img);
 				u.setIsCrowd(iscrowd);
-				removeOffLineUserid(id);
 				Intent intent = new Intent(context, ChatActivity.class);
 				intent.putExtra("user", u);
 				context.startActivity(intent);

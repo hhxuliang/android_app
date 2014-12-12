@@ -155,7 +155,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		newNum = application.getRecentNum();// 从新获取一下全局变量
 
 		application.getmRecentAdapter().notifyDataSetChanged();
-		updateUserState();
+		myExAdapter.notifyDataSetChanged();
 		if (mGroupGridView != null && mGroupGridView.getAdapter() != null){
 			((GroupAdapter) mGroupGridView.getAdapter()).resetList();			
 		}
@@ -281,7 +281,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		// 下面是处理好友列表界面处理
 		myListView = (MyListView) lay2.findViewById(R.id.tab2_listView);
-		myExAdapter = new MyExAdapter(this, group, application.getOffLineList());
+		myExAdapter = new MyExAdapter(this, group);
 		myListView.setAdapter(myExAdapter);
 		myListView.setGroupIndicator(null);// 不设置大组指示器图标，因为我们自定义设置了
 		myListView.setDivider(null);// 设置图片可拉伸的
@@ -376,17 +376,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	}
 
 	public void updateUserState() {
-		HashMap<String, String> map = application.getNeedRefreshMap();
-
-		Iterator<java.util.Map.Entry<String, String>> ite = map.entrySet()
-				.iterator();
-		java.util.Map.Entry<String, String> entry;
-		while (ite.hasNext()) {
-			entry = ite.next();
-			System.out.println((String) entry.getKey());
-			myExAdapter.addOffLineUserid((String) entry.getKey());
-		}
-		myExAdapter.notifyDataSetChanged();
+		
+		
 	}
 
 	@Override
@@ -395,7 +386,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		switch (msg.getType()) {
 		case MESSAGE:
 			application.getmRecentAdapter().notifyDataSetChanged();
-			updateUserState();
+			myExAdapter.notifyDataSetChanged();
 			break;
 		default:
 			break;

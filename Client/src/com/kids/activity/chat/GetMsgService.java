@@ -72,7 +72,7 @@ public class GetMsgService extends Service {
 	private HashMap<String, TranObject> mMap_Waiting_Download_Pic = new HashMap<String, TranObject>();
 	private final Timer timer = new Timer();
 	private TimerTask task;
-
+	
 	private Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
@@ -147,7 +147,11 @@ public class GetMsgService extends Service {
 
 		}
 	}
-
+	public static String getMyName()
+	{
+		return "com.kids.activity.chat.GetMsgService" ;
+		
+	}
 	@Override
 	public void onCreate() {// 在onCreate方法里面注册广播接收者
 		// TODO Auto-generated method stub
@@ -208,7 +212,7 @@ public class GetMsgService extends Service {
 					mNotification.contentView = null;
 
 					Intent intent = new Intent(mContext,
-							FriendListActivity.class);
+							MyMainActivity.class);
 					PendingIntent contentIntent = PendingIntent.getActivity(
 							mContext, 0, intent, 0);
 					mNotification.setLatestEventInfo(mContext, util.getName()
@@ -313,11 +317,13 @@ public class GetMsgService extends Service {
 			RecentChatEntity entity2 = new RecentChatEntity(msg.getFromUser(),
 					user2.getImg(), 0, user2.getName(), MyDate.getDate(),
 					message);
+			if(!application.getNotReadmsslist().contains(msg.getFromUser()+""))
+				application.getNotReadmsslist().add(msg.getFromUser()+"");
 			application.addNeedRefresh(msg.getFromUser() + "");
 			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
 			application.getmRecentList().addFirst(entity2);// 再添加到首部
 
-			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			//MediaPlayer.create(this, R.raw.msg).start();// 声音提示
 			break;
 		case LOGIN:
 			List<User> list = (List<User>) msg.getObject();
@@ -328,7 +334,7 @@ public class GetMsgService extends Service {
 			}
 			break;
 		case LOGOUT:
-			MediaPlayer.create(this, R.raw.msg).start();
+			//MediaPlayer.create(this, R.raw.msg).start();
 			break;
 		default:
 			break;
