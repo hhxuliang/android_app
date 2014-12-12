@@ -21,7 +21,7 @@ public class MessageDB {
 	public void createTable(int id) {
 		db.execSQL("CREATE table IF NOT EXISTS _"
 				+ id
-				+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT, img TEXT,date TEXT,isCome TEXT,message TEXT,isPic TEXT,picPath TEXT,sendsta TEXT,readsta TEXT)");
+				+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT, img TEXT,date TEXT,isCome TEXT,message TEXT,isPic TEXT,picPath TEXT,sendsta TEXT,readsta TEXT,datekey TEXT)");
 	}
 
 	public void saveMsg(int id, ChatMsgEntity entity) {
@@ -33,11 +33,11 @@ public class MessageDB {
 		db.execSQL(
 				"insert into _"
 						+ id
-						+ " (name,img,date,isCome,message,isPic,picPath,sendsta,readsta) values(?,?,?,?,?,?,?,?,?)",
+						+ " (name,img,date,isCome,message,isPic,picPath,sendsta,readsta,datekey) values(?,?,?,?,?,?,?,?,?,?)",
 				new Object[] { entity.getName(), entity.getImg(),
 						entity.getDate(), isCome, entity.getMessage(),
 						entity.get_is_pic(), entity.getPicPath(),
-						entity.getSendSta(),entity.getReadSta() });
+						entity.getSendSta(),entity.getReadSta(),entity.getDatekey() });
 	}
 
 	public void updateMsg(int id, String setStr_path, String whereStr_msg) {
@@ -46,10 +46,10 @@ public class MessageDB {
 				new Object[] { setStr_path, whereStr_msg });
 	}
 
-	public void updateDBbyMsgOk(String msg, int id) {
-		createTable(id);
-		db.execSQL("update _" + id + "  set sendsta=? where message=?",
-				new Object[] { 1, msg });
+	public void updateDBbyMsgOk(String key, String id) {
+		createTable(Integer.parseInt(id));
+		db.execSQL("update _" + id + "  set sendsta=? where datekey=?",
+				new Object[] { 1, key });
 	}
 	public void updateReadsta( int id) {
 		createTable(id);
@@ -91,6 +91,7 @@ public class MessageDB {
 			int ispic = c.getInt(c.getColumnIndex("isPic"));
 			String pic_path = c.getString(c.getColumnIndex("picPath"));
 			int sends = c.getInt(c.getColumnIndex("sendsta"));
+			String datekey = c.getString(c.getColumnIndex("datekey"));
 			boolean isComMsg = false;
 			if (isCome == 1) {
 				isComMsg = true;
@@ -104,6 +105,7 @@ public class MessageDB {
 					isComMsg, picOrNot, pic_path);
 			entity.setPicPath(pic_path);
 			entity.setSendSta(sends);
+			entity.setDatekey(datekey);
 			list.add(entity);
 		}
 		c.close();

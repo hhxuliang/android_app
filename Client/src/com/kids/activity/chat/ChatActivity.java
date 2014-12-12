@@ -92,7 +92,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		Runnable runnable = new Runnable() {
 			public void run() {
 				try {
-					Thread.sleep(10000);// we need to wait 10s for
+					Thread.sleep(5000);// we need to wait 10s for
 										// friendActivity not receive the
 										// message,
 										// that will cause duplicate message
@@ -272,6 +272,9 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		application.getNotReadmsslist().remove(user.getId() + "");
+		messageDB.updateReadsta(user.getId());
+		
 	}
 
 	@Override
@@ -322,9 +325,9 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		}
 	}
 
-	public void msgsendok(String msgs, String id) {
+	public void msgsendok(String key, String id) {
 		for (ChatMsgEntity cme : mDataArrays) {
-			if (cme.getMessage().equals(msgs) && id.equals(user.getId() + "")) {
+			if (key.equals(cme.getDatekey()) && id.equals(user.getId() + "")) {
 				cme.setSendSta(1);
 				mAdapter.notifyDataSetChanged();
 				// break;
@@ -339,17 +342,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private void send(String contString, boolean is_pic, String pic_path_local) {
 
 		if (contString.length() > 0) {
-			application.send(contString, is_pic, pic_path_local, user);
-			ChatMsgEntity entity = new ChatMsgEntity();
-			entity.setName(util.getName());
-			entity.setDate(MyDate.getDateEN());
-			entity.set_is_pic(is_pic);
-			entity.setMessage(contString);
-			entity.setImg(util.getImg());
-			entity.setMsgType(false);
-			entity.setPicPath(pic_path_local);
-
-			mDataArrays.add(entity);
+			ChatMsgEntity entity=application.send(contString, is_pic, pic_path_local, user);
+						mDataArrays.add(entity);
 			mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
 
 			mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项

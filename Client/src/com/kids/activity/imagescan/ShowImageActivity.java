@@ -306,7 +306,7 @@ public class ShowImageActivity extends MyActivity implements
 			if (user != null) {
 				if(application==null)
 					System.out.println("application is null");
-				if (0 == application.send(url_path, true, picnewstr, user)){
+				if (null != application.send(url_path, true, picnewstr, user)){
 					Toast.makeText(	getApplicationContext(),"成功上传" + picnewstr ,0).show();
 				}else{
 					Toast.makeText(	getApplicationContext(),"上传" + picnewstr + "失败" ,0).show();

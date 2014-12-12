@@ -574,7 +574,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	private void addIntoList(Bitmap bitmap, String path, String itemtype) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		String prefix = path.substring(path.lastIndexOf("."));
-		String date_str = MyDate.getDateForImageName();
+		String date_str = MyDate.getDateMillis();
 		mGridItemList.remove(mGridItemList.size() - 1);
 		map.put("ItemImage", bitmap);
 		map.put("ItemActualPath", path);

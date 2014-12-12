@@ -44,6 +44,7 @@ import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UserDB;
 import com.kids.util.ZipUtil;
 import com.way.chat.activity.R;
+import com.way.chat.common.bean.CommonMsg;
 import com.way.chat.common.bean.TextMessage;
 import com.way.chat.common.bean.User;
 import com.way.chat.common.tran.bean.TranObject;
@@ -72,7 +73,8 @@ public class GetMsgService extends Service {
 	private HashMap<String, TranObject> mMap_Waiting_Download_Pic = new HashMap<String, TranObject>();
 	private final Timer timer = new Timer();
 	private TimerTask task;
-	
+	private int mHeartBeat = 0;
+
 	private Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
@@ -102,7 +104,7 @@ public class GetMsgService extends Service {
 		private String mUrl = null;
 		private int mUid;
 
-		public Download(String p,int uid) {
+		public Download(String p, int uid) {
 			mUrl = p;
 			mUid = uid;
 		}
@@ -119,11 +121,12 @@ public class GetMsgService extends Service {
 				con.setRequestMethod("GET");
 				con.connect();
 				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-				
+
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
-					String savePath = application.getDownloadPicPath() + "/" + mUid + "_kids_"
-							+ MyDate.getDateForImageName() + prefix;
+					String savePath = application.getDownloadPicPath() + "/"
+							+ mUid + "_kids_" + MyDate.getDateMillis()
+							+ prefix;
 					FileOutputStream fos = new FileOutputStream(savePath);
 					byte[] buffer = new byte[8192];
 					int count = 0;
@@ -147,11 +150,12 @@ public class GetMsgService extends Service {
 
 		}
 	}
-	public static String getMyName()
-	{
-		return "com.kids.activity.chat.GetMsgService" ;
-		
+
+	public static String getMyName() {
+		return "com.kids.activity.chat.GetMsgService";
+
 	}
+
 	@Override
 	public void onCreate() {// 在onCreate方法里面注册广播接收者
 		// TODO Auto-generated method stub
@@ -211,8 +215,7 @@ public class GetMsgService extends Service {
 					mNotification.defaults |= Notification.DEFAULT_VIBRATE;
 					mNotification.contentView = null;
 
-					Intent intent = new Intent(mContext,
-							MyMainActivity.class);
+					Intent intent = new Intent(mContext, MyMainActivity.class);
 					PendingIntent contentIntent = PendingIntent.getActivity(
 							mContext, 0, intent, 0);
 					mNotification.setLatestEventInfo(mContext, util.getName()
@@ -240,16 +243,18 @@ public class GetMsgService extends Service {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				if (client.testNet()
-						&& client.getClientOutputThread().isStart()
+				if (mHeartBeat == 2 && client.getClientOutputThread().isStart()
 						&& client.getClientInputThread().isStart()) {
 					isStart = true;
 					application.setClientStart(isStart);
+					client.sendHeartBeat();
+					mHeartBeat = 1;
 				} else {
 					application.setClientStart(false);
 					client.stopNet();
 					start_client_socket();
 				}
+				
 			}
 		};
 		timer.schedule(task, 500, 15000);
@@ -260,6 +265,7 @@ public class GetMsgService extends Service {
 		isStart = client.start();
 		application.setClientStart(isStart);
 		if (isStart) {
+			mHeartBeat = 2;
 			ClientInputThread in = client.getClientInputThread();
 			in.setMessageListener(new MessageListener() {
 
@@ -308,7 +314,8 @@ public class GetMsgService extends Service {
 				// new thread to download the picture to update the picpath in
 				// local db
 				mMap_Waiting_Download_Pic.put(tm.getMessage(), msg);
-				new Thread(new Download(tm.getMessage(),msg.getFromUser())).start();
+				new Thread(new Download(tm.getMessage(), msg.getFromUser()))
+						.start();
 			}
 			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
 
@@ -317,13 +324,14 @@ public class GetMsgService extends Service {
 			RecentChatEntity entity2 = new RecentChatEntity(msg.getFromUser(),
 					user2.getImg(), 0, user2.getName(), MyDate.getDate(),
 					message);
-			if(!application.getNotReadmsslist().contains(msg.getFromUser()+""))
-				application.getNotReadmsslist().add(msg.getFromUser()+"");
+			if (!application.getNotReadmsslist().contains(
+					msg.getFromUser() + ""))
+				application.getNotReadmsslist().add(msg.getFromUser() + "");
 			application.addNeedRefresh(msg.getFromUser() + "");
 			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
 			application.getmRecentList().addFirst(entity2);// 再添加到首部
 
-			//MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			// MediaPlayer.create(this, R.raw.msg).start();// 声音提示
 			break;
 		case LOGIN:
 			List<User> list = (List<User>) msg.getObject();
@@ -332,9 +340,21 @@ public class GetMsgService extends Service {
 				application.getUserDB().updateUser(list);
 				application.setIsLogin(true);
 			}
+			if (list.get(0).getOffLineMessUser() != null
+					&& list.get(0).getOffLineMessUser().size() > 0) {
+				application.setOffLineList(list.get(0)
+						.getOffLineMessUser());
+			}
 			break;
 		case LOGOUT:
-			//MediaPlayer.create(this, R.raw.msg).start();
+			// MediaPlayer.create(this, R.raw.msg).start();
+			break;
+		case HEARTBEAT:
+			this.mHeartBeat=2;
+			break;
+		case ACKMSG:
+			CommonMsg cm = (CommonMsg) msg.getObject();
+			application.updateDBbyMsgOk(cm.getarg1(), cm.getarg2());
 			break;
 		default:
 			break;

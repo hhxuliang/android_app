@@ -22,7 +22,7 @@ public class MyDate {
 		return date;
 	}
 
-	public static String getDateForImageName() {
+	public static String getDateMillis() {
 		SimpleDateFormat format = new SimpleDateFormat(
 				"yyyy_MM_dd_hh_mm_ss_SSS");
 		String date = format.format(new Date(System.currentTimeMillis()));

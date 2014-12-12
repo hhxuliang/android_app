@@ -3,6 +3,7 @@ package com.kids.client;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import com.kids.activity.chat.GetMsgService;
 import com.way.chat.common.bean.TextMessage;
@@ -19,12 +20,11 @@ public class ClientOutputThread extends Thread {
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private boolean isStart = true;
+	private ArrayList<TranObject> object = new ArrayList<TranObject>();
 
 	public boolean isStart() {
 		return isStart;
 	}
-
-	private TranObject msg;
 
 	public ClientOutputThread(Socket socket) {
 		this.socket = socket;
@@ -41,7 +41,7 @@ public class ClientOutputThread extends Thread {
 
 	// 这里处理跟服务器是一样的
 	public void setMsg(TranObject msg) {
-		this.msg = msg;
+		object.add(msg);
 		synchronized (this) {
 			notify();
 		}
@@ -60,23 +60,26 @@ public class ClientOutputThread extends Thread {
 
 	@Override
 	public void run() {
+		boolean close = false;
 		try {
 			while (isStart) {
-				if (msg != null) {
-					oos.writeObject(msg);
-					oos.flush();
-					oos.reset();
-					if (msg.getType() == TranObjectType.LOGOUT) {// 如果是发送下线的消息，就直接跳出循环
+				if (object.size() > 0) {
+					for (TranObject msg : object) {
+						oos.writeObject(msg);
+						oos.flush();
+						oos.reset();
+						object.remove(msg);
+						
+						if (msg.getType() == TranObjectType.LOGOUT) {// 如果是发送下线的消息，就直接跳出循环
+							close = true;
+							break;
+						}
+					}
+					if (close == true)
 						break;
-					}
-					if (msg.getType() == TranObjectType.MESSAGE) {// 如果是发送下线的消息，就直接跳出循环
-						GetMsgService.application.updateDBbyMsgOk(
-								((TextMessage) msg.getObject()).getMessage(),
-								msg.getToUser());
-					}
-					synchronized (this) {
-						wait();// 发送完消息后，线程进入等待状态
-					}
+				}
+				synchronized (this) {
+					wait();// 发送完消息后，线程进入等待状态
 				}
 			}
 

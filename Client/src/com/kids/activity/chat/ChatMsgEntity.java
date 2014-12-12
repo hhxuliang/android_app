@@ -16,6 +16,15 @@ public class ChatMsgEntity {
 	private String pic_path;
 	private int sendSta;
 	private int readSta;
+	private String datekey;
+
+	public String getDatekey() {
+		return datekey;
+	}
+
+	public void setDatekey(String datekey) {
+		this.datekey = datekey;
+	}
 
 	public int getReadSta() {
 		return readSta;

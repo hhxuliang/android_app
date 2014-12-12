@@ -89,11 +89,11 @@ public class MyApplication extends Application {
 	public HashMap<String, String> getNeedRefreshMap() {
 		return mNeedRefresh;
 	}
-	public void updateDBbyMsgOk(String msg, int id) {
-		messageDB.updateDBbyMsgOk(msg, id);
+	public void updateDBbyMsgOk(String datekey, String id) {
+		messageDB.updateDBbyMsgOk(datekey, id);
 		Intent broadCast = new Intent();
 		broadCast.setAction(Constants.ACTION);
-		broadCast.putExtra("MSG", msg);
+		broadCast.putExtra("MSGDATEKEY", datekey);
 		broadCast.putExtra("SENDSTA", id+"");
 		sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
 	}
@@ -212,15 +212,16 @@ public class MyApplication extends Application {
 			messageDB.close();
 
 	}
-	public int send(String contString, boolean is_pic, String pic_path_local,User user) {
+	public ChatMsgEntity send(String contString, boolean is_pic, String pic_path_local,User user) {
 		ClientOutputThread out = client.getClientOutputThread();
+		ChatMsgEntity entity=null;
 		if (!isClientStart()  || out == null) {
-			return -1;
+			return null;
 		}
 		SharePreferenceUtil util = new SharePreferenceUtil(getApplicationContext(),
 				Constants.SAVE_USER);
 		if (contString.length() > 0) {
-			ChatMsgEntity entity = new ChatMsgEntity();
+			entity = new ChatMsgEntity();
 			entity.setName(util.getName());
 			entity.setDate(MyDate.getDateEN());
 			entity.set_is_pic(is_pic);
@@ -229,6 +230,7 @@ public class MyApplication extends Application {
 			entity.setMsgType(false);
 			entity.setPicPath(pic_path_local);
 			entity.setSendSta(-1);
+			entity.setDatekey(MyDate.getDateMillis());
 			messageDB.saveMsg(user.getId(), entity);
 			addNeedRefresh(user.getId()+"");
 			
@@ -239,6 +241,7 @@ public class MyApplication extends Application {
 				TextMessage message = new TextMessage();
 				message.setMessage(contString);
 				message.set_is_pic(is_pic);
+				message.setDatekey(entity.getDatekey());
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
 				o.setToUser(user.getId());
@@ -257,7 +260,7 @@ public class MyApplication extends Application {
 			getmRecentList().addFirst(entity1);
 			getmRecentAdapter().notifyDataSetChanged();
 		}
-		return 0;
+		return  entity;
 	}
 	
 	public int Resend(String contString, boolean is_pic, String pic_path_local,User user) {

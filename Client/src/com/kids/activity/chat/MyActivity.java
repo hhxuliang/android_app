@@ -61,7 +61,7 @@ public abstract class MyActivity extends Activity {
 			HandleMsg hm = (HandleMsg) intent
 					.getSerializableExtra(Constants.PICUPDATE);
 
-			String msgs = (String) intent.getSerializableExtra("MSG");
+			String keyms = (String) intent.getSerializableExtra("MSGDATEKEY");
 			String id = (String) intent.getSerializableExtra("SENDSTA");
 
 			if (msg != null) {// 如果不是空，说明是消息广播
@@ -69,8 +69,8 @@ public abstract class MyActivity extends Activity {
 				getMessage(msg);// 把收到的消息传递给子类
 			} else if (hm != null) {
 				getPicUpdate(hm);
-			} else if (msgs != null && id != null) {
-				msgsendok(msgs, id);
+			} else if (keyms != null && id != null) {
+				msgsendok(keyms, id);
 			} else {
 				unregisterReceiver(this);
 				close();

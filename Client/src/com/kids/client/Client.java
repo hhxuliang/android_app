@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import com.way.chat.common.bean.CommonMsg;
+import com.way.chat.common.tran.bean.TranObject;
+import com.way.chat.common.tran.bean.TranObjectType;
+
 /**
  * 客户端
  * 
@@ -23,7 +27,7 @@ public class Client {
 	}
 
 	public void stopNet() {
-		if(clientThread==null || client==null)
+		if (clientThread == null || client == null)
 			return;
 		clientThread.stopNet();
 		try {
@@ -72,21 +76,18 @@ public class Client {
 		clientThread.getOut().setStart(isStart);
 	}
 
-	public boolean testNet() {
-		if(client!=null)
-			return client.isConnected();
-		return false;
-//		try {
-//			if (client != null && client.isConnected()) {
-//				client.sendUrgentData(0xFF);
-//				return true;
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			// 网络断开
-//			e.printStackTrace();
-//		}
-//		return false;
+	public void sendHeartBeat() {
+		if (client != null && client.isConnected() && clientThread != null
+				&& getClientOutputThread().isStart()) {
+			CommonMsg cm = new CommonMsg();
+			cm.setarg1("1");
+			cm.setarg2("1");
+			cm.setarg3("1");
+			TranObject<CommonMsg> msg2Object = new TranObject<CommonMsg>(
+					TranObjectType.HEARTBEAT);
+			msg2Object.setObject(cm);
+			getClientOutputThread().setMsg(msg2Object);
+		}
 	}
 
 	public class ClientThread extends Thread {
