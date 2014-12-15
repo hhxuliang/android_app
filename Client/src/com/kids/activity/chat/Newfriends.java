@@ -50,7 +50,7 @@ import com.kids.util.DialogFactory;
 import com.kids.util.Encode;
 import com.kids.util.GroupFriend;
 import com.kids.util.MessageDB;
-import com.kids.util.MyDate;
+import com.way.chat.common.util.MyDate;
 import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UserDB;
 import com.way.chat.activity.R;

@@ -21,7 +21,7 @@ public class MessageDB {
 	public void createTable(int id) {
 		db.execSQL("CREATE table IF NOT EXISTS _"
 				+ id
-				+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT, img TEXT,date TEXT,isCome TEXT,message TEXT,isPic TEXT,picPath TEXT,sendsta TEXT,readsta TEXT,datekey TEXT)");
+				+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT, img TEXT,date TEXT,isCome TEXT,message TEXT,isPic TEXT,picPath TEXT,sendsta TEXT,readsta TEXT,datekey TEXT,msgid TEXT,serverdatekey TEXT)");
 	}
 
 	public void saveMsg(int id, ChatMsgEntity entity) {
@@ -33,11 +33,11 @@ public class MessageDB {
 		db.execSQL(
 				"insert into _"
 						+ id
-						+ " (name,img,date,isCome,message,isPic,picPath,sendsta,readsta,datekey) values(?,?,?,?,?,?,?,?,?,?)",
+						+ " (name,img,date,isCome,message,isPic,picPath,sendsta,readsta,datekey,msgid,serverdatekey) values(?,?,?,?,?,?,?,?,?,?,?,?)",
 				new Object[] { entity.getName(), entity.getImg(),
 						entity.getDate(), isCome, entity.getMessage(),
 						entity.get_is_pic(), entity.getPicPath(),
-						entity.getSendSta(),entity.getReadSta(),entity.getDatekey() });
+						entity.getSendSta(),entity.getReadSta(),entity.getDatekey(),entity.getMsgid(),entity.getServerdatekey() });
 	}
 
 	public void updateMsg(int id, String setStr_path, String whereStr_msg) {
@@ -51,23 +51,26 @@ public class MessageDB {
 		db.execSQL("update _" + id + "  set sendsta=? where datekey=?",
 				new Object[] { 1, key });
 	}
-	public void updateReadsta( int id) {
+
+	public void updateReadsta(int id) {
 		createTable(id);
-		db.execSQL("update _" + id + "  set readsta=?",new Object[] { 0 });
+		db.execSQL("update _" + id + "  set readsta=?", new Object[] { 0 });
 	}
-	public boolean GetMsgReadSta( int id) {
+
+	public boolean GetMsgReadSta(int id) {
 		createTable(id);
 		Cursor c;
-		c=db.rawQuery("select * from _" + id + " where isCome='1' and  readsta='1' LIMIT 1",
-				null);
+		c = db.rawQuery("select * from _" + id
+				+ " where isCome='1' and  readsta='1' LIMIT 1", null);
 		if (c.moveToNext()) {
-			int iii=c.getInt(c.getColumnIndex("readsta"));
+			int iii = c.getInt(c.getColumnIndex("readsta"));
 			c.close();
 			return true;
 		}
 		c.close();
 		return false;
 	}
+
 	public List<ChatMsgEntity> getMsg(int id, String whereStr_time, int limit) {
 		List<ChatMsgEntity> list = new ArrayList<ChatMsgEntity>();
 		createTable(id);
@@ -92,6 +95,7 @@ public class MessageDB {
 			String pic_path = c.getString(c.getColumnIndex("picPath"));
 			int sends = c.getInt(c.getColumnIndex("sendsta"));
 			String datekey = c.getString(c.getColumnIndex("datekey"));
+			String serverdatekey = c.getString(c.getColumnIndex("serverdatekey"));
 			boolean isComMsg = false;
 			if (isCome == 1) {
 				isComMsg = true;
@@ -106,6 +110,7 @@ public class MessageDB {
 			entity.setPicPath(pic_path);
 			entity.setSendSta(sends);
 			entity.setDatekey(datekey);
+			entity.setServerdatekey(serverdatekey);
 			list.add(entity);
 		}
 		c.close();

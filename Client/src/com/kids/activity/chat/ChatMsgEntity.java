@@ -17,6 +17,24 @@ public class ChatMsgEntity {
 	private int sendSta;
 	private int readSta;
 	private String datekey;
+	private String serverdatekey;
+	private int msgid;
+
+	public String getServerdatekey() {
+		return serverdatekey;
+	}
+
+	public void setServerdatekey(String serverdatekey) {
+		this.serverdatekey = serverdatekey;
+	}
+
+	public int getMsgid() {
+		return msgid;
+	}
+
+	public void setMsgid(int msgid) {
+		this.msgid = msgid;
+	}
 
 	public String getDatekey() {
 		return datekey;

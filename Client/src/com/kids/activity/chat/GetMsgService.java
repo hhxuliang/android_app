@@ -38,7 +38,7 @@ import com.kids.client.MessageListener;
 import com.kids.util.DialogFactory;
 import com.kids.util.Encode;
 import com.kids.util.MessageDB;
-import com.kids.util.MyDate;
+import com.way.chat.common.util.MyDate;
 import com.kids.util.MyUtils;
 import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UserDB;
@@ -301,9 +301,21 @@ public class GetMsgService extends Service {
 		switch (msg.getType()) {
 		case MESSAGE:
 			TextMessage tm = (TextMessage) msg.getObject();
+			CommonMsg cmg = new CommonMsg();
+			cmg.setarg1(tm.getDatekey());
+			TranObject<CommonMsg> ack = new TranObject<CommonMsg>(
+					TranObjectType.ACKMSG);
+			ack.setObject(cmg);
+			ack.setFromUser(Integer.parseInt(util.getId()));
+			if(client !=null && application.isClientStart() && client.getClientOutputThread().isStart()){
+				ClientOutputThread out = client.getClientOutputThread();
+				out.setMsg(ack);
+			}
+			
 			String message = tm.getMessage();
 			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
 					message, -1, true, tm.get_is_pic(), "");// 收到的消息
+			entity.setMsgid(tm.getMessageid());
 			/*
 			 * if (msg.getCrowd() == user.getId()) {
 			 * entity.setName(msg.getFromUserName());
@@ -330,7 +342,7 @@ public class GetMsgService extends Service {
 			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
 			application.getmRecentList().addFirst(entity2);// 再添加到首部
 
-			// MediaPlayer.create(this, R.raw.msg).start();// 声音提示
+			MediaPlayer.create(this, R.raw.msg).start();// 声音提示
 			break;
 		case LOGIN:
 			List<User> list = (List<User>) msg.getObject();

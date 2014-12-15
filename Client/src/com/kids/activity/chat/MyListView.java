@@ -3,7 +3,7 @@ package com.kids.activity.chat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.kids.util.MyDate;
+import com.way.chat.common.util.MyDate;
 import com.way.chat.activity.R;
 
 import android.content.Context;

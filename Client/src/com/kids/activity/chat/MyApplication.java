@@ -8,7 +8,7 @@ import java.util.List;
 import com.kids.client.Client;
 import com.kids.client.ClientOutputThread;
 import com.kids.util.MessageDB;
-import com.kids.util.MyDate;
+import com.way.chat.common.util.MyDate;
 import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UserDB;
 import com.way.chat.common.bean.TextMessage;

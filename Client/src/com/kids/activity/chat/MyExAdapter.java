@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kids.util.GroupFriend;
-import com.kids.util.MyDate;
+import com.way.chat.common.util.MyDate;
 import com.way.chat.activity.R;
 import com.way.chat.common.bean.User;
 

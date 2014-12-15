@@ -17,7 +17,7 @@ import java.util.Map;
 
 import com.kids.util.DialogFactory;
 import com.kids.util.ImageProcess;
-import com.kids.util.MyDate;
+import com.way.chat.common.util.MyDate;
 import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UploadUtil;
 import com.kids.util.ZipUtil;
