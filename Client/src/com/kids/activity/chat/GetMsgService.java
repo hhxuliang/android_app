@@ -82,7 +82,10 @@ public class GetMsgService extends Service {
 			switch (msg.what) {
 			case DOWNLOADPIC_OK:
 				if (tobj != null) {
-					hmsg.mComefromUid = tobj.getFromUser();
+					if(tobj.getCrowd()>0)
+						hmsg.mComefromUid = tobj.getCrowd();
+					else
+						hmsg.mComefromUid = tobj.getFromUser();
 					messageDB.updateMsg(tobj.getFromUser(), hmsg.mSavePath,
 							hmsg.mUrl);
 					Intent broadCast = new Intent();
@@ -256,7 +259,7 @@ public class GetMsgService extends Service {
 
 			}
 		};
-		timer.schedule(task, 500, 60000);
+		timer.schedule(task, 500, 1500000);
 	}
 
 	public void start_client_socket() {
@@ -289,6 +292,7 @@ public class GetMsgService extends Service {
 				}
 			});
 			MyUtils.login(util.getName(), util.getPasswd(), application);
+
 		}
 	}
 
@@ -298,47 +302,56 @@ public class GetMsgService extends Service {
 	 */
 	public void preProcess(TranObject msg) {
 		// TODO Auto-generated method stub
+		UserDB userDB = application.getUserDB();
 		switch (msg.getType()) {
 		case MESSAGE:
 			TextMessage tm = (TextMessage) msg.getObject();
+			int uid = 0;
+			if (msg.getCrowd() > 0)
+				uid = msg.getCrowd();
+			else
+				uid = msg.getFromUser();
 			CommonMsg cmg = new CommonMsg();
 			cmg.setarg1(tm.getDatekey());
 			TranObject<CommonMsg> ack = new TranObject<CommonMsg>(
 					TranObjectType.ACKMSG);
-			ack.setObject(cmg);
 			ack.setFromUser(Integer.parseInt(util.getId()));
-			if(client !=null && application.isClientStart() && client.getClientOutputThread().isStart()){
+			ack.setObject(cmg);
+			
+			if (client != null && application.isClientStart()
+					&& client.getClientOutputThread().isStart()) {
 				ClientOutputThread out = client.getClientOutputThread();
 				out.setMsg(ack);
 			}
-			
+
 			String message = tm.getMessage();
-			ChatMsgEntity entity = new ChatMsgEntity("", MyDate.getDateEN(),
-					message, -1, true, tm.get_is_pic(), "");// 收到的消息
+			ChatMsgEntity entity = new ChatMsgEntity(msg.getFromUserName(), MyDate.getDateEN(),
+					message, msg.getFromImg(), true, tm.get_is_pic(), "");// 收到的消息
 			entity.setMsgid(tm.getMessageid());
-			/*
-			 * if (msg.getCrowd() == user.getId()) {
-			 * entity.setName(msg.getFromUserName());
-			 * entity.setImg(msg.getFromImg()); }
-			 */
+			entity.setDatekey(tm.getDatekey());
+			entity.setServerdatekey(tm.getServerdatekey());
+
+			if (msg.getCrowd() > 0) {
+				entity.setName(msg.getFromUserName());
+				entity.setImg(msg.getFromImg());
+			}
+
 			if (tm.get_is_pic()) {
 				// new thread to download the picture to update the picpath in
 				// local db
 				mMap_Waiting_Download_Pic.put(tm.getMessage(), msg);
-				new Thread(new Download(tm.getMessage(), msg.getFromUser()))
-						.start();
+				new Thread(new Download(tm.getMessage(), uid)).start();
 			}
-			messageDB.saveMsg(msg.getFromUser(), entity);// 保存到数据库
 
-			UserDB userDB = application.getUserDB();
-			User user2 = userDB.selectInfo(msg.getFromUser());// 通过id查询对应数据库该好友信息
-			RecentChatEntity entity2 = new RecentChatEntity(msg.getFromUser(),
+			messageDB.saveMsg(uid, entity);// 保存到数据库
+
+			User user2 = userDB.selectInfo(uid);// 通过id查询对应数据库该好友信息
+			RecentChatEntity entity2 = new RecentChatEntity(uid,
 					user2.getImg(), 0, user2.getName(), MyDate.getDate(),
-					message);
-			if (!application.getNotReadmsslist().contains(
-					msg.getFromUser() + ""))
-				application.getNotReadmsslist().add(msg.getFromUser() + "");
-			application.addNeedRefresh(msg.getFromUser() + "");
+					message, user2.getIsCrowd());
+			if (!application.getNotReadmsslist().contains(uid + ""))
+				application.getNotReadmsslist().add(uid + "");
+			application.addNeedRefresh(uid + "");
 			application.getmRecentAdapter().remove(entity2);// 先移除该对象，目的是添加到首部
 			application.getmRecentList().addFirst(entity2);// 再添加到首部
 
@@ -350,6 +363,13 @@ public class GetMsgService extends Service {
 				// 保存用户信息
 				application.getUserDB().updateUser(list);
 				application.setIsLogin(true);
+			}
+
+			for (String s : userDB.getCrowdid()) {
+				String where = messageDB.getServerDatekeybyCrowd(Integer
+						.parseInt(s));
+				MyUtils.sendCrowdofflineMsgReq(util.getId(), s, where,
+						application);
 			}
 			break;
 		case LOGOUT:

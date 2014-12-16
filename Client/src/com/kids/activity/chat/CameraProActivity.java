@@ -400,7 +400,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 									// TODO Auto-generated method stub
 
 									String itemIndex = null;
-									itemIndex = CameraProActivity.this.selItemIndex;
+									itemIndex = CameraProActivity.this.pic_NO+"";
 									takePhoto(picPath + itemIndex + ".jpg");
 								}
 							}).setNegativeButton("否", null).create();

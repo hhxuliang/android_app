@@ -75,7 +75,7 @@ public class MyApplication extends Application {
 				ChatMsgEntity msg = lt.get(0);
 				RecentChatEntity entity = new RecentChatEntity(u.getId(),
 						u.getImg(), 0, u.getName(), msg.getDate(),
-						msg.getMessage());
+						msg.getMessage(),u.getIsCrowd());
 				mRecentList.add(entity);
 			}
 			if(messageDB.GetMsgReadSta(u.getId()))
@@ -235,6 +235,8 @@ public class MyApplication extends Application {
 				message.setDatekey(entity.getDatekey());
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
+				o.setFromUserName(util.getName());
+				o.setFromImg(util.getImg());
 				o.setToUser(user.getId());
 				if (user.getIsCrowd() == 1)
 					o.setCrowd(user.getId());
@@ -246,7 +248,7 @@ public class MyApplication extends Application {
 			// 下面是添加到最近会话列表的处理，在按发送键之后
 			RecentChatEntity entity1 = new RecentChatEntity(user.getId(),
 					user.getImg(), 0, user.getName(), MyDate.getDate(),
-					contString);
+					contString,user.getIsCrowd());
 			getmRecentList().remove(entity1);
 			getmRecentList().addFirst(entity1);
 			getmRecentAdapter().notifyDataSetChanged();
@@ -271,6 +273,9 @@ public class MyApplication extends Application {
 				message.setDatekey(datekey);
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
+				o.setFromUserName(util.getName());
+				o.setFromImg(util.getImg());
+				
 				o.setToUser(user.getId());
 				if (user.getIsCrowd() == 1)
 					o.setCrowd(user.getId());

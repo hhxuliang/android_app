@@ -37,7 +37,9 @@ public class MessageDB {
 				new Object[] { entity.getName(), entity.getImg(),
 						entity.getDate(), isCome, entity.getMessage(),
 						entity.get_is_pic(), entity.getPicPath(),
-						entity.getSendSta(),entity.getReadSta(),entity.getDatekey(),entity.getMsgid(),entity.getServerdatekey() });
+						entity.getSendSta(), entity.getReadSta(),
+						entity.getDatekey(), entity.getMsgid(),
+						entity.getServerdatekey() });
 	}
 
 	public void updateMsg(int id, String setStr_path, String whereStr_msg) {
@@ -71,6 +73,20 @@ public class MessageDB {
 		return false;
 	}
 
+	public String getServerDatekeybyCrowd(int id) {
+		createTable(id);
+		Cursor c;
+		c = db.rawQuery("SELECT * from _" + id
+				+ " ORDER BY serverdatekey DESC LIMIT 1",
+				null);
+		String serverdatekey="";
+		while (c.moveToNext()) {
+			serverdatekey = c.getString(c.getColumnIndex("serverdatekey"));
+		}
+		c.close();
+		return serverdatekey;
+	}
+
 	public List<ChatMsgEntity> getMsg(int id, String whereStr_time, int limit) {
 		List<ChatMsgEntity> list = new ArrayList<ChatMsgEntity>();
 		createTable(id);
@@ -95,7 +111,8 @@ public class MessageDB {
 			String pic_path = c.getString(c.getColumnIndex("picPath"));
 			int sends = c.getInt(c.getColumnIndex("sendsta"));
 			String datekey = c.getString(c.getColumnIndex("datekey"));
-			String serverdatekey = c.getString(c.getColumnIndex("serverdatekey"));
+			String serverdatekey = c.getString(c
+					.getColumnIndex("serverdatekey"));
 			boolean isComMsg = false;
 			if (isCome == 1) {
 				isComMsg = true;

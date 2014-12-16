@@ -34,9 +34,20 @@ public class UserDB {
 			db.execSQL(
 					"insert into user (id,name,img,isOnline,_group,iscrowd) values(?,?,?,?,?,?)",
 					new Object[] { u.getId(), u.getName(), u.getImg(),
-							u.getIsOnline(), u.getGroup(),u.getIsCrowd() });
+							u.getIsOnline(), u.getGroup(), u.getIsCrowd() });
 		}
 		db.close();
+	}
+
+	public ArrayList<String> getCrowdid() {
+		ArrayList<String> u = new ArrayList<String>();
+		SQLiteDatabase db = helper.getReadableDatabase();
+		Cursor c = db.rawQuery("select * from user where iscrowd=1",
+				null);
+		if (c.moveToFirst()) {
+			u.add("" + c.getInt(c.getColumnIndex("id")));
+		}
+		return u;
 	}
 
 	public void updateUser(List<User> list) {

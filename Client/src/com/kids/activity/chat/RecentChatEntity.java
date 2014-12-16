@@ -7,13 +7,14 @@ public class RecentChatEntity {
 	private String name;
 	private String time;
 	private String msg;
+	private int usertype;
 
 	public RecentChatEntity() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public RecentChatEntity(int id, int img, int count, String name,
-			String time, String msg) {
+			String time, String msg,int usertype) {
 		super();
 		this.id = id;
 		this.img = img;
@@ -21,6 +22,15 @@ public class RecentChatEntity {
 		this.name = name;
 		this.time = time;
 		this.msg = msg;
+		this.usertype = usertype;
+	}
+
+	public int getUsertype() {
+		return usertype;
+	}
+
+	public void setUsertype(int usertype) {
+		this.usertype = usertype;
 	}
 
 	public int getId() {
