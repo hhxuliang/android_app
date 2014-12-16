@@ -259,7 +259,7 @@ public class GetMsgService extends Service {
 
 			}
 		};
-		timer.schedule(task, 500, 1500000);
+		timer.schedule(task, 500, 15000);
 	}
 
 	public void start_client_socket() {
