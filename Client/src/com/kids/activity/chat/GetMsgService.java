@@ -86,7 +86,7 @@ public class GetMsgService extends Service {
 						hmsg.mComefromUid = tobj.getCrowd();
 					else
 						hmsg.mComefromUid = tobj.getFromUser();
-					messageDB.updateMsg(tobj.getFromUser(), hmsg.mSavePath,
+					messageDB.updateMsg(hmsg.mComefromUid, hmsg.mSavePath,
 							hmsg.mUrl);
 					Intent broadCast = new Intent();
 					broadCast.setAction(Constants.ACTION);
