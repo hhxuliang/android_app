@@ -70,7 +70,7 @@ public class GetMsgService extends Service {
 	private Context mContext = this;
 	private SharePreferenceUtil util;
 	private MessageDB messageDB;
-	private HashMap<String, TranObject> mMap_Waiting_Download_Pic = new HashMap<String, TranObject>();
+	private HashMap<String, Integer> mMap_Waiting_Download_Pic = new HashMap<String, Integer>();
 	private final Timer timer = new Timer();
 	private TimerTask task;
 	private int mHeartBeat = 0;
@@ -78,14 +78,14 @@ public class GetMsgService extends Service {
 	private Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
-			TranObject tobj = mMap_Waiting_Download_Pic.get(hmsg.mUrl);
+			Integer ti = mMap_Waiting_Download_Pic.get(hmsg.mUrl);
+			int uid = 0;
+			if(ti!=null)
+				uid = ti.intValue();
 			switch (msg.what) {
 			case DOWNLOADPIC_OK:
-				if (tobj != null) {
-					if(tobj.getCrowd()>0)
-						hmsg.mComefromUid = tobj.getCrowd();
-					else
-						hmsg.mComefromUid = tobj.getFromUser();
+				if (uid > 0) {
+					hmsg.mComefromUid = uid;
 					messageDB.updateMsg(hmsg.mComefromUid, hmsg.mSavePath,
 							hmsg.mUrl);
 					Intent broadCast = new Intent();
@@ -96,7 +96,7 @@ public class GetMsgService extends Service {
 					System.out.println("获取图片消息对象失败!");
 				break;
 			case DOWNLOADPIC_FAULT:
-				System.out.println("获取图片消息对象失败!应该再来一次！");
+				System.out.println("获取图片消息对象失败!");
 				break;
 			}
 			mMap_Waiting_Download_Pic.remove(hmsg.mUrl);
@@ -115,7 +115,7 @@ public class GetMsgService extends Service {
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-
+			String savePath = null;
 			try {
 				URL url = new URL(mUrl);
 				HttpURLConnection con = (HttpURLConnection) url
@@ -124,11 +124,11 @@ public class GetMsgService extends Service {
 				con.setRequestMethod("GET");
 				con.connect();
 				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-
+				savePath = application.getDownloadPicPath() + "/" + mUid
+						+ "_kids_" + MyDate.getDateMillis() + prefix;
 				if (con.getResponseCode() == 200) {
 					InputStream is = con.getInputStream();
-					String savePath = application.getDownloadPicPath() + "/"
-							+ mUid + "_kids_" + MyDate.getDateMillis() + prefix;
+
 					FileOutputStream fos = new FileOutputStream(savePath);
 					byte[] buffer = new byte[8192];
 					int count = 0;
@@ -140,6 +140,7 @@ public class GetMsgService extends Service {
 
 					handler_download_pic.obtainMessage(DOWNLOADPIC_OK,
 							new HandleMsg(mUrl, savePath)).sendToTarget();
+					return;
 				} else {
 					handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
 							new HandleMsg(mUrl, "")).sendToTarget();
@@ -148,6 +149,14 @@ public class GetMsgService extends Service {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
+						new HandleMsg(mUrl, "")).sendToTarget();
+			}
+			if (savePath != null) {
+				File file = new File(savePath);
+				if (file.exists() && file.isFile()) {
+					file.delete();
+				}
 			}
 
 		}
@@ -295,7 +304,11 @@ public class GetMsgService extends Service {
 
 		}
 	}
-
+	public void startDownloadPic(String msg,int uid)
+	{
+		mMap_Waiting_Download_Pic.put(msg, uid);
+		new Thread(new Download(msg, uid)).start();
+	}
 	/*
 	 * At here, we need preprocess the msg: 1.save the message into local db and
 	 * update the adapter object 2.media reminder
@@ -317,7 +330,7 @@ public class GetMsgService extends Service {
 					TranObjectType.ACKMSG);
 			ack.setFromUser(Integer.parseInt(util.getId()));
 			ack.setObject(cmg);
-			
+
 			if (client != null && application.isClientStart()
 					&& client.getClientOutputThread().isStart()) {
 				ClientOutputThread out = client.getClientOutputThread();
@@ -325,8 +338,9 @@ public class GetMsgService extends Service {
 			}
 
 			String message = tm.getMessage();
-			ChatMsgEntity entity = new ChatMsgEntity(msg.getFromUserName(), MyDate.getDateEN(),
-					message, msg.getFromImg(), true, tm.get_is_pic(), "");// 收到的消息
+			ChatMsgEntity entity = new ChatMsgEntity(msg.getFromUserName(),
+					MyDate.getDateEN(), message, msg.getFromImg(), true,
+					tm.get_is_pic(), "");// 收到的消息
 			entity.setMsgid(tm.getMessageid());
 			entity.setDatekey(tm.getDatekey());
 			entity.setServerdatekey(tm.getServerdatekey());
@@ -339,8 +353,7 @@ public class GetMsgService extends Service {
 			if (tm.get_is_pic()) {
 				// new thread to download the picture to update the picpath in
 				// local db
-				mMap_Waiting_Download_Pic.put(tm.getMessage(), msg);
-				new Thread(new Download(tm.getMessage(), uid)).start();
+				startDownloadPic(tm.getMessage(),uid);
 			}
 
 			messageDB.saveMsg(uid, entity);// 保存到数据库

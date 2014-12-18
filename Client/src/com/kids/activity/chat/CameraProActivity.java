@@ -112,6 +112,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	private User user=null;
 	ArrayList<String> ap;
 	ArrayList<String> alp;
+	private Bitmap bitmap_zoom=null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -196,17 +197,22 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 					String picpath = image.getContentDescription().toString();
 					if (picpath != null) {
-						Bitmap bitmap = ImageProcess.GetBitmapByPath(
+						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
+							bitmap_zoom.recycle();
+							bitmap_zoom=null;
+						}
+						System.gc();
+						bitmap_zoom = ImageProcess.GetBitmapByPath(
 								CameraProActivity.this, picpath,
 								MyApplication.mWindowHeight,
 								MyApplication.mWindowWidth, 2);
-						if (bitmap != null) {
+						if (bitmap_zoom != null) {
 							int degree = ImageProcess.getBitmapDegree(picpath);
 							if (degree != 0)
-								bitmap = ImageProcess.rotateBitmapByDegree(
-										bitmap, degree);
+								bitmap_zoom = ImageProcess.rotateBitmapByDegree(
+										bitmap_zoom, degree);
 							ZoomImageView zoom = new ZoomImageView(mContext,
-									bitmap);
+									bitmap_zoom);
 							zoom.showZoomView();
 						}
 					}
@@ -611,8 +617,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	}
 
 	private void toUploadFile() {
-
-		progressDialog.setMessage("正在上传文件...");
+		progressDialog.setCanceledOnTouchOutside(false);
+		progressDialog.setMessage("正在上传文件,请等待...");
 		/*
 		 * uploadImageResult.setText("正在上传中...");
 		 * progressDialog.setMessage("正在请求服务器上传...");

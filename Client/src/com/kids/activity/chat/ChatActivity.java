@@ -77,7 +77,8 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private MyApplication application;
 	private boolean alreadycreate;
 	private Client client;
-
+	private Bitmap bitmap_zoom=null;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉标题栏
@@ -115,7 +116,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			refreshData();
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
-
+		mAdapter.notifyDataSetInvalidated();
 	}
 
 	/**
@@ -138,18 +139,23 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 						intent.setDataAndType(Uri.parse(path), "video/mp4");
 						startActivity(intent);
 					} else {
-						Bitmap bitmap = ImageProcess.GetBitmapByPath(
+						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
+							bitmap_zoom.recycle();
+							bitmap_zoom=null;
+						}
+						System.gc();
+						bitmap_zoom = ImageProcess.GetBitmapByPath(
 								ChatActivity.this, path,
 								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 1);
-						if (bitmap != null) {
+								MyApplication.mWindowWidth, 0.9);
+						if (bitmap_zoom != null) {
 							int degree = ImageProcess.getBitmapDegree(path);
 							if (degree != 0)
-								bitmap = ImageProcess.rotateBitmapByDegree(
-										bitmap, degree);
+								bitmap_zoom = ImageProcess.rotateBitmapByDegree(
+										bitmap_zoom, degree);
 
 							ZoomImageView zoom = new ZoomImageView(
-									ChatActivity.this, bitmap);
+									ChatActivity.this, bitmap_zoom);
 							zoom.showZoomView();
 						}
 					}
@@ -235,7 +241,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		super.onDestroy();
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
-
+		mAdapter.clearBitmap();
 	}
 
 	@Override

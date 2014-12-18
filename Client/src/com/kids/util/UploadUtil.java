@@ -218,6 +218,11 @@ public class UploadUtil {
 			sendMessage(UPLOAD_SERVER_ERROR_CODE,"�ϴ�ʧ�ܣ�error=" + e.getMessage());
 			e.printStackTrace();
 			return;
+		}catch (Exception e) {
+			// TODO Auto-generated catch block
+			sendMessage(UPLOAD_SERVER_ERROR_CODE,"�ϴ�ʧ�ܣ�error=" + e.getMessage());
+			e.printStackTrace();
+			return;
 		}
 	}
 

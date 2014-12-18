@@ -79,7 +79,7 @@ public class ShowImageActivity extends MyActivity implements
 	private ArrayList<String> alp;
 	private MyApplication application;
 	private User user = null;
-
+	private Bitmap bitmap_zoom=null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -129,17 +129,22 @@ public class ShowImageActivity extends MyActivity implements
 				if (ImageProcess.checkFileType(picpath) == ImageProcess.FileType.IMAGE) {
 
 					if (picpath != null) {
-						Bitmap bitmap = ImageProcess.GetBitmapByPath(
+						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
+							bitmap_zoom.recycle();
+							bitmap_zoom=null;
+						}
+						System.gc();
+						bitmap_zoom = ImageProcess.GetBitmapByPath(
 								ShowImageActivity.this, picpath,
 								MyApplication.mWindowHeight,
 								MyApplication.mWindowWidth, 1);
-						if (bitmap != null) {
+						if (bitmap_zoom != null) {
 							int degree = ImageProcess.getBitmapDegree(picpath);
 							if (degree != 0)
-								bitmap = ImageProcess.rotateBitmapByDegree(
-										bitmap, degree);
+								bitmap_zoom = ImageProcess.rotateBitmapByDegree(
+										bitmap_zoom, degree);
 							ZoomImageView zoom = new ZoomImageView(
-									ShowImageActivity.this, bitmap);
+									ShowImageActivity.this, bitmap_zoom);
 							zoom.showZoomView();
 						}
 					}
@@ -212,8 +217,8 @@ public class ShowImageActivity extends MyActivity implements
 	}
 
 	private void toUploadFile() {
-
-		progressDialog.setMessage("正在上传文件...");
+		progressDialog.setCanceledOnTouchOutside(false);
+		progressDialog.setMessage("正在上传文件,请等待...");
 		/*
 		 * uploadImageResult.setText("正在上传中...");
 		 * progressDialog.setMessage("正在请求服务器上传...");

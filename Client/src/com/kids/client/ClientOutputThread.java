@@ -41,6 +41,15 @@ public class ClientOutputThread extends Thread {
 
 	// 这里处理跟服务器是一样的
 	public void setMsg(TranObject msg) {
+		if (msg.getType() == TranObjectType.MESSAGE) {
+			for (TranObject m : object) {
+				if (msg.getType() == TranObjectType.MESSAGE
+						&& ((TextMessage) m.getObject()).getDatekey().equals(
+								((TextMessage) msg.getObject()).getDatekey()))
+					return;
+			}
+
+		}
 		object.add(msg);
 		synchronized (this) {
 			notify();
@@ -69,7 +78,7 @@ public class ClientOutputThread extends Thread {
 						oos.flush();
 						oos.reset();
 						object.remove(msg);
-						
+
 						if (msg.getType() == TranObjectType.LOGOUT) {// 如果是发送下线的消息，就直接跳出循环
 							close = true;
 							break;

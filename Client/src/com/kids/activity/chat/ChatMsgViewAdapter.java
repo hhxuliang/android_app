@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.kids.util.ImageProcess;
@@ -50,6 +51,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 	private List<ChatMsgEntity> coll;// 消息对象数组
 	private LayoutInflater mInflater;
 	private User user = null;
+	private ArrayList<Bitmap> mblist = new ArrayList<Bitmap>();
 
 	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u) {
 		this.coll = coll;
@@ -81,6 +83,15 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		} else {// 自己发送的消息
 			return IMsgViewType.IMVT_TO_MSG;
 		}
+	}
+
+	public void clearBitmap() {
+		for (Bitmap mp : mblist) {
+			if (mp!=null && !mp.isRecycled())
+				mp.recycle();
+		}
+		mblist.clear();
+		System.gc();
 	}
 
 	/**
@@ -142,7 +153,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				} else {
 					bitmap = ImageProcess.GetBitmapByPath(mContext,
 							entity.getPicPath(), MyApplication.mWindowHeight,
-							MyApplication.mWindowWidth, 0.2);
+							MyApplication.mWindowWidth, 0.15);
 					if (bitmap != null) {
 						int degree = ImageProcess.getBitmapDegree(entity
 								.getPicPath());
@@ -151,9 +162,10 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 									degree);
 					}
 				}
-				if (bitmap != null)
+				if (bitmap != null) {
 					viewHolder.tvPicture.setImageBitmap(bitmap);
-				else
+					mblist.add(bitmap);
+				} else
 					viewHolder.tvPicture
 							.setImageResource(R.drawable.waitloadpic);
 			} else {
@@ -191,12 +203,13 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 						if (GetMsgService.application != null) {
 							if (-1 == GetMsgService.application.Resend(
 									entity.getMessage(), entity.get_is_pic(),
-									entity.getPicPath(), user,entity.getDatekey())) {
+									entity.getPicPath(), user,
+									entity.getDatekey())) {
 								Toast.makeText(mContext, "网络连接异常", 0).show();
 							}
-						}else
+						} else
 							Toast.makeText(mContext, "服务异常，请重新启动", 0).show();
-							
+
 					}
 				}
 			});

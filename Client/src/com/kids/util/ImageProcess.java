@@ -69,13 +69,17 @@ public class ImageProcess {
 		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
 		int windowHeight = (int) (winHeight * myscale);
 		int windowWidth = (int) (winWidth * myscale);
-		if (windowWidth == 0)
+		if (windowWidth == 0 || windowHeight==0)
 			return null;
 		// 计算采样率
 		int scaleX = imageWidth / windowWidth;
+		int scaleY = imageHeight / windowHeight;
 		int scale = 1;
 		if (scaleX > 1) {
 			scale = scaleX;
+		}
+		if (scaleY > scaleX ) {
+			scale = scaleY;
 		}
 		// 采样率依照最大的方向为准
 		// if (scaleX > scaleY && scaleY >= 1) {
