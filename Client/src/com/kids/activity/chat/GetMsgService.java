@@ -59,8 +59,6 @@ import com.way.chat.common.util.Constants;
  */
 public class GetMsgService extends Service {
 	private static final int MSG = 0x001;
-	private static final int DOWNLOADPIC_OK = 1;
-	private static final int DOWNLOADPIC_FAULT = 2;
 
 	public static MyApplication application;
 	private Client client;
@@ -70,97 +68,11 @@ public class GetMsgService extends Service {
 	private Context mContext = this;
 	private SharePreferenceUtil util;
 	private MessageDB messageDB;
-	private HashMap<String, Integer> mMap_Waiting_Download_Pic = new HashMap<String, Integer>();
+
 	private final Timer timer = new Timer();
 	private TimerTask task;
 	private int mHeartBeat = 0;
-
-	private Handler handler_download_pic = new Handler() {
-		public void handleMessage(Message msg) {
-			HandleMsg hmsg = (HandleMsg) msg.obj;
-			Integer ti = mMap_Waiting_Download_Pic.get(hmsg.mUrl);
-			int uid = 0;
-			if(ti!=null)
-				uid = ti.intValue();
-			switch (msg.what) {
-			case DOWNLOADPIC_OK:
-				if (uid > 0) {
-					hmsg.mComefromUid = uid;
-					messageDB.updateMsg(hmsg.mComefromUid, hmsg.mSavePath,
-							hmsg.mUrl);
-					Intent broadCast = new Intent();
-					broadCast.setAction(Constants.ACTION);
-					broadCast.putExtra(Constants.PICUPDATE, hmsg);
-					sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
-				} else
-					System.out.println("获取图片消息对象失败!");
-				break;
-			case DOWNLOADPIC_FAULT:
-				System.out.println("获取图片消息对象失败!");
-				break;
-			}
-			mMap_Waiting_Download_Pic.remove(hmsg.mUrl);
-		}
-	};
-
-	class Download implements Runnable {
-		private String mUrl = null;
-		private int mUid;
-
-		public Download(String p, int uid) {
-			mUrl = p;
-			mUid = uid;
-		}
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			String savePath = null;
-			try {
-				URL url = new URL(mUrl);
-				HttpURLConnection con = (HttpURLConnection) url
-						.openConnection();
-				con.setConnectTimeout(5000);
-				con.setRequestMethod("GET");
-				con.connect();
-				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-				savePath = application.getDownloadPicPath() + "/" + mUid
-						+ "_kids_" + MyDate.getDateMillis() + prefix;
-				if (con.getResponseCode() == 200) {
-					InputStream is = con.getInputStream();
-
-					FileOutputStream fos = new FileOutputStream(savePath);
-					byte[] buffer = new byte[8192];
-					int count = 0;
-					while ((count = is.read(buffer)) != -1) {
-						fos.write(buffer, 0, count);
-					}
-					fos.close();
-					is.close();
-
-					handler_download_pic.obtainMessage(DOWNLOADPIC_OK,
-							new HandleMsg(mUrl, savePath)).sendToTarget();
-					return;
-				} else {
-					handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
-							new HandleMsg(mUrl, "")).sendToTarget();
-				}
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
-						new HandleMsg(mUrl, "")).sendToTarget();
-			}
-			if (savePath != null) {
-				File file = new File(savePath);
-				if (file.exists() && file.isFile()) {
-					file.delete();
-				}
-			}
-
-		}
-	}
+	private boolean upgrade = true;
 
 	public static String getMyName() {
 		return "com.kids.activity.chat.GetMsgService";
@@ -268,7 +180,7 @@ public class GetMsgService extends Service {
 
 			}
 		};
-		timer.schedule(task, 500, 15000);
+		timer.schedule(task, 500, 1500000);
 	}
 
 	public void start_client_socket() {
@@ -304,11 +216,7 @@ public class GetMsgService extends Service {
 
 		}
 	}
-	public void startDownloadPic(String msg,int uid)
-	{
-		mMap_Waiting_Download_Pic.put(msg, uid);
-		new Thread(new Download(msg, uid)).start();
-	}
+
 	/*
 	 * At here, we need preprocess the msg: 1.save the message into local db and
 	 * update the adapter object 2.media reminder
@@ -353,7 +261,7 @@ public class GetMsgService extends Service {
 			if (tm.get_is_pic()) {
 				// new thread to download the picture to update the picpath in
 				// local db
-				startDownloadPic(tm.getMessage(),uid);
+				application.startDownloadPic(tm.getMessage(), uid);
 			}
 
 			messageDB.saveMsg(uid, entity);// 保存到数据库
@@ -384,6 +292,25 @@ public class GetMsgService extends Service {
 				MyUtils.sendCrowdofflineMsgReq(util.getId(), s, where,
 						application);
 			}
+			if (upgrade) {
+				upgrade = false;
+				CommonMsg cmg_v = new CommonMsg();
+				cmg_v.setarg1(Constants.VERSION);
+				cmg_v.setarg2(Constants.VERSION);
+				cmg_v.setarg3(Constants.VERSION);
+				TranObject<CommonMsg> version = new TranObject<CommonMsg>(
+						TranObjectType.VERSION);
+				if (!util.getId().equals("")) {
+					version.setFromUser(Integer.parseInt(util.getId()));
+					version.setObject(cmg_v);
+					if (client != null && application.isClientStart()
+							&& client.getClientOutputThread().isStart()) {
+						ClientOutputThread out = client.getClientOutputThread();
+						out.setMsg(version);
+					}
+				}
+
+			}
 			break;
 		case LOGOUT:
 			// MediaPlayer.create(this, R.raw.msg).start();
@@ -397,6 +324,7 @@ public class GetMsgService extends Service {
 					|| (cm.getarg2() != null && cm.getarg2().length() > 0))
 				application.updateDBbyMsgOk(cm.getarg1(), cm.getarg2());
 			break;
+
 		default:
 			break;
 		}

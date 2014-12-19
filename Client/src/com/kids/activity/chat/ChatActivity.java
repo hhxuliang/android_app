@@ -184,7 +184,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			cme = mDataArrays.get(mDataArrays.size() - 1);
 			datestr = cme.getDate();
 		}
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), datestr, 10);
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), datestr, 20);
 		List<ChatMsgEntity> mDataArrays_tmp = new ArrayList<ChatMsgEntity>();
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
@@ -218,7 +218,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	 * 加载消息历史，从数据库中读出
 	 */
 	public void initData() {
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "", 10);
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "", 20);
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
 				if (entity.getName()!=null && entity.getName().equals("")) {

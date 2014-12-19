@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Vector;
 
 import com.kids.activity.chat.GetMsgService;
 import com.way.chat.common.bean.TextMessage;
@@ -20,7 +23,7 @@ public class ClientOutputThread extends Thread {
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private boolean isStart = true;
-	private ArrayList<TranObject> object = new ArrayList<TranObject>();
+	private Vector object = new Vector();
 
 	public boolean isStart() {
 		return isStart;
@@ -41,17 +44,20 @@ public class ClientOutputThread extends Thread {
 
 	// 这里处理跟服务器是一样的
 	public void setMsg(TranObject msg) {
-		if (msg.getType() == TranObjectType.MESSAGE) {
-			for (TranObject m : object) {
-				if (msg.getType() == TranObjectType.MESSAGE
-						&& ((TextMessage) m.getObject()).getDatekey().equals(
-								((TextMessage) msg.getObject()).getDatekey()))
-					return;
+		synchronized (this) {
+			if (msg.getType() == TranObjectType.MESSAGE) {
+				for (int i = 0; i < object.size(); i++) {
+					if (msg.getType() == TranObjectType.MESSAGE
+							&& ((TextMessage) ((TranObject) object.get(i))
+									.getObject()).getDatekey().equals(
+									((TextMessage) msg.getObject())
+											.getDatekey()))
+						return;
+				}
+
 			}
 
-		}
-		object.add(msg);
-		synchronized (this) {
+			object.add(msg);
 			notify();
 		}
 	}
@@ -72,22 +78,23 @@ public class ClientOutputThread extends Thread {
 		boolean close = false;
 		try {
 			while (isStart) {
-				if (object.size() > 0) {
-					for (TranObject msg : object) {
+				synchronized (this) {
+					Iterator i = object.iterator(); // Must be in synchronized
+													// block
+					while (i.hasNext()) {
+						TranObject msg = (TranObject) i.next();
 						oos.writeObject(msg);
 						oos.flush();
 						oos.reset();
-						object.remove(msg);
 
 						if (msg.getType() == TranObjectType.LOGOUT) {// 如果是发送下线的消息，就直接跳出循环
 							close = true;
 							break;
 						}
 					}
+					object.removeAllElements();
 					if (close == true)
 						break;
-				}
-				synchronized (this) {
 					wait();// 发送完消息后，线程进入等待状态
 				}
 			}

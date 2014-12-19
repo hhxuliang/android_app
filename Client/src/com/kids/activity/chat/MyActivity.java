@@ -4,9 +4,12 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
@@ -18,6 +21,7 @@ import com.kids.util.MessageDB;
 import com.way.chat.common.util.MyDate;
 import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UserDB;
+import com.way.chat.common.bean.CommonMsg;
 import com.way.chat.common.bean.TextMessage;
 import com.way.chat.common.bean.User;
 import com.way.chat.common.tran.bean.TranObject;
@@ -30,7 +34,7 @@ import com.way.chat.common.util.Constants;
  * 
  */
 public abstract class MyActivity extends Activity {
-
+	private MyApplication application=null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,6 +51,7 @@ public abstract class MyActivity extends Activity {
 			Intent service = new Intent(this, GetMsgService.class);
 			startService(service);
 		}
+		application = (MyApplication) this.getApplicationContext();
 	}
 
 	/**
@@ -109,6 +114,29 @@ public abstract class MyActivity extends Activity {
 			User logoutUser = (User) msg.getObject();
 			Toast.makeText(MyActivity.this, "亲！" + logoutUser.getId() + "下线了哦",
 					0).show();
+			break;
+		case VERSION:
+			CommonMsg cm_v = (CommonMsg) msg.getObject();
+			if (cm_v.getarg1() != null && cm_v.getarg1().length() > 0)
+				if (cm_v.getarg1().compareTo(Constants.VERSION) != 0) {
+					Dialog alertDialog = new AlertDialog.Builder(MyActivity.this)
+							.setTitle("有新版本,是否下载?")
+							.setPositiveButton("是",
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											// TODO Auto-generated method stub
+											application.startDownloadPic(Constants.UPGRADE_URL,0);
+											Toast.makeText(MyActivity.this, "正在后台下载......",
+													0).show();
+										}
+									}).setNegativeButton("否", null).create();
+					alertDialog.show();
+					
+				}
 			break;
 		default:
 			break;

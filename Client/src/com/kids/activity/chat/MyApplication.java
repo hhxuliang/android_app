@@ -1,5 +1,10 @@
 package com.kids.activity.chat;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,6 +25,9 @@ import com.way.chat.common.util.Constants;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 
 public class MyApplication extends Application {
@@ -39,6 +47,118 @@ public class MyApplication extends Application {
 	public static int mWindowHeight = 0;
 	public static int mWindowWidth = 0;
 	private boolean IsLogin = false;
+	private static final int DOWNLOADPIC_OK = 1;
+	private static final int DOWNLOADPIC_FAULT = 2;
+	private HashMap<String, Integer> mMap_Waiting_Download_Pic = new HashMap<String, Integer>();
+	private Handler handler_download_pic = new Handler() {
+		public void handleMessage(Message msg) {
+			HandleMsg hmsg = (HandleMsg) msg.obj;
+			Integer ti = mMap_Waiting_Download_Pic.get(hmsg.mUrl);
+			int uid = 0;
+			if (ti != null)
+				uid = ti.intValue();
+			switch (msg.what) {
+			case DOWNLOADPIC_OK:
+				if (uid > 0) {
+					hmsg.mComefromUid = uid;
+					messageDB.updateMsg(hmsg.mComefromUid, hmsg.mSavePath,
+							hmsg.mUrl);
+					Intent broadCast = new Intent();
+					broadCast.setAction(Constants.ACTION);
+					broadCast.putExtra(Constants.PICUPDATE, hmsg);
+					sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
+				} else if (uid == 0) {
+					installApk(hmsg.mSavePath);
+				} else
+					System.out.println("获取图片消息对象失败!");
+				break;
+			case DOWNLOADPIC_FAULT:
+				System.out.println("获取图片消息对象失败!");
+				break;
+			}
+			mMap_Waiting_Download_Pic.remove(hmsg.mUrl);
+		}
+	};
+
+	class Download implements Runnable {
+		private String mUrl = null;
+		private int mUid;
+
+		public Download(String p, int uid) {
+			mUrl = p;
+			mUid = uid;
+		}
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			String savePath = null;
+			try {
+				URL url = new URL(mUrl);
+				HttpURLConnection con = (HttpURLConnection) url
+						.openConnection();
+				con.setConnectTimeout(5000);
+				con.setRequestMethod("GET");
+				con.connect();
+				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
+				savePath = getDownloadPicPath() + "/" + mUid + "_kids_"
+						+ MyDate.getDateMillis() + prefix;
+				if (con.getResponseCode() == 200) {
+					InputStream is = con.getInputStream();
+
+					FileOutputStream fos = new FileOutputStream(savePath);
+					byte[] buffer = new byte[8192];
+					int count = 0;
+					while ((count = is.read(buffer)) != -1) {
+						fos.write(buffer, 0, count);
+					}
+					fos.close();
+					is.close();
+
+					handler_download_pic.obtainMessage(DOWNLOADPIC_OK,
+							new HandleMsg(mUrl, savePath)).sendToTarget();
+					return;
+				} else {
+					handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
+							new HandleMsg(mUrl, "")).sendToTarget();
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
+						new HandleMsg(mUrl, "")).sendToTarget();
+			}
+			if (savePath != null) {
+				File file = new File(savePath);
+				if (file.exists() && file.isFile()) {
+					file.delete();
+				}
+			}
+
+		}
+	}
+	/**
+	 * å®è£APKæä»¶
+	 */
+	private void installApk(String path)
+	{
+		File apkfile = new File(path);
+		if (!apkfile.exists())
+		{
+			return;
+		}
+//		// éè¿Intentå®è£APKæä»¶
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		i.setDataAndType(Uri.fromFile(apkfile), "application/vnd.android.package-archive");
+		startActivity(i);
+	}
+	public void startDownloadPic(String msg, int uid) {
+		mMap_Waiting_Download_Pic.put(msg, uid);
+		new Thread(new Download(msg, uid)).start();
+	}
+
 	public ArrayList<String> getNotReadmsslist() {
 		return notReadmsslist;
 	}
@@ -46,6 +166,7 @@ public class MyApplication extends Application {
 	public void setNotReadmsslist(ArrayList<String> notReadmsslist) {
 		this.notReadmsslist.addAll(notReadmsslist);
 	}
+
 	public boolean isIsLogin() {
 		return IsLogin;
 	}
@@ -75,11 +196,11 @@ public class MyApplication extends Application {
 				ChatMsgEntity msg = lt.get(0);
 				RecentChatEntity entity = new RecentChatEntity(u.getId(),
 						u.getImg(), 0, u.getName(), msg.getDate(),
-						msg.getMessage(),u.getIsCrowd());
+						msg.getMessage(), u.getIsCrowd());
 				mRecentList.add(entity);
 			}
-			if(messageDB.GetMsgReadSta(u.getId()))
-				notReadmsslist.add(u.getId()+"");
+			if (messageDB.GetMsgReadSta(u.getId()))
+				notReadmsslist.add(u.getId() + "");
 		}
 		mRecentAdapter = new RecentChatAdapter(getApplicationContext(),
 				mRecentList);
@@ -88,14 +209,16 @@ public class MyApplication extends Application {
 	public HashMap<String, String> getNeedRefreshMap() {
 		return mNeedRefresh;
 	}
+
 	public void updateDBbyMsgOk(String datekey, String id) {
 		messageDB.updateDBbyMsgOk(datekey, id);
 		Intent broadCast = new Intent();
 		broadCast.setAction(Constants.ACTION);
 		broadCast.putExtra("MSGDATEKEY", datekey);
-		broadCast.putExtra("SENDSTA", id+"");
+		broadCast.putExtra("SENDSTA", id + "");
 		sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
 	}
+
 	public boolean needRefresh(String uidstr) {
 		if (mNeedRefresh.get(uidstr) == null) {
 			return false;
@@ -116,8 +239,6 @@ public class MyApplication extends Application {
 	public void removeNeedRefresh(String uidstr) {
 		mNeedRefresh.remove(uidstr);
 	}
-
-	
 
 	public String getHomePath() {
 		return home_path;
@@ -205,12 +326,14 @@ public class MyApplication extends Application {
 			messageDB.close();
 
 	}
-	public ChatMsgEntity send(String contString, boolean is_pic, String pic_path_local,User user) {
+
+	public ChatMsgEntity send(String contString, boolean is_pic,
+			String pic_path_local, User user) {
 		ClientOutputThread out = client.getClientOutputThread();
-		ChatMsgEntity entity=null;
-		
-		SharePreferenceUtil util = new SharePreferenceUtil(getApplicationContext(),
-				Constants.SAVE_USER);
+		ChatMsgEntity entity = null;
+
+		SharePreferenceUtil util = new SharePreferenceUtil(
+				getApplicationContext(), Constants.SAVE_USER);
 		if (contString.length() > 0) {
 			entity = new ChatMsgEntity();
 			entity.setName(util.getName());
@@ -223,8 +346,7 @@ public class MyApplication extends Application {
 			entity.setSendSta(-1);
 			entity.setDatekey(MyDate.getDateMillis());
 			messageDB.saveMsg(user.getId(), entity);
-			addNeedRefresh(user.getId()+"");
-			
+			addNeedRefresh(user.getId() + "");
 
 			if (isClientStart() && out != null) {
 				TranObject<TextMessage> o = new TranObject<TextMessage>(
@@ -243,26 +365,27 @@ public class MyApplication extends Application {
 				else
 					o.setCrowd(0);
 				out.setMsg(o);
-			} 
-			
+			}
+
 			// 下面是添加到最近会话列表的处理，在按发送键之后
 			RecentChatEntity entity1 = new RecentChatEntity(user.getId(),
 					user.getImg(), 0, user.getName(), MyDate.getDate(),
-					contString,user.getIsCrowd());
+					contString, user.getIsCrowd());
 			getmRecentList().remove(entity1);
 			getmRecentList().addFirst(entity1);
 			getmRecentAdapter().notifyDataSetChanged();
 		}
-		return  entity;
+		return entity;
 	}
-	
-	public int Resend(String contString, boolean is_pic, String pic_path_local,User user,String datekey) {
+
+	public int Resend(String contString, boolean is_pic, String pic_path_local,
+			User user, String datekey) {
 		ClientOutputThread out = client.getClientOutputThread();
-		if (!isClientStart()  || out == null) {
+		if (!isClientStart() || out == null) {
 			return -1;
 		}
-		SharePreferenceUtil util = new SharePreferenceUtil(getApplicationContext(),
-				Constants.SAVE_USER);
+		SharePreferenceUtil util = new SharePreferenceUtil(
+				getApplicationContext(), Constants.SAVE_USER);
 		if (contString.length() > 0) {
 			if (out != null) {
 				TranObject<TextMessage> o = new TranObject<TextMessage>(
@@ -275,14 +398,14 @@ public class MyApplication extends Application {
 				o.setFromUser(Integer.parseInt(util.getId()));
 				o.setFromUserName(util.getName());
 				o.setFromImg(util.getImg());
-				
+
 				o.setToUser(user.getId());
 				if (user.getIsCrowd() == 1)
 					o.setCrowd(user.getId());
 				else
 					o.setCrowd(0);
 				out.setMsg(o);
-			} 
+			}
 		}
 		return 0;
 	}
