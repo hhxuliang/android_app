@@ -87,7 +87,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 
 	public void clearBitmap() {
 		for (Bitmap mp : mblist) {
-			if (mp!=null && !mp.isRecycled())
+			if (mp != null && !mp.isRecycled())
 				mp.recycle();
 		}
 		mblist.clear();
@@ -137,6 +137,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		}
 		viewHolder.tvSendTime.setText(entity.getDate());
 		viewHolder.tvUserName.setText(entity.getName());
+		viewHolder.tvReflesh.setVisibility(View.GONE);
 		if (entity.get_is_pic()) {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
@@ -170,6 +171,23 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 							.setImageResource(R.drawable.waitloadpic);
 			} else {
 				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
+				if (isComMsg) {
+					viewHolder.tvReflesh.setVisibility(View.VISIBLE);
+					viewHolder.tvReflesh.setContentDescription(position + "");
+					viewHolder.tvReflesh.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							String p = v.getContentDescription().toString();
+							if (p != null) {
+								int position = Integer.parseInt(p);
+								ChatMsgEntity entity = coll.get(position);
+								if (GetMsgService.application != null) {
+									GetMsgService.application.startDownloadPic(entity.getMessage(), user.getId());
+								} 
+							}
+						}
+					});
+				}
 			}
 			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
 			viewHolder.tvPicture.invalidate();
@@ -189,7 +207,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			viewHolder.tvContent.setText(entity.getMessage());
 
 		}
-		viewHolder.tvReflesh.setVisibility(View.GONE);
+
 		if (entity.getSendSta() != 1 && !isComMsg) {
 			viewHolder.tvReflesh.setVisibility(View.VISIBLE);
 			viewHolder.tvReflesh.setContentDescription(position + "");
