@@ -163,8 +163,11 @@ public class ShowImageActivity extends MyActivity implements
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+		UploadUtil uploadUtil = UploadUtil.getInstance();
 
+		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
+		super.onBackPressed();
+		
 	}
 
 	public void doaction() {

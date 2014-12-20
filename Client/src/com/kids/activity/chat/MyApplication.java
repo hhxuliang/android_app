@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.kids.client.Client;
 import com.kids.client.ClientOutputThread;
+import com.kids.client.DownloadFile;
 import com.kids.util.MessageDB;
 import com.way.chat.common.util.MyDate;
 import com.kids.util.SharePreferenceUtil;
@@ -47,10 +48,12 @@ public class MyApplication extends Application {
 	public static int mWindowHeight = 0;
 	public static int mWindowWidth = 0;
 	private boolean IsLogin = false;
-	private static final int DOWNLOADPIC_OK = 1;
-	private static final int DOWNLOADPIC_FAULT = 2;
+	private DownloadFile downloadfile = null;
+	public static final int DOWNLOADPIC_OK = 1;
+	public static final int DOWNLOADPIC_FAULT = 2;
 	private HashMap<String, Integer> mMap_Waiting_Download_Pic = new HashMap<String, Integer>();
-	private Handler handler_download_pic = new Handler() {
+	
+	public Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
 			Integer ti = mMap_Waiting_Download_Pic.get(hmsg.mUrl);
@@ -61,8 +64,8 @@ public class MyApplication extends Application {
 			case DOWNLOADPIC_OK:
 				if (uid > 0) {
 					hmsg.mComefromUid = uid;
-					messageDB.updateMsg(hmsg.mComefromUid, hmsg.mSavePath,
-							hmsg.mUrl);
+					getMessageDB().updateMsg(hmsg.mComefromUid,
+							hmsg.mSavePath, hmsg.mUrl);
 					Intent broadCast = new Intent();
 					broadCast.setAction(Constants.ACTION);
 					broadCast.putExtra(Constants.PICUPDATE, hmsg);
@@ -80,83 +83,34 @@ public class MyApplication extends Application {
 		}
 	};
 
-	class Download implements Runnable {
-		private String mUrl = null;
-		private int mUid;
-
-		public Download(String p, int uid) {
-			mUrl = p;
-			mUid = uid;
-		}
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			String savePath = null;
-			try {
-				URL url = new URL(mUrl);
-				HttpURLConnection con = (HttpURLConnection) url
-						.openConnection();
-				con.setConnectTimeout(5000);
-				con.setRequestMethod("GET");
-				con.connect();
-				String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-				savePath = getDownloadPicPath() + "/" + mUid + "_kids_"
-						+ MyDate.getDateMillis() + prefix;
-				if (con.getResponseCode() == 200) {
-					InputStream is = con.getInputStream();
-
-					FileOutputStream fos = new FileOutputStream(savePath);
-					byte[] buffer = new byte[8192];
-					int count = 0;
-					while ((count = is.read(buffer)) != -1) {
-						fos.write(buffer, 0, count);
-					}
-					fos.close();
-					is.close();
-
-					handler_download_pic.obtainMessage(DOWNLOADPIC_OK,
-							new HandleMsg(mUrl, savePath)).sendToTarget();
-					return;
-				} else {
-					handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
-							new HandleMsg(mUrl, "")).sendToTarget();
-				}
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				handler_download_pic.obtainMessage(DOWNLOADPIC_FAULT,
-						new HandleMsg(mUrl, "")).sendToTarget();
-			}
-			if (savePath != null) {
-				File file = new File(savePath);
-				if (file.exists() && file.isFile()) {
-					file.delete();
-				}
-			}
-
-		}
-	}
 	/**
 	 * å®è£APKæä»¶
 	 */
-	private void installApk(String path)
-	{
+	private void installApk(String path) {
 		File apkfile = new File(path);
-		if (!apkfile.exists())
-		{
+		if (!apkfile.exists()) {
 			return;
 		}
-//		// éè¿Intentå®è£APKæä»¶
+		// // éè¿Intentå®è£APKæä»¶
 		Intent i = new Intent(Intent.ACTION_VIEW);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		i.setDataAndType(Uri.fromFile(apkfile), "application/vnd.android.package-archive");
+		i.setDataAndType(Uri.fromFile(apkfile),
+				"application/vnd.android.package-archive");
 		startActivity(i);
 	}
 	public void startDownloadPic(String msg, int uid) {
-		mMap_Waiting_Download_Pic.put(msg, uid);
-		new Thread(new Download(msg, uid)).start();
+		stardownloadpicthread();
+		if (downloadfile != null) {
+			downloadfile.startDownloadPic(msg, uid);
+		}
+	}
+
+	public void stardownloadpicthread() {
+		if (downloadfile == null || (downloadfile!=null  && downloadfile.getStatu() == 2)) {
+			downloadfile = new DownloadFile(this,this.mMap_Waiting_Download_Pic);
+
+			downloadfile.start();
+		} 
 	}
 
 	public ArrayList<String> getNotReadmsslist() {
@@ -183,6 +137,7 @@ public class MyApplication extends Application {
 		client = new Client(util.getIp(), util.getPort());// 从配置文件中读ip和地址
 		userDB = new UserDB(MyApplication.this);// 本地用户数据库
 		messageDB = new MessageDB(MyApplication.this);
+
 		initRencentAdap();
 		super.onCreate();
 	}
