@@ -183,6 +183,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 								ChatMsgEntity entity = coll.get(position);
 								if (GetMsgService.application != null) {
 									GetMsgService.application.startDownloadPic(entity.getMessage(), user.getId());
+									Toast.makeText(mContext,"开始下载图片，请等待......!", 0).show();
 								} 
 							}
 						}
@@ -224,7 +225,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 									entity.getPicPath(), user,
 									entity.getDatekey())) {
 								Toast.makeText(mContext, "网络连接异常", 0).show();
-							}
+							}else
+								Toast.makeText(mContext,"重新发送消息，请等待......!", 0).show();
 						} else
 							Toast.makeText(mContext, "服务异常，请重新启动", 0).show();
 

@@ -85,17 +85,17 @@ public class MyMainActivity extends MyActivity {
 						exitsys();
 					}
 				})
-//				.setNegativeButton("后台运行",
-//						new DialogInterface.OnClickListener() {
-//
-//							@Override
-//							public void onClick(DialogInterface dialog,
-//									int which) {
-//								// TODO Auto-generated method stub
-//								//backRun();
-//								onHome();
-//							}
-//						})
+				.setNegativeButton("后台运行",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method stub
+								//backRun();
+								onHome();
+							}
+						})
 						.create();
 		alertDialog.show();
 	}
@@ -117,8 +117,11 @@ public class MyMainActivity extends MyActivity {
 	    //super.onBackPressed();这句话一定要注掉,不然又去调用默认的back处理方式了 
 	    Intent i= new Intent(Intent.ACTION_MAIN); 
 	    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-	    i.addCategory(Intent.CATEGORY_HOME); 
-	    startActivity(i);  
+	    i.addCategory(Intent.CATEGORY_HOME);
+	    SharePreferenceUtil util = new SharePreferenceUtil(this,
+				Constants.SAVE_USER);
+	    util.setIsStart(true);// 设置后台运行标志，正在运行
+		startActivity(i);  
 	}
 	private void exitsys() {
 		// 关闭服务

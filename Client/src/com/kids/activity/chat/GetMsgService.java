@@ -94,6 +94,11 @@ public class GetMsgService extends Service {
 		application.setmNotificationManager(mNotificationManager);
 		util = new SharePreferenceUtil(getApplicationContext(),
 				Constants.SAVE_USER);
+		final IntentFilter homeFilter = new IntentFilter(
+				Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+
+		registerReceiver(homePressReceiver, homeFilter);
+
 	}
 
 	// 收到用户按返回键发出的广播，就显示通知栏
@@ -199,6 +204,8 @@ public class GetMsgService extends Service {
 						if (msg.getType() == TranObjectType.MESSAGE) {// 只处理文本消息类型
 							// System.out.println("收到新消息");
 							// 把消息对象发送到handler去处理
+							// Toast.makeText(context, "", 0).show();
+							setMsgNotification();
 							Message message = handler.obtainMessage();
 							message.what = MSG;
 							message.getData().putSerializable("msg", msg);
@@ -352,6 +359,20 @@ public class GetMsgService extends Service {
 		timer.purge();
 		// Intent intent = new Intent(this, GetMsgService.class);
 		// startService(intent);
+		if (homePressReceiver != null) {
+
+			try {
+
+				unregisterReceiver(homePressReceiver);
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+
+			}
+
+		}
+
 	}
 
 	/**
@@ -381,5 +402,33 @@ public class GetMsgService extends Service {
 		mNotification.contentIntent = contentIntent;
 		mNotificationManager.notify(Constants.NOTIFY_ID, mNotification);
 	}
+
+	private final BroadcastReceiver homePressReceiver = new BroadcastReceiver() {
+
+		final String SYSTEM_DIALOG_REASON_KEY = "reason";
+
+		final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+
+			if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
+
+				String reason = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY);
+
+				if (reason != null
+						&& reason.equals(SYSTEM_DIALOG_REASON_HOME_KEY)) {
+
+					util.setIsStart(true);// 设置后台运行标志，正在运行
+
+				}
+
+			}
+
+		}
+
+	};
 
 }

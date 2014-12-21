@@ -45,11 +45,11 @@
         </activity>
 
         <service android:name="com.kids.activity.chat.GetMsgService" >
-        </service><activity android:name="com.kids.activity.chat.MyMainActivity"></activity>
+        </service><activity android:name="com.kids.activity.chat.MyMainActivity" android:launchMode="singleTask"></activity>
 
         <activity
             android:name="com.kids.activity.chat.FriendListActivity"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTask" >
         </activity><activity android:name="com.kids.activity.chat.Newfriends"></activity>
         <activity android:name="com.kids.activity.chat.Tab1" >
         </activity>

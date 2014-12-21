@@ -129,7 +129,7 @@ public class WelcomeActivity extends Activity {
 	 * 进入好友列表界面
 	 */
 	public void goFriendListActivity() {
-		Intent i = new Intent(this, FriendListActivity.class);
+		Intent i = new Intent(this, MyMainActivity.class);
 		startActivity(i);
 		util.setIsStart(false);
 		finish();
@@ -142,6 +142,7 @@ public class WelcomeActivity extends Activity {
 		// 创建添加快捷方式的Intent
 		Intent addIntent = new Intent(
 				"com.android.launcher.action.INSTALL_SHORTCUT");
+		addIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED| Intent.FLAG_ACTIVITY_NEW_TASK);
 		String title = getResources().getString(R.string.app_name);
 		// 加载快捷方式的图标
 		Parcelable icon = Intent.ShortcutIconResource.fromContext(
