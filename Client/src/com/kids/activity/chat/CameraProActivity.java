@@ -197,15 +197,15 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 					String picpath = image.getContentDescription().toString();
 					if (picpath != null) {
-						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
-							bitmap_zoom.recycle();
-							bitmap_zoom=null;
-						}
-						System.gc();
+//						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
+//							bitmap_zoom.recycle();
+//							bitmap_zoom=null;
+//						}
+//						System.gc();
 						bitmap_zoom = ImageProcess.GetBitmapByPath(
 								CameraProActivity.this, picpath,
 								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 2);
+								MyApplication.mWindowWidth, 0.8);
 						if (bitmap_zoom != null) {
 							int degree = ImageProcess.getBitmapDegree(picpath);
 							if (degree != 0)

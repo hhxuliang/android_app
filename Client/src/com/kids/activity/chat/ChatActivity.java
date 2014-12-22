@@ -139,15 +139,15 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 						intent.setDataAndType(Uri.parse(path), "video/mp4");
 						startActivity(intent);
 					} else {
-						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
-							bitmap_zoom.recycle();
-							bitmap_zoom=null;
-						}
-						System.gc();
+//						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
+//							bitmap_zoom.recycle();
+//							bitmap_zoom=null;
+//						}
+//						System.gc();
 						bitmap_zoom = ImageProcess.GetBitmapByPath(
 								ChatActivity.this, path,
 								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 0.9);
+								MyApplication.mWindowWidth, 0.8);
 						if (bitmap_zoom != null) {
 							int degree = ImageProcess.getBitmapDegree(path);
 							if (degree != 0)

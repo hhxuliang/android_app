@@ -30,8 +30,8 @@ public class NativeImageLoader {
 		//获取应用程序的最大内存
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
-		//用最大内存的1/4来存储图片
-		final int cacheSize = maxMemory / 4;
+		//用最大内存的1/8来存储图片
+		final int cacheSize = maxMemory / 8;
 		mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 			
 			//获取每张图片的大小
