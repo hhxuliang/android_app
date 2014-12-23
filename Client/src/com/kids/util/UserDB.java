@@ -24,6 +24,7 @@ public class UserDB {
 		if (c.moveToFirst()) {
 			u.setImg(c.getInt(c.getColumnIndex("img")));
 			u.setName(c.getString(c.getColumnIndex("name")));
+			u.setIsCrowd(c.getInt(c.getColumnIndex("iscrowd")));
 		}
 		return u;
 	}
