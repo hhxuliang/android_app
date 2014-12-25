@@ -637,7 +637,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		progressDialog.show();
 		String fileKey = "img";
 		UploadUtil uploadUtil = UploadUtil.getInstance();
-		;
+		
 		uploadUtil.setOnUploadProcessListener(this); // 设置监听器监听上传状态
 
 		Map<String, String> params = new HashMap<String, String>();

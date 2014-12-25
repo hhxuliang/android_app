@@ -27,9 +27,11 @@ import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.widget.Toast;
 
 public class MyApplication extends Application {
 	private Client client;// 客户端
@@ -131,6 +133,11 @@ public class MyApplication extends Application {
 
 	@Override
 	public void onCreate() {
+		super.onCreate();
+		initEnv();
+		CrashHandler crashHandler = CrashHandler.getInstance();  
+		crashHandler.init(getApplicationContext(),this);  
+
 		SharePreferenceUtil util = new SharePreferenceUtil(this,
 				Constants.SAVE_USER);
 		System.out.println(util.getIp() + " " + util.getPort());
@@ -139,9 +146,49 @@ public class MyApplication extends Application {
 		messageDB = new MessageDB(MyApplication.this);
 
 		initRencentAdap();
-		super.onCreate();
+		
 	}
+	public void initEnv() {
+		if (Environment.MEDIA_MOUNTED.equals(Environment
+				.getExternalStorageState())) {
+			// 创建一个文件夹对象，赋值为外部存储器的目录
+			File sdcardDir = Environment.getExternalStorageDirectory();
+			// 得到一个路径，内容是sdcard的文件夹路径和名字
+			String path = sdcardDir.getPath() + "/children";
+			setHomePath(path);
+			
+			File path1 = new File(path);
+			if (!path1.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path1.mkdirs();
+			}
+			
+			String path_camera = getCameraPath();
+			File path_camera_f = new File(path_camera);
+			if (!path_camera_f.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path_camera_f.mkdirs();
+			}
+			String path_pic = getMyUploadPicPath();
+			File path_pic_f = new File(path_pic);
+			if (!path_pic_f.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path_pic_f.mkdirs();
+			}
+			
+			String path_pic_1 = getDownloadPicPath();
+			File path_pic_f_1 = new File(path_pic_1);
+			if (!path_pic_f_1.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path_pic_f_1.mkdirs();
+			}
+		} else {
+			Toast.makeText(this, "内存卡不存在...", Toast.LENGTH_LONG).show();
+			return;
 
+		}
+
+	}
 	private void initRencentAdap() {
 		mRecentList = new LinkedList<RecentChatEntity>();
 		List<User> list = userDB.getUser();
@@ -279,6 +326,8 @@ public class MyApplication extends Application {
 
 		if (messageDB != null)
 			messageDB.close();
+		if(userDB!=null)
+			userDB.close();
 
 	}
 

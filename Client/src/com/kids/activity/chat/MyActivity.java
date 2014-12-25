@@ -43,7 +43,7 @@ public abstract class MyActivity extends Activity {
 		ActivityManager mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 
 		List<ActivityManager.RunningServiceInfo> mServiceList = mActivityManager
-				.getRunningServices(30);
+				.getRunningServices(50);
 		final String mClassName = GetMsgService.getMyName();
 
 		boolean b = ServiceIsStart(mServiceList, mClassName);

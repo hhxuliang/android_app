@@ -37,7 +37,7 @@ public class UserDB {
 					new Object[] { u.getId(), u.getName(), u.getImg(),
 							u.getIsOnline(), u.getGroup(), u.getIsCrowd() });
 		}
-		db.close();
+		//db.close();
 	}
 
 	public ArrayList<String> getCrowdid() {
@@ -73,13 +73,15 @@ public class UserDB {
 			list.add(u);
 		}
 		c.close();
-		db.close();
+		//db.close();
 		return list;
 	}
-
+	public void close() {
+		helper.close();
+	}
 	public void delete() {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		db.execSQL("delete from user");
-		db.close();
+		//db.close();
 	}
 }

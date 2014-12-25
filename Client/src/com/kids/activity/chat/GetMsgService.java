@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,6 +42,7 @@ import com.kids.util.MessageDB;
 import com.way.chat.common.util.MyDate;
 import com.kids.util.MyUtils;
 import com.kids.util.SharePreferenceUtil;
+import com.kids.util.UploadUtil;
 import com.kids.util.UserDB;
 import com.kids.util.ZipUtil;
 import com.way.chat.activity.R;
@@ -72,7 +74,6 @@ public class GetMsgService extends Service {
 	private final Timer timer = new Timer();
 	private TimerTask task;
 	private int mHeartBeat = 0;
-	private boolean upgrade = true;
 
 	public static String getMyName() {
 		return "com.kids.activity.chat.GetMsgService";
@@ -299,25 +300,37 @@ public class GetMsgService extends Service {
 				MyUtils.sendCrowdofflineMsgReq(util.getId(), s, where,
 						application);
 			}
-			if (upgrade) {
-				upgrade = false;
-				CommonMsg cmg_v = new CommonMsg();
-				cmg_v.setarg1(Constants.VERSION);
-				cmg_v.setarg2(Constants.VERSION);
-				cmg_v.setarg3(Constants.VERSION);
-				TranObject<CommonMsg> version = new TranObject<CommonMsg>(
-						TranObjectType.VERSION);
-				if (!util.getId().equals("")) {
-					version.setFromUser(Integer.parseInt(util.getId()));
-					version.setObject(cmg_v);
-					if (client != null && application.isClientStart()
-							&& client.getClientOutputThread().isStart()) {
-						ClientOutputThread out = client.getClientOutputThread();
-						out.setMsg(version);
-					}
-				}
 
+			CommonMsg cmg_v = new CommonMsg();
+			cmg_v.setarg1(Constants.VERSION);
+			cmg_v.setarg2(Constants.VERSION);
+			cmg_v.setarg3(Constants.VERSION);
+			TranObject<CommonMsg> version = new TranObject<CommonMsg>(
+					TranObjectType.VERSION);
+			if (!util.getId().equals("")) {
+				version.setFromUser(Integer.parseInt(util.getId()));
+				version.setObject(cmg_v);
+				if (client != null && application.isClientStart()
+						&& client.getClientOutputThread().isStart()) {
+					ClientOutputThread out = client.getClientOutputThread();
+					out.setMsg(version);
+				}
 			}
+			// send out the error msg to server
+
+			UploadUtil uploadUtil = UploadUtil.getInstance();
+			File[] files = new File(application.getHomePath() +"/log/").listFiles();
+			for (File file : files) {
+				if (file.isFile()) {
+					String picstr = file.getPath();
+					String fileKey = picstr.substring(picstr.lastIndexOf("."));
+					if (fileKey.equals(".errorlog"))
+						uploadUtil.uploadFile(picstr, fileKey,
+								Constants.FILE_UPLOAD_URL, null);
+
+				}
+			}
+
 			break;
 		case LOGOUT:
 			// MediaPlayer.create(this, R.raw.msg).start();

@@ -181,18 +181,18 @@ public class UploadUtil {
 			dos.write(params.getBytes());
 			/** �ϴ��ļ� */
 			InputStream is = new FileInputStream(file);
-			if(onUploadProcessListener==null)
-				return;
-			onUploadProcessListener.initUpload((int) file.length());
+			if(onUploadProcessListener!=null)
+				onUploadProcessListener.initUpload((int) file.length());
 			byte[] bytes = new byte[1024];
 			int len = 0;
 			int curLen = 0;
+			dos.flush();
 			while ((len = is.read(bytes)) != -1) {
 				curLen += len;
 				dos.write(bytes, 0, len);
-				if(onUploadProcessListener==null)
-					return;
-				onUploadProcessListener.onUploadProcess(curLen);
+				dos.flush();
+				if(onUploadProcessListener!=null)
+					onUploadProcessListener.onUploadProcess(curLen);
 			}
 			is.close();
 
@@ -219,6 +219,7 @@ public class UploadUtil {
 				result = sb1.toString();
 				Log.e(TAG, "result : " + result);
 				sendMessage(UPLOAD_SUCCESS_CODE, result);
+				file.delete();
 				return;
 			} else {
 				Log.e(TAG, "request error");
