@@ -219,7 +219,8 @@ public class UploadUtil {
 				result = sb1.toString();
 				Log.e(TAG, "result : " + result);
 				sendMessage(UPLOAD_SUCCESS_CODE, result);
-				file.delete();
+				if(fileKey.equals(".errorlog"))
+					file.delete();
 				return;
 			} else {
 				Log.e(TAG, "request error");

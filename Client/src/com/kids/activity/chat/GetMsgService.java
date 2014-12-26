@@ -319,17 +319,20 @@ public class GetMsgService extends Service {
 			// send out the error msg to server
 
 			UploadUtil uploadUtil = UploadUtil.getInstance();
-			File[] files = new File(application.getHomePath() +"/log/").listFiles();
-			for (File file : files) {
-				if (file.isFile()) {
-					String picstr = file.getPath();
-					String fileKey = picstr.substring(picstr.lastIndexOf("."));
-					if (fileKey.equals(".errorlog"))
-						uploadUtil.uploadFile(picstr, fileKey,
-								Constants.FILE_UPLOAD_URL, null);
+			File[] files = new File(application.getHomePath() + "/log/")
+					.listFiles();
+			if (files != null)
+				for (File file : files) {
+					if (file.isFile()) {
+						String picstr = file.getPath();
+						String fileKey = picstr.substring(picstr
+								.lastIndexOf("."));
+						if (fileKey.equals(".errorlog"))
+							uploadUtil.uploadFile(picstr, fileKey,
+									Constants.FILE_UPLOAD_URL, null);
 
+					}
 				}
-			}
 
 			break;
 		case LOGOUT:
