@@ -34,7 +34,7 @@ import com.way.chat.common.util.Constants;
  * 
  */
 public abstract class MyActivity extends Activity {
-	private MyApplication application=null;
+	public MyApplication application=null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

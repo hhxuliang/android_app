@@ -281,7 +281,11 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 										intent.putExtra("user", user);
 										startActivityForResult(intent, 1);
 										break;
-									case 3:
+									case 2:
+										intent = new Intent(ChatActivity.this,
+												LeaveActivity.class);
+										intent.putExtra("user", user);
+										startActivityForResult(intent, 1);
 										break;
 									}
 									dialog.cancel();

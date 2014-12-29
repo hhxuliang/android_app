@@ -156,18 +156,18 @@ public class NativeImageLoader {
 
 		// 设置为false,解析Bitmap对象加入到内存中
 		options.inJustDecodeBounds = false;
-		try {
-			FileOutputStream fos = new FileOutputStream(
-					"/storage/sdcard0/children/log.txt");
-			fos.write(path.getBytes());
-			fos.write(("\n" + options.inSampleSize).getBytes());
-			fos.write(("\n" + options.outWidth).getBytes());
-			fos.write(("\n" + options.outHeight).getBytes());
-			fos.write(("\n" + viewWidth).getBytes());
-			fos.write(("\n" + viewHeight).getBytes());
-			fos.close();
-		} catch (Exception e) {
-		}
+//		try {
+//			FileOutputStream fos = new FileOutputStream(
+//					"/storage/sdcard0/children/log.txt");
+//			fos.write(path.getBytes());
+//			fos.write(("\n" + options.inSampleSize).getBytes());
+//			fos.write(("\n" + options.outWidth).getBytes());
+//			fos.write(("\n" + options.outHeight).getBytes());
+//			fos.write(("\n" + viewWidth).getBytes());
+//			fos.write(("\n" + viewHeight).getBytes());
+//			fos.close();
+//		} catch (Exception e) {
+//		}
 		return BitmapFactory.decodeFile(path, options);
 	}
 
