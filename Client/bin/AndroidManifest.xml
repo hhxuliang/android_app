@@ -70,7 +70,7 @@
         <activity android:name="com.kids.activity.imagescan.MultiSelImageActivity"></activity>
         <activity android:name="com.kids.activity.chat.MoreActionActivity"></activity>
         <activity android:name="com.kids.activity.calendar.ClassCalenderActivity"></activity>
-        <activity android:name="com.kids.activity.chat.LeaveActivity"></activity>
+        <activity android:name="com.kids.activity.chat.ActionActivity"></activity>
         
         
         

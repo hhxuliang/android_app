@@ -282,8 +282,9 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 										break;
 									case 2:
 										intent = new Intent(ChatActivity.this,
-												LeaveActivity.class);
+												ActionActivity.class);
 										intent.putExtra("user", user);
+										intent.putExtra("subview", R.layout.sub_leave);
 										startActivityForResult(intent, 1);
 										break;
 									}
