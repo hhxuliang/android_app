@@ -57,7 +57,6 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 	private List<ChatMsgEntity> coll;// 消息对象数组
 	private LayoutInflater mInflater;
 	private User user = null;
-	private ArrayList<Bitmap> mblist = new ArrayList<Bitmap>();
 	private ListView mlistView;
 
 	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u,ListView list) {
@@ -93,14 +92,6 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		}
 	}
 
-	public void clearBitmap() {
-		for (Bitmap mp : mblist) {
-			if (mp != null && !mp.isRecycled())
-				mp.recycle();
-		}
-		mblist.clear();
-		System.gc();
-	}
 
 	/**
 	 * Item类型的总数
@@ -204,7 +195,6 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				}
 				if (bitmap != null) {
 					viewHolder.tvPicture.setImageBitmap(bitmap);
-					mblist.add(bitmap);
 				} else
 					viewHolder.tvPicture
 							.setImageResource(R.drawable.waitloadpic);

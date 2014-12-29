@@ -243,7 +243,6 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		super.onDestroy();
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
-		mAdapter.clearBitmap();
 	}
 
 	@Override
