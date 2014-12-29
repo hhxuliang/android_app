@@ -233,7 +233,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			}
 			Collections.reverse(mDataArrays);
 		}
-		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user);
+		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user,mListView);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelection(mAdapter.getCount() - 1);
 	}

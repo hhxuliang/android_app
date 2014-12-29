@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.kids.util.ImageProcess;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -31,7 +33,7 @@ public class NativeImageLoader {
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
 		// 用最大内存的1/4来存储图片
-		final int cacheSize = maxMemory / 4;
+		final int cacheSize = maxMemory / 3;
 		mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 
 			// 获取每张图片的大小
@@ -151,24 +153,19 @@ public class NativeImageLoader {
 		// 设置为true,表示解析Bitmap对象，该对象不占内存
 		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeFile(path, options);
+		int degree = ImageProcess.getBitmapDegree(path);
 		// 设置缩放比例
 		options.inSampleSize = computeScale(options, viewWidth, viewHeight);
 
 		// 设置为false,解析Bitmap对象加入到内存中
 		options.inJustDecodeBounds = false;
-//		try {
-//			FileOutputStream fos = new FileOutputStream(
-//					"/storage/sdcard0/children/log.txt");
-//			fos.write(path.getBytes());
-//			fos.write(("\n" + options.inSampleSize).getBytes());
-//			fos.write(("\n" + options.outWidth).getBytes());
-//			fos.write(("\n" + options.outHeight).getBytes());
-//			fos.write(("\n" + viewWidth).getBytes());
-//			fos.write(("\n" + viewHeight).getBytes());
-//			fos.close();
-//		} catch (Exception e) {
-//		}
-		return BitmapFactory.decodeFile(path, options);
+	
+		Bitmap bitmap=BitmapFactory.decodeFile(path, options);
+		if(degree>0)
+			bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
+				degree);
+	
+		return bitmap;
 	}
 
 	/**

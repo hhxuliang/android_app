@@ -8,6 +8,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kids.activity.imagescan.MyImageView;
+import com.kids.activity.imagescan.NativeImageLoader;
+import com.kids.activity.imagescan.MyImageView.OnMeasureListener;
+import com.kids.activity.imagescan.NativeImageLoader.NativeImageCallBack;
 import com.kids.util.ImageProcess;
 import com.kids.util.ZoomImageView;
 import com.way.chat.activity.R;
@@ -16,6 +20,7 @@ import com.way.chat.common.bean.User;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
@@ -28,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,19 +51,21 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		int IMVT_COM_MSG = 0;// 收到对方的消息
 		int IMVT_TO_MSG = 1;// 自己发送出去的消息
 	}
-
+	private Point mPoint = new Point(0, 0);// 用来封装ImageView的宽和高的对象
 	private Context mContext = null;
 	private static final int ITEMCOUNT = 2;// 消息类型的总数
 	private List<ChatMsgEntity> coll;// 消息对象数组
 	private LayoutInflater mInflater;
 	private User user = null;
 	private ArrayList<Bitmap> mblist = new ArrayList<Bitmap>();
+	private ListView mlistView;
 
-	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u) {
+	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u,ListView list) {
 		this.coll = coll;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
 		user = u;
+		mlistView = list;
 	}
 
 	public int getCount() {
@@ -123,7 +131,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 					.findViewById(R.id.tv_username);
 			viewHolder.tvContent = (TextView) convertView
 					.findViewById(R.id.tv_chatcontent);
-			viewHolder.tvPicture = (ImageView) convertView
+			viewHolder.tvPicture = (MyImageView) convertView
 					.findViewById(R.id.imageView_chat_pic);
 			viewHolder.icon = (ImageView) convertView
 					.findViewById(R.id.iv_userhead);
@@ -138,6 +146,15 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		viewHolder.tvSendTime.setText(entity.getDate());
 		viewHolder.tvUserName.setText(entity.getName());
 		viewHolder.tvReflesh.setVisibility(View.GONE);
+		// 用来监听ImageView的宽和高
+		viewHolder.tvPicture.setOnMeasureListener(new OnMeasureListener() {
+
+			@Override
+			public void onMeasureSize(int width, int height) {
+				mPoint.set(width, height);
+			}
+		});
+		
 		if (entity.get_is_pic()) {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
@@ -148,6 +165,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				String path = entity.getPicPath();
 				String prefix = path.substring(path.lastIndexOf("."));
 				Bitmap bitmap = null;
+				// 给ImageView设置路径Tag,这是异步加载图片的小技巧
+				viewHolder.tvPicture.setTag(path);
 				if (prefix.equals(".mp4")) {
 					bitmap = ThumbnailUtils.createVideoThumbnail(path,
 							Thumbnails.MINI_KIND);
@@ -161,6 +180,26 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 						if (degree != 0)
 							bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
 									degree);
+					}
+					
+					
+					if(ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE){
+						bitmap = NativeImageLoader.getInstance().loadNativeImage(path,
+								mPoint, new NativeImageCallBack() {
+
+								@Override
+								public void onImageLoader(Bitmap bitmap, String path) {
+									ImageView mImageView = (ImageView) mlistView
+											.findViewWithTag(path);
+									if (bitmap != null && mImageView != null) {
+										mImageView.setImageBitmap(bitmap);
+									}
+								}
+							});
+					}
+					else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
+						bitmap = ThumbnailUtils.createVideoThumbnail(path,
+								Thumbnails.MINI_KIND);
 					}
 				}
 				if (bitmap != null) {
@@ -242,7 +281,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		public TextView tvSendTime;
 		public TextView tvUserName;
 		public TextView tvContent;
-		public ImageView tvPicture;
+		public MyImageView tvPicture;
 		public ImageView icon;
 		public ImageView tvReflesh;
 		public boolean isComMsg = true;

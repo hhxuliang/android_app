@@ -62,14 +62,14 @@
             android:textColor="#818181"
             android:textSize="15sp" />
 
-        <ImageView
+        <com.kids.activity.imagescan.MyImageView
             android:id="@+id/imageView_chat_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/tv_chatcontent"
             android:adjustViewBounds="true"
-            android:maxHeight="250dp"
-            android:maxWidth="200dp"
+            android:maxHeight="130dp"
+            android:maxWidth="100dp"
             android:paddingRight="25px"
             android:paddingTop="25px"
             android:scaleType="fitEnd"
