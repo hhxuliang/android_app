@@ -5,22 +5,19 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
- 
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:tag="TextView"
-        android:text="请假条"
+        android:text="会议通知"
         android:textSize="20sp" />
-
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:tag="TextView"
-        android:text="请假时间:" />
+        android:text="会议时间:" />
 
     <EditText
         android:id="@+id/inputDate"
@@ -49,12 +46,12 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:tag="TextView"
-	    android:text="说明:" />
+	    android:text="会议内容:" />
 
     <EditText
         android:id="@+id/inputDate_remark"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="160dp"
         android:enabled="true"
         android:focusable="false"
         android:inputType="text"

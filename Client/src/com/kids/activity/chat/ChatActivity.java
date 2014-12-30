@@ -185,8 +185,10 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		if (mDataArrays.size() > 0) {
 			cme = mDataArrays.get(mDataArrays.size() - 1);
 			datestr = cme.getDate();
+			datestr = " date >'" + datestr + "' ";
 		}
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), datestr, 20);
+		
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(),datestr , 20);
 		List<ChatMsgEntity> mDataArrays_tmp = new ArrayList<ChatMsgEntity>();
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
@@ -261,7 +263,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 			new AlertDialog.Builder(ChatActivity.this)
 					.setTitle("发送")
 					.setIcon(android.R.drawable.ic_dialog_info)
-					.setItems(new String[] { "相机拍照/视频", "本地相册", "请假事件" },
+					.setItems(new String[] { "相机拍照/视频", "本地相册", "请假","会议通知" },
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {
@@ -285,6 +287,13 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 												ActionActivity.class);
 										intent.putExtra("user", user);
 										intent.putExtra("subview", R.layout.sub_leave);
+										startActivityForResult(intent, 1);
+										break;
+									case 3:
+										intent = new Intent(ChatActivity.this,
+												ActionActivity.class);
+										intent.putExtra("user", user);
+										intent.putExtra("subview", R.layout.sub_notify);
 										startActivityForResult(intent, 1);
 										break;
 									}

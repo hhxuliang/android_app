@@ -16,7 +16,9 @@
 
 package com.kids.activity.calendar;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.kids.util.CalendarUtils;
 import com.way.chat.activity.R;
@@ -47,7 +49,7 @@ public class CalendarFragment extends Fragment {
 	private Calendar mCalendar;
 
 	private CalendarGridViewAdapter calendarGridViewAdapter;
-
+	private FragmentListener myListener;
 	public static Fragment create(int pageNumber) {
 		CalendarFragment fragment = new CalendarFragment();
 		Bundle args = new Bundle();
@@ -55,10 +57,22 @@ public class CalendarFragment extends Fragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
-
+	/** Acitivity要实现这个接口，这样Fragment和Activity就可以共享事件触发的资源了 */
+    public interface FragmentListener 
+    { 
+        public void dateUpdate(String str); 
+    } 
 	public CalendarFragment() {
 	}
-
+	/** Fragment第一次附属于Activity时调用,在onCreate之前调用 */
+    @Override 
+    public void onAttach(Activity activity) 
+    { 
+        super.onAttach(activity); 
+        System.out.println("LeftFragment--->onAttach"); 
+   
+        myListener = (FragmentListener) activity; 
+    } 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -102,9 +116,18 @@ public class CalendarFragment extends Fragment {
 				}
 				view.setBackgroundColor(getActivity().getResources().getColor(
 						R.color.selection));
+				Date d = (Date) calendarGridViewAdapter.getItem(position);
+				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+				String date1 = format1.format(d);
+				datechange(date1);
 			}
 		});
 		return rootView;
+	}
+
+	private void datechange(String str) {
+		myListener.dateUpdate(str);
+		
 	}
 
 	private void initGridView(GridView gridView, BaseAdapter adapter) {

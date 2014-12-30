@@ -1,5 +1,6 @@
 package com.kids.activity.calendar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -144,6 +145,7 @@ public class CalendarGridViewAdapter extends BaseAdapter {
 
 		int day = myDate.getDate(); // 日期
 		txtDay.setText(String.valueOf(day));
+		
 
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);

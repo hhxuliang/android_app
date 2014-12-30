@@ -35,6 +35,8 @@ import com.way.chat.common.util.Constants;
  */
 public abstract class MyActivity extends Activity {
 	public MyApplication application=null;
+	public MessageDB messageDB =null;
+	public UserDB userDB;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,6 +54,8 @@ public abstract class MyActivity extends Activity {
 			startService(service);
 		}
 		application = (MyApplication) this.getApplicationContext();
+		messageDB = application.getMessageDB();
+		userDB = application.getUserDB();
 	}
 
 	/**

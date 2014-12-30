@@ -96,8 +96,8 @@ public class MessageDB {
 					+ " ORDER BY _id DESC LIMIT " + limit, null);
 		} else {
 			c = db.rawQuery("SELECT * from _" + id
-					+ " where date > ? ORDER BY _id DESC LIMIT " + limit,
-					new String[] { whereStr_time });
+					+ " where " + whereStr_time + " ORDER BY _id DESC LIMIT " + limit,
+					null);
 		}
 
 		while (c.moveToNext()) {

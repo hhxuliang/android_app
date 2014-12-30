@@ -25,6 +25,8 @@ public class MyMainActivity extends MyActivity {
 	/** Called when the activity is first created. */
 	MyImageView message;
 	MyImageView picture;
+	MyImageView yuan;
+	MyImageView other;
 	private MenuInflater mi;// 菜单
 	MyApplication application;
 
@@ -37,6 +39,8 @@ public class MyMainActivity extends MyActivity {
 		mi = new MenuInflater(this);
 		message = (MyImageView) findViewById(R.id.c_joke);
 		picture = (MyImageView) findViewById(R.id.c_constellation);
+		yuan = (MyImageView) findViewById(R.id.c_idea);
+		
 		application = (MyApplication) this.getApplicationContext();
 		message.setOnClickIntent(new MyImageView.OnViewClick() {
 			@Override
@@ -51,6 +55,16 @@ public class MyMainActivity extends MyActivity {
 			public void onClick() {
 				Intent i = new Intent(MyMainActivity.this,
 						ClassCalenderActivity.class);
+				i.putExtra("crowdid", 2082);
+				startActivity(i);
+			}
+		});
+		yuan.setOnClickIntent(new MyImageView.OnViewClick() {
+			@Override
+			public void onClick() {
+				Intent i = new Intent(MyMainActivity.this,
+						ClassCalenderActivity.class);
+				i.putExtra("crowdid", 2088);
 				startActivity(i);
 			}
 		});
