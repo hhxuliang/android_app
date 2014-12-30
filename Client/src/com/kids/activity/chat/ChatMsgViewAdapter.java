@@ -146,7 +146,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			}
 		});
 		
-		if (entity.get_is_pic()) {
+		if (entity.getmsgtype()==1) {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
 
@@ -250,7 +250,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 						ChatMsgEntity entity = coll.get(position);
 						if (GetMsgService.application != null) {
 							if (-1 == GetMsgService.application.Resend(
-									entity.getMessage(), entity.get_is_pic(),
+									entity.getMessage(), entity.getmsgtype(),
 									entity.getPicPath(), user,
 									entity.getDatekey())) {
 								Toast.makeText(mContext, "网络连接异常", 0).show();

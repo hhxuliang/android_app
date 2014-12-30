@@ -727,7 +727,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 			copyFile(picoldstr, picnewstr);
 			alp.add(picnewstr);
 			ap.add(url_path);
-			application.send(url_path, true, picnewstr, user);
+			application.send(url_path, 1, picnewstr, user);
 		} else {
 			Toast.makeText(getApplicationContext(),
 					"失败上传" + upload_ok_pic + "/" + (this.total_pic - 1), 0)

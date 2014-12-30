@@ -128,7 +128,7 @@ public class GetMsgService extends Service {
 					String content = textObject.getObject().getMessage();// 消息内容
 
 					ChatMsgEntity entity = new ChatMsgEntity("",
-							MyDate.getDateEN(), content, -1, true, false, "");// 收到的消息
+							MyDate.getDateEN(), content, -1, true, 0, "");// 收到的消息
 					// messageDB.saveMsg(form, entity);// 保存到数据库
 
 					// 更新通知栏
@@ -256,7 +256,7 @@ public class GetMsgService extends Service {
 			String message = tm.getMessage();
 			ChatMsgEntity entity = new ChatMsgEntity(msg.getFromUserName(),
 					MyDate.getDateEN(), message, msg.getFromImg(), true,
-					tm.get_is_pic(), "");// 收到的消息
+					tm.getmsgtype(), "");// 收到的消息
 			entity.setMsgid(tm.getMessageid());
 			entity.setDatekey(tm.getDatekey());
 			entity.setServerdatekey(tm.getServerdatekey());
@@ -266,7 +266,7 @@ public class GetMsgService extends Service {
 				entity.setImg(msg.getFromImg());
 			}
 
-			if (tm.get_is_pic()) {
+			if (tm.getmsgtype()==1) {
 				// new thread to download the picture to update the picpath in
 				// local db
 				application.startDownloadPic(tm.getMessage(), uid);

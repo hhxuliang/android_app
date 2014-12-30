@@ -250,7 +250,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.chat_send:// 发送按钮点击事件
 			String contString = mEditTextContent.getText().toString();
-			send(contString, false, "");
+			send(contString, 0, "");
 			mEditTextContent.setText("");// 清空编辑框数据
 			break;
 		case R.id.pic_send:// 发送按钮点击事件
@@ -312,7 +312,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	/**
 	 * 发送消息
 	 */
-	private void send(String contString, boolean is_pic, String pic_path_local) {
+	private void send(String contString, int is_pic, String pic_path_local) {
 
 		if (contString.length() > 0) {
 			ChatMsgEntity entity = application.send(contString, is_pic,
@@ -333,18 +333,18 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		case MESSAGE:
 			TextMessage tm = (TextMessage) msg.getObject();
 			application.removeNeedRefresh(user.getId() + "");
-			Receive_message(msg, tm.get_is_pic(), "");
+			Receive_message(msg, tm.getmsgtype(), "");
 			break;
 		default:
 			break;
 		}
 	}
 
-	private void Receive_message(TranObject msg, boolean ispic, String path_pic) {
+	private void Receive_message(TranObject msg, int msgtype, String path_pic) {
 		TextMessage tm = (TextMessage) msg.getObject();
 		String message = tm.getMessage();
 		ChatMsgEntity entity = new ChatMsgEntity(user.getName(),
-				MyDate.getDateEN(), message, user.getImg(), true, ispic,
+				MyDate.getDateEN(), message, user.getImg(), true, msgtype,
 				path_pic);// 收到的消息
 		System.out.println("herris ====>" + msg.getFromUser());
 		System.out.println("herris ====>" + user.getId());
@@ -377,7 +377,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 								+ stringList_local.size(), 0).show();
 			}
 			for (int i = 0; i < stringList.size(); i++) {
-				send(stringList.get(i), true, stringList_local.get(i));
+				send(stringList.get(i), 1, stringList_local.get(i));
 			}
 		} else {
 

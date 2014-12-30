@@ -331,7 +331,7 @@ public class MyApplication extends Application {
 
 	}
 
-	public ChatMsgEntity send(String contString, boolean is_pic,
+	public ChatMsgEntity send(String contString, int msgtype,
 			String pic_path_local, User user) {
 		ClientOutputThread out = client.getClientOutputThread();
 		ChatMsgEntity entity = null;
@@ -342,7 +342,7 @@ public class MyApplication extends Application {
 			entity = new ChatMsgEntity();
 			entity.setName(util.getName());
 			entity.setDate(MyDate.getDateEN());
-			entity.set_is_pic(is_pic);
+			entity.setmsgtype(msgtype);
 			entity.setMessage(contString);
 			entity.setImg(util.getImg());
 			entity.setMsgType(false);
@@ -357,7 +357,7 @@ public class MyApplication extends Application {
 						TranObjectType.MESSAGE);
 				TextMessage message = new TextMessage();
 				message.setMessage(contString);
-				message.set_is_pic(is_pic);
+				message.setmsgtype(msgtype);
 				message.setDatekey(entity.getDatekey());
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));
@@ -382,7 +382,7 @@ public class MyApplication extends Application {
 		return entity;
 	}
 
-	public int Resend(String contString, boolean is_pic, String pic_path_local,
+	public int Resend(String contString, int is_pic, String pic_path_local,
 			User user, String datekey) {
 		ClientOutputThread out = client.getClientOutputThread();
 		if (!isClientStart() || out == null) {
@@ -396,7 +396,7 @@ public class MyApplication extends Application {
 						TranObjectType.MESSAGE);
 				TextMessage message = new TextMessage();
 				message.setMessage(contString);
-				message.set_is_pic(is_pic);
+				message.setmsgtype(is_pic);
 				message.setDatekey(datekey);
 				o.setObject(message);
 				o.setFromUser(Integer.parseInt(util.getId()));

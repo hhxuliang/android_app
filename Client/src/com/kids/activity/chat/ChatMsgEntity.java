@@ -12,7 +12,7 @@ public class ChatMsgEntity {
 	private String message;// 消息内容
 	private int img;
 	private boolean isComMeg = true;// 是否为收到的消息
-	private boolean is_pic = false;
+	private int msgtype=0;
 	private String pic_path;
 	private int sendSta;
 	private int readSta;
@@ -65,24 +65,24 @@ public class ChatMsgEntity {
 	}
 
 	public ChatMsgEntity(String name, String date, String text, int img,
-			boolean isComMsg, boolean isPic, String picPath) {
+			boolean isComMsg, int type, String picPath) {
 		super();
 		this.name = name;
 		this.date = date;
 		this.message = text;
 		this.img = img;
 		this.isComMeg = isComMsg;
-		this.is_pic = isPic;
+		this.msgtype = type;
 		this.pic_path = picPath;
 		this.readSta = 1;
 	}
 
-	public boolean get_is_pic() {
-		return is_pic;
+	public int getmsgtype() {
+		return msgtype;
 	}
 
-	public void set_is_pic(boolean ispic) {
-		this.is_pic = ispic;
+	public void setmsgtype(int ispic) {
+		msgtype=ispic;
 	}
 
 	public String getPicPath() {

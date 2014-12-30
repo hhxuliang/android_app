@@ -36,7 +36,7 @@ public class MessageDB {
 						+ " (name,img,date,isCome,message,isPic,picPath,sendsta,readsta,datekey,msgid,serverdatekey) values(?,?,?,?,?,?,?,?,?,?,?,?)",
 				new Object[] { entity.getName(), entity.getImg(),
 						entity.getDate(), isCome, entity.getMessage(),
-						entity.get_is_pic(), entity.getPicPath(),
+						entity.getmsgtype(), entity.getPicPath(),
 						entity.getSendSta(), entity.getReadSta(),
 						entity.getDatekey(), entity.getMsgid(),
 						entity.getServerdatekey() });
@@ -117,13 +117,8 @@ public class MessageDB {
 			if (isCome == 1) {
 				isComMsg = true;
 			}
-			boolean picOrNot = false;
-			if (ispic >= 1)
-				picOrNot = true;
-			else
-				picOrNot = false;
 			ChatMsgEntity entity = new ChatMsgEntity(name, date, message, img,
-					isComMsg, picOrNot, pic_path);
+					isComMsg, ispic, pic_path);
 			entity.setPicPath(pic_path);
 			entity.setSendSta(sends);
 			entity.setDatekey(datekey);

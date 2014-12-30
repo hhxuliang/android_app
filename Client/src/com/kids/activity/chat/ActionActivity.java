@@ -95,15 +95,11 @@ public class ActionActivity extends MyActivity implements OnClickListener {
 		String str = "";
 
 		for (int i = 0; i < layout_body_activity.getChildCount(); i++) {
-			if ("EditText".equals(layout_body_activity.getChildAt(i).getTag()
-					+ "")
-					|| "DateTime".equals(layout_body_activity.getChildAt(i)
-							.getTag() + ""))
+			if(layout_body_activity.getChildAt(i) instanceof EditText)
 				str = str
 						+ ((EditText) layout_body_activity.getChildAt(i))
 								.getText().toString() + "\n";
-			else if ("TextView".equals(layout_body_activity.getChildAt(i)
-					.getTag() + ""))
+			else if (layout_body_activity.getChildAt(i) instanceof TextView)
 				str = str
 						+ ((TextView) layout_body_activity.getChildAt(i))
 								.getText().toString() + "\n";
@@ -117,7 +113,7 @@ public class ActionActivity extends MyActivity implements OnClickListener {
 		String str = toStr();
 		switch (v.getId()) {
 		case R.id.uploadImage:
-			application.send(str, false, "", user);
+			application.send(str, 3, "", user);
 			finish();
 			break;
 		case R.id.back:
