@@ -191,7 +191,7 @@ public class MyApplication extends Application {
 	}
 	private void initRencentAdap() {
 		mRecentList = new LinkedList<RecentChatEntity>();
-		List<User> list = userDB.getUser();
+		List<User> list = userDB.getUser("");
 		for (User u : list) {
 			List<ChatMsgEntity> lt = messageDB.getMsg(u.getId(), "", 1);
 			if (lt.size() == 1) {

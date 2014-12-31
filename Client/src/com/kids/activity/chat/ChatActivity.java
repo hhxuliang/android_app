@@ -71,7 +71,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 	private ListView mListView;
 	private ChatMsgViewAdapter mAdapter;// 消息视图的Adapter
 	private List<ChatMsgEntity> mDataArrays = new ArrayList<ChatMsgEntity>();// 消息对象数组
-	private SharePreferenceUtil util;
+	
 	private User user;
 	private MessageDB messageDB;
 	private MyApplication application;
@@ -86,7 +86,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		application = (MyApplication) getApplicationContext();
 		messageDB = application.getMessageDB();
 		user = (User) getIntent().getSerializableExtra("user");
-		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
+		
 		client = application.getClient();
 		initView();// 初始化view
 		initData();// 初始化数据

@@ -23,7 +23,15 @@ public class SharePreferenceUtil {
 	public String getPasswd() {
 		return sp.getString("passwd", "");
 	}
+	// 默认班务
+	public void setdefaultcrowd(int id) {
+		editor.putInt("defaultcrowd", id);
+		editor.commit();
+	}
 
+	public int getdefaultcrowd() {
+		return sp.getInt("defaultcrowd", -1);
+	}
 	// 用户的id，即QQ号
 	public void setId(String id) {
 		editor.putString("id", id);

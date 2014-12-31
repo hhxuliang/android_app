@@ -40,7 +40,7 @@ public class MyMainActivity extends MyActivity {
 		message = (MyImageView) findViewById(R.id.c_joke);
 		picture = (MyImageView) findViewById(R.id.c_constellation);
 		yuan = (MyImageView) findViewById(R.id.c_idea);
-		
+		other=(MyImageView) findViewById(R.id.c_recommend);
 		application = (MyApplication) this.getApplicationContext();
 		message.setOnClickIntent(new MyImageView.OnViewClick() {
 			@Override
@@ -55,7 +55,7 @@ public class MyMainActivity extends MyActivity {
 			public void onClick() {
 				Intent i = new Intent(MyMainActivity.this,
 						ClassCalenderActivity.class);
-				i.putExtra("crowdid", 2082);
+				i.putExtra("crowdid", util.getdefaultcrowd());
 				startActivity(i);
 			}
 		});
@@ -63,8 +63,19 @@ public class MyMainActivity extends MyActivity {
 			@Override
 			public void onClick() {
 				Intent i = new Intent(MyMainActivity.this,
-						ClassCalenderActivity.class);
-				i.putExtra("crowdid", 2088);
+						WebActivity.class);
+				i.putExtra("title", "幼儿生活");
+				i.putExtra("url", "http://115.159.71.239:8080/QQServer/introduce.html");
+				startActivity(i);
+			}
+		});
+		other.setOnClickIntent(new MyImageView.OnViewClick() {
+			@Override
+			public void onClick() {
+				Intent i = new Intent(MyMainActivity.this,
+						WebActivity.class);
+				i.putExtra("title", "精品推荐");
+				i.putExtra("url", "http://m.nuomi.com/webapp/tuan/list?kw=%E5%84%BF%E7%AB%A5");
 				startActivity(i);
 			}
 		});

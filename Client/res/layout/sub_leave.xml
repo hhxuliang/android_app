@@ -1,63 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bodylayout"
+    android:id="@+id/alllayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-
- 
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:tag="TextView"
-        android:text="请假条"
-        android:textSize="20sp" />
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:tag="TextView"
-        android:text="请假时间:" />
-
-    <EditText
-        android:id="@+id/inputDate"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:enabled="true"
-        android:focusable="false"
-        android:inputType="none"
-        android:tag="DateTime" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:tag="TextView"
-        android:text="结束时间:" />
-
-    <EditText
-        android:id="@+id/inputDate2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:focusable="false"
-        android:inputType="none"
-        android:tag="DateTime" />
-
-	<TextView
-	    android:layout_width="wrap_content"
+	<LinearLayout 
+	    android:id="@+id/bodylayout"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:tag="TextView"
-	    android:text="说明:" />
-
-    <EditText
-        android:id="@+id/inputDate_remark"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:enabled="true"
-        android:focusable="false"
-        android:inputType="text"
-        android:tag="EditText" />
-    
+	    android:orientation="vertical" >
+	 
+	
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:tag="TextView"
+	        android:text="请假条"
+	        android:textSize="20sp" />
+	
+	
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:tag="TextView"
+	        android:text="请假时间:" />
+	
+	    <EditText
+	        android:id="@+id/inputDate"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:enabled="true"
+	        android:focusable="false"
+	        android:inputType="none"
+	        android:tag="DateTime" />
+	
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:tag="TextView"
+	        android:text="结束时间:" />
+	
+	    <EditText
+	        android:id="@+id/inputDate2"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:focusable="false"
+	        android:inputType="none"
+	        android:tag="DateTime" />
+	
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:tag="TextView"
+		    android:text="说明:" />
+	
+	    <EditText
+	        android:id="@+id/inputDate_remark"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:enabled="true"
+	        android:focusable="false"
+	        android:inputType="text"
+	        android:tag="EditText" />
+    </LinearLayout> 
+	<LinearLayout 
+	    android:id="@+id/otherlayout"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical" >
+	    
+	    <TextView
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:tag="TextView"
+		    android:text="\n\n\n提示：本请假信息仅老师们可见！" />
+	</LinearLayout>    
 </LinearLayout>

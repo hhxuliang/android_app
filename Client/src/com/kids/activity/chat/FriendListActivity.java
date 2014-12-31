@@ -173,7 +173,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		if (list != null && list.size() > 0)
 			list.clear();
-		list = userDB.getUser();
+		list = userDB.getUser("");
 		initListViewData(list);
 	}
 

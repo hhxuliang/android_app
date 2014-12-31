@@ -57,11 +57,11 @@ public class UserDB {
 			addUser(list);
 		}
 	}
-
-	public List<User> getUser() {
+	
+	public List<User> getUser(String where) {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		List<User> list = new ArrayList<User>();
-		Cursor c = db.rawQuery("select * from user", null);
+		Cursor c = db.rawQuery("select * from user " + where, null);
 		while (c.moveToNext()) {
 			User u = new User();
 			u.setId(c.getInt(c.getColumnIndex("id")));

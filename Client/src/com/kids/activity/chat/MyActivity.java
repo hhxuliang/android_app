@@ -37,6 +37,7 @@ public abstract class MyActivity extends Activity {
 	public MyApplication application=null;
 	public MessageDB messageDB =null;
 	public UserDB userDB;
+	public SharePreferenceUtil util;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,6 +57,7 @@ public abstract class MyActivity extends Activity {
 		application = (MyApplication) this.getApplicationContext();
 		messageDB = application.getMessageDB();
 		userDB = application.getUserDB();
+		util = new SharePreferenceUtil(this, Constants.SAVE_USER);
 	}
 
 	/**
