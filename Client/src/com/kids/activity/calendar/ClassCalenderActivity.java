@@ -46,7 +46,7 @@ public class ClassCalenderActivity extends MyActivity implements
 		FragmentListener, OnClickListener {
 
 	private ViewPager viewPager;
-	private TextView tvMonth;
+	private TextView tvMonth, information;
 	private CheckBox title;
 	private String month;
 	private EventAdapter mAdapter;// 消息视图的Adapter
@@ -72,6 +72,7 @@ public class ClassCalenderActivity extends MyActivity implements
 		viewPager.setAdapter(screenSlidePagerAdapter);
 		viewPager.setCurrentItem(500);
 		tvMonth = (TextView) this.findViewById(R.id.tv_month);
+		information = (TextView) this.findViewById(R.id.information);
 		title = (CheckBox) this.findViewById(R.id.pic_name);
 		title.setOnClickListener(this);
 
@@ -160,8 +161,8 @@ public class ClassCalenderActivity extends MyActivity implements
 						"你已设置本班务为默认显示的班级班务！", Toast.LENGTH_LONG).show();
 			} else
 				util.setdefaultcrowd(-1);
-				Toast.makeText(ClassCalenderActivity.this,
-						"你已取消本班务为默认显示的班级班务！", Toast.LENGTH_LONG).show();
+			Toast.makeText(ClassCalenderActivity.this, "你已取消本班务为默认显示的班级班务！",
+					Toast.LENGTH_LONG).show();
 			break;
 		}
 	}
@@ -170,13 +171,15 @@ public class ClassCalenderActivity extends MyActivity implements
 	 * 加载消息历史，从数据库中读出
 	 */
 	public void initData(String datestr) {
-		if (crowdid < 0)
-			Toast.makeText(ClassCalenderActivity.this, "请点击选择按钮，选择你要显示的班级班务！",
-					Toast.LENGTH_LONG).show();
+		information.setVisibility(View.GONE);
 		user = userDB.getUserByID(crowdid);
 
 		if (user == null)
+		{
+			information.setVisibility(View.VISIBLE);
+			information.setText("请点击选择按钮，选择你要显示的班级班务！");
 			return;
+		}
 		title.setText(user.getName());
 		title.setChecked(false);
 		if (util.getdefaultcrowd() == crowdid)
@@ -197,6 +200,10 @@ public class ClassCalenderActivity extends MyActivity implements
 				mDataArrays.add(entity);
 			}
 			Collections.reverse(mDataArrays);
+		}else
+		{
+			information.setVisibility(View.VISIBLE);
+			information.setText("没有任何园务/班务详细信息，请选择其它日期！");
 		}
 		if (mAdapter == null) {
 			mAdapter = new EventAdapter(this, mDataArrays);

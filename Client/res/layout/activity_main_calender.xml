@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:background="@color/sc_nameselect"
         android:gravity="center"
-        android:text="班务详细信息"
+        android:text="园务/班务详细信息"
         android:textColor="@color/white"
         android:textIsSelectable="true"
         android:textSize="18sp" />
@@ -75,7 +75,13 @@
         android:layout_height="wrap_content"
         android:background="@color/chat_close_press"
         android:orientation="vertical" >
-
+		 <TextView 
+	        android:textIsSelectable="true"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center"
+	        android:text="没有任何班务详细信息，请选择其它日期！"
+	        android:id="@+id/information"/>
         <ListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
