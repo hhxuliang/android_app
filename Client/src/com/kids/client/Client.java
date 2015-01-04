@@ -16,7 +16,7 @@ import com.way.chat.common.tran.bean.TranObjectType;
  */
 public class Client {
 
-	private Socket client;
+	private Socket client = null ;
 	private ClientThread clientThread = null;
 	private String ip;
 	private int port;
@@ -40,6 +40,11 @@ public class Client {
 
 	public boolean start() {
 		try {
+			if(clientThread!=null)
+				clientThread.stopNet();
+			if(client!=null)
+				client.close();
+			
 			client = new Socket();
 			// client.connect(new InetSocketAddress(Constants.SERVER_IP,
 			// Constants.SERVER_PORT), 3000);

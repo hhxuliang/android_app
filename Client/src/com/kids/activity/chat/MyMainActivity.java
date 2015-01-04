@@ -94,8 +94,8 @@ public class MyMainActivity extends MyActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
-						//exitsys();
-						onHome();
+						exitsys();
+						//onHome();
 					}
 				}).setNeutralButton("注销",
 						new DialogInterface.OnClickListener() {

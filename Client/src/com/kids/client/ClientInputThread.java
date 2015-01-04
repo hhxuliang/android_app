@@ -16,6 +16,7 @@ public class ClientInputThread extends Thread {
 	private Socket socket;
 	private TranObject msg;
 	private boolean isStart = true;
+
 	public boolean isStart() {
 		return isStart;
 	}
@@ -31,16 +32,20 @@ public class ClientInputThread extends Thread {
 			e.printStackTrace();
 		}
 	}
-	public void stopNet(){
-		isStart=false;
-		try {
-			ois.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+	public void stopNet() {
+
+		if (isStart) {
+			try {
+				ois.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		
+		isStart = false;
 	}
+
 	/**
 	 * 提供给外部的消息监听方法
 	 * 
@@ -71,14 +76,6 @@ public class ClientInputThread extends Thread {
 			e.printStackTrace();
 		}
 
-		try {
-			ois.close();
-			if (socket != null)
-				socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		isStart = false;
+		stopNet();
 	}
 }

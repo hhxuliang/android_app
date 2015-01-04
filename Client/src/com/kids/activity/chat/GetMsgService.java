@@ -192,7 +192,7 @@ public class GetMsgService extends Service {
 	public void start_client_socket() {
 
 		isStart = client.start();
-		application.setClientStart(isStart);
+		
 		if (isStart) {
 			mHeartBeat = 2;
 			ClientInputThread in = client.getClientInputThread();
@@ -220,6 +220,7 @@ public class GetMsgService extends Service {
 					}
 				}
 			});
+			application.setClientStart(isStart);
 			MyUtils.login(util.getName(), util.getPasswd(), application);
 
 		}

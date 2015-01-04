@@ -44,6 +44,8 @@ public class ClientOutputThread extends Thread {
 
 	// 这里处理跟服务器是一样的
 	public void setMsg(TranObject msg) {
+		if(isStart==false)
+			return;
 		synchronized (this) {
 			if (msg.getType() == TranObjectType.MESSAGE) {
 				for (int i = 0; i < object.size(); i++) {
@@ -63,14 +65,16 @@ public class ClientOutputThread extends Thread {
 	}
 
 	public void stopNet() {
-		isStart = false;
-		try {
-			oos.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		if (isStart) {
+			try {
+				oos.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
+		isStart = false;
 	}
 
 	@Override
@@ -104,15 +108,7 @@ public class ClientOutputThread extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		try {
-			oos.close();// 循环结束后，关闭输出流和socket
-			if (socket != null)
-				socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		isStart = false;
+		stopNet();
 	}
 
 }
