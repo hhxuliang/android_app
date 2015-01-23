@@ -245,7 +245,8 @@ public class GetMsgService extends Service {
 			cmg.setarg1(tm.getDatekey());
 			TranObject<CommonMsg> ack = new TranObject<CommonMsg>(
 					TranObjectType.ACKMSG);
-			ack.setFromUser(Integer.parseInt(util.getId()));
+			if(util.getId().length()>0)
+				ack.setFromUser(Integer.parseInt(util.getId()));
 			ack.setObject(cmg);
 
 			if (client != null && application.isClientStart()

@@ -156,8 +156,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		application.getmRecentAdapter().notifyDataSetChanged();
 		myExAdapter.notifyDataSetChanged();
-		if (mGroupGridView != null && mGroupGridView.getAdapter() != null){
-			((GroupAdapter) mGroupGridView.getAdapter()).resetList();			
+		if (mGroupGridView != null && mGroupGridView.getAdapter() != null) {
+			((GroupAdapter) mGroupGridView.getAdapter()).resetList();
 		}
 
 		getImages();
@@ -254,8 +254,10 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 
 		cursor = (ImageView) findViewById(R.id.tab2_bg);
 
-		myHeadImage.setImageResource(imgs[list.get(0).getImg()]);
-		myName.setText(list.get(0).getName());
+		if (list != null && list.size() > 0) {
+			myHeadImage.setImageResource(imgs[list.get(0).getImg()]);
+			myName.setText(list.get(0).getName());
+		}
 		layout_body_activity.setFocusable(true);
 
 		mPager = (ViewPager) findViewById(R.id.viewPager);
@@ -275,9 +277,8 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		mRecentListView = (ListView) lay1.findViewById(R.id.tab1_listView);
 		// mRecentAdapter = new RecentChatAdapter(FriendListActivity.this,
 		// application.getmRecentList());// 从全局变量中获取最近聊天对象数组
-		
+
 		mRecentListView.setAdapter(application.getmRecentAdapter());// 先设置空对象，要么从数据库中读出
-		
 
 		// 下面是处理好友列表界面处理
 		myListView = (MyListView) lay2.findViewById(R.id.tab2_listView);
@@ -376,8 +377,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	}
 
 	public void updateUserState() {
-		
-		
+
 	}
 
 	@Override
@@ -533,21 +533,23 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 					ArrayList<String> pathstr = ImageProcess.ListFile(parentN);
 
 					File file = new File(parentN);
-					//String parentName = file.getName();
+					// String parentName = file.getName();
 					for (String path : pathstr) {
 						// 根据父路径名将图片放入到mGruopMap中
 						String parentName = "其他";
-						int id=0;
-						if (path.lastIndexOf("/")>0 && path.lastIndexOf("_kids_")>0)
-						{	
-							parentName = path.substring(path.lastIndexOf("/")+1, path.lastIndexOf("_kids_"));
-							System.out.println("usid is :" + parentName);					
-							try{
+						int id = 0;
+						if (path.lastIndexOf("/") > 0
+								&& path.lastIndexOf("_kids_") > 0) {
+							parentName = path.substring(
+									path.lastIndexOf("/") + 1,
+									path.lastIndexOf("_kids_"));
+							System.out.println("usid is :" + parentName);
+							try {
 								id = Integer.parseInt(parentName);
 								UserDB userDB = application.getUserDB();
 								User user2 = userDB.selectInfo(id);// 通过id查询对应数据库该好友信息
 								parentName = user2.getName();
-							}catch(Exception e){
+							} catch (Exception e) {
 								parentName = "其他";
 							}
 						}

@@ -302,6 +302,8 @@ public class ShowImageActivity extends MyActivity implements
 	};
 
 	public int onUploadOK(boolean statu, String url_path) {
+		if(pathl==null || pathl.size()==0)
+			return 0;
 		this.upload_ok_pic++;
 		String picnewstr = (String) pathl.get(0);
 		if (statu) {

@@ -193,7 +193,7 @@ public class ChatActivity extends MyActivity implements OnClickListener {
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
-				if (entity.getName().equals("")) {
+				if (entity.getName()!=null && entity.getName().equals("")) {
 					entity.setName(user.getName());
 				}
 				if (entity.getImg() < 0) {

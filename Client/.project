@@ -32,9 +32,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src_common</name>
+			<name>share</name>
 			<type>2</type>
-			<location>D:/Program Files/android/Android_OO/common/Share/src</location>
+			<location>D:/workspace-sts-3.6.3.RELEASE/git/server/Share/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>
