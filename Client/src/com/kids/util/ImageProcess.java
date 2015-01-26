@@ -23,7 +23,7 @@ import android.view.WindowManager;
 
 public class ImageProcess {
 	public enum FileType {
-		IMAGE, VIDEO, UNKNOW
+		IMAGE, VIDEO, APK, UNKNOW
 	};
 
 	/**
@@ -69,7 +69,7 @@ public class ImageProcess {
 		// 应该使用getSize()，但是这里为了向下兼容所以依然使用它们
 		int windowHeight = (int) (winHeight * myscale);
 		int windowWidth = (int) (winWidth * myscale);
-		if (windowWidth == 0 || windowHeight==0)
+		if (windowWidth == 0 || windowHeight == 0)
 			return null;
 		// 计算采样率
 		int scaleX = imageWidth / windowWidth;
@@ -78,7 +78,7 @@ public class ImageProcess {
 		if (scaleX > 1) {
 			scale = scaleX;
 		}
-		if (scaleY > scaleX ) {
+		if (scaleY > scaleX) {
 			scale = scaleY;
 		}
 		// 采样率依照最大的方向为准
@@ -205,7 +205,11 @@ public class ImageProcess {
 			returnBm = bm;
 		}
 		if (bm != returnBm) {
-			bm.recycle();
+			if (bm != null && !bm.isRecycled()) {
+				bm.recycle();
+				bm = null;
+				System.gc();
+			}
 		}
 		return returnBm;
 	}
@@ -237,6 +241,8 @@ public class ImageProcess {
 			isImageFile = ImageProcess.FileType.IMAGE;
 		} else if (FileEnd.equals("mp4")) {
 			isImageFile = ImageProcess.FileType.VIDEO;
+		} else if (FileEnd.equals("apk")) {
+			isImageFile = ImageProcess.FileType.APK;
 		}
 		return isImageFile;
 	}
@@ -276,6 +282,86 @@ public class ImageProcess {
 		//
 		// // 通知Handler扫描图片完成
 		// mHandler.sendEmptyMessage(SCAN_OK);
+	}
+
+	public static ByteArrayOutputStream getSmallBitmap(String filePath) {
+
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(filePath, options);
+
+		// Calculate inSampleSize
+		options.inSampleSize = calculateInSampleSize(options, 480, 800);
+
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+
+		Bitmap bm1 = BitmapFactory.decodeFile(filePath, options);
+		if (bm1 == null) {
+			return null;
+		}
+		int degree = readPictureDegree(filePath);
+		Bitmap bm = rotateBitmapByDegree(bm1, degree);
+		ByteArrayOutputStream baos = null;
+		baos = new ByteArrayOutputStream();
+		bm.compress(Bitmap.CompressFormat.JPEG, 30, baos);
+
+		if(bm != null && !bm.isRecycled()){
+			bm.recycle();
+			bm = null;
+			System.gc();
+        }
+		return baos;
+
+	}
+
+	private static int readPictureDegree(String path) {
+		int degree = 0;
+		try {
+			ExifInterface exifInterface = new ExifInterface(path);
+			int orientation = exifInterface.getAttributeInt(
+					ExifInterface.TAG_ORIENTATION,
+					ExifInterface.ORIENTATION_NORMAL);
+			switch (orientation) {
+			case ExifInterface.ORIENTATION_ROTATE_90:
+				degree = 90;
+				break;
+			case ExifInterface.ORIENTATION_ROTATE_180:
+				degree = 180;
+				break;
+			case ExifInterface.ORIENTATION_ROTATE_270:
+				degree = 270;
+				break;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return degree;
+	}
+
+	private static int calculateInSampleSize(BitmapFactory.Options options,
+			int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+
+		if (height > reqHeight || width > reqWidth) {
+
+			// Calculate ratios of height and width to requested height and
+			// width
+			final int heightRatio = Math.round((float) height
+					/ (float) reqHeight);
+			final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+			// Choose the smallest ratio as inSampleSize value, this will
+			// guarantee
+			// a final image with both dimensions larger than or equal to the
+			// requested height and width.
+			inSampleSize = heightRatio < widthRatio ? widthRatio : heightRatio;
+		}
+
+		return inSampleSize;
 	}
 
 }

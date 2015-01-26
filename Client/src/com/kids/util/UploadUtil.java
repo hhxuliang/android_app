@@ -1,8 +1,10 @@
 package com.kids.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -179,23 +181,14 @@ public class UploadUtil {
 
 			Log.i(TAG, file.getName() + "=" + params + "##");
 			dos.write(params.getBytes());
-			/** �ϴ��ļ� */
-			InputStream is = new FileInputStream(file);
-			if(onUploadProcessListener!=null)
-				onUploadProcessListener.initUpload((int) file.length());
-			byte[] bytes = new byte[1024];
-			int len = 0;
-			int curLen = 0;
 			dos.flush();
-			while ((len = is.read(bytes)) != -1) {
-				curLen += len;
-				dos.write(bytes, 0, len);
-				dos.flush();
-				if(onUploadProcessListener!=null)
-					onUploadProcessListener.onUploadProcess(curLen);
-			}
-			is.close();
-
+			/** �ϴ��ļ� */
+			if (onUploadProcessListener != null)
+				onUploadProcessListener.initUpload((int) file.length());
+			if (ImageProcess.checkFileType(file.getPath()) == ImageProcess.FileType.IMAGE)
+				sendSmallImageContent(file.getPath(),dos);
+			else
+				sendFileContent(file, dos);
 			dos.write(LINE_END.getBytes());
 			byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINE_END)
 					.getBytes();
@@ -219,7 +212,7 @@ public class UploadUtil {
 				result = sb1.toString();
 				Log.e(TAG, "result : " + result);
 				sendMessage(UPLOAD_SUCCESS_CODE, result);
-				if(fileKey.equals(".errorlog"))
+				if (fileKey.equals(".errorlog"))
 					file.delete();
 				return;
 			} else {
@@ -244,6 +237,44 @@ public class UploadUtil {
 			e.printStackTrace();
 			return;
 		}
+	}
+
+	private void sendSmallImageContent(String path, DataOutputStream dos)
+			throws IOException {
+		ByteArrayOutputStream bout = ImageProcess.getSmallBitmap(path);
+		byte[] buf = bout.toByteArray();// 获取内存缓冲中的数据
+		int curLen = 0;
+		int len = buf.length;
+		int packet_len = 1024;
+		int i = 0;
+		do {
+			int writelen = (len - i * packet_len > packet_len ? packet_len
+					: len - i * packet_len);
+			dos.write(buf, i * packet_len, writelen);
+			dos.flush();
+			curLen += writelen;
+			i++;
+			if (onUploadProcessListener != null)
+				onUploadProcessListener.onUploadProcess(curLen);
+		} while (len > curLen);
+		bout.close();
+	}
+
+	private void sendFileContent(File file, DataOutputStream dos)
+			throws IOException {
+		byte[] bytes = new byte[1024];
+		int len = 0;
+		int curLen = 0;
+		InputStream is = new FileInputStream(file);
+		while ((len = is.read(bytes)) != -1) {
+			curLen += len;
+			dos.write(bytes, 0, len);
+			dos.flush();
+			if (onUploadProcessListener != null)
+				onUploadProcessListener.onUploadProcess(curLen);
+		}
+		is.close();
+		return;
 	}
 
 	// �����ϴ����

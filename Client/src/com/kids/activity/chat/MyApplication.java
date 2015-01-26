@@ -15,6 +15,7 @@ import com.kids.client.ClientOutputThread;
 import com.kids.client.DownloadFile;
 import com.kids.util.MessageDB;
 import com.way.chat.common.util.MyDate;
+import com.kids.util.ImageProcess;
 import com.kids.util.SharePreferenceUtil;
 import com.kids.util.UserDB;
 import com.way.chat.common.bean.TextMessage;
@@ -54,7 +55,7 @@ public class MyApplication extends Application {
 	public static final int DOWNLOADPIC_OK = 1;
 	public static final int DOWNLOADPIC_FAULT = 2;
 	private HashMap<String, Integer> mMap_Waiting_Download_Pic = new HashMap<String, Integer>();
-	
+
 	public Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;
@@ -64,16 +65,19 @@ public class MyApplication extends Application {
 				uid = ti.intValue();
 			switch (msg.what) {
 			case DOWNLOADPIC_OK:
+				if(hmsg.mSavePath==null)
+					break;
+
+				if (ImageProcess.FileType.APK==ImageProcess.checkFileType(hmsg.mSavePath))
+					installApk(hmsg.mSavePath);
 				if (uid > 0) {
 					hmsg.mComefromUid = uid;
-					getMessageDB().updateMsg(hmsg.mComefromUid,
-							hmsg.mSavePath, hmsg.mUrl);
+					getMessageDB().updateMsg(hmsg.mComefromUid, hmsg.mSavePath,
+							hmsg.mUrl);
 					Intent broadCast = new Intent();
 					broadCast.setAction(Constants.ACTION);
 					broadCast.putExtra(Constants.PICUPDATE, hmsg);
 					sendBroadcast(broadCast);// 把收到的消息已广播的形式发送出去
-				} else if (uid == 0) {
-					installApk(hmsg.mSavePath);
 				} else
 					System.out.println("获取图片消息对象失败!");
 				break;
@@ -100,6 +104,7 @@ public class MyApplication extends Application {
 				"application/vnd.android.package-archive");
 		startActivity(i);
 	}
+
 	public void startDownloadPic(String msg, int uid) {
 		stardownloadpicthread();
 		if (downloadfile != null) {
@@ -108,11 +113,13 @@ public class MyApplication extends Application {
 	}
 
 	public void stardownloadpicthread() {
-		if (downloadfile == null || (downloadfile!=null  && downloadfile.getStatu() == 2)) {
-			downloadfile = new DownloadFile(this,this.mMap_Waiting_Download_Pic);
+		if (downloadfile == null
+				|| (downloadfile != null && downloadfile.getStatu() == 2)) {
+			downloadfile = new DownloadFile(this,
+					this.mMap_Waiting_Download_Pic);
 
 			downloadfile.start();
-		} 
+		}
 	}
 
 	public ArrayList<String> getNotReadmsslist() {
@@ -135,8 +142,8 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		initEnv();
-		CrashHandler crashHandler = CrashHandler.getInstance();  
-		crashHandler.init(getApplicationContext(),this);  
+		CrashHandler crashHandler = CrashHandler.getInstance();
+		crashHandler.init(getApplicationContext(), this);
 
 		SharePreferenceUtil util = new SharePreferenceUtil(this,
 				Constants.SAVE_USER);
@@ -146,8 +153,9 @@ public class MyApplication extends Application {
 		messageDB = new MessageDB(MyApplication.this);
 
 		initRencentAdap();
-		
+
 	}
+
 	public void initEnv() {
 		if (Environment.MEDIA_MOUNTED.equals(Environment
 				.getExternalStorageState())) {
@@ -156,13 +164,13 @@ public class MyApplication extends Application {
 			// 得到一个路径，内容是sdcard的文件夹路径和名字
 			String path = sdcardDir.getPath() + "/children";
 			setHomePath(path);
-			
+
 			File path1 = new File(path);
 			if (!path1.exists()) {
 				// 若不存在，创建目录，可以在应用启动的时候创建
 				path1.mkdirs();
 			}
-			
+
 			String path_camera = getCameraPath();
 			File path_camera_f = new File(path_camera);
 			if (!path_camera_f.exists()) {
@@ -175,7 +183,7 @@ public class MyApplication extends Application {
 				// 若不存在，创建目录，可以在应用启动的时候创建
 				path_pic_f.mkdirs();
 			}
-			
+
 			String path_pic_1 = getDownloadPicPath();
 			File path_pic_f_1 = new File(path_pic_1);
 			if (!path_pic_f_1.exists()) {
@@ -189,6 +197,7 @@ public class MyApplication extends Application {
 		}
 
 	}
+
 	private void initRencentAdap() {
 		mRecentList = new LinkedList<RecentChatEntity>();
 		List<User> list = userDB.getUser("");
@@ -326,7 +335,7 @@ public class MyApplication extends Application {
 
 		if (messageDB != null)
 			messageDB.close();
-		if(userDB!=null)
+		if (userDB != null)
 			userDB.close();
 
 	}

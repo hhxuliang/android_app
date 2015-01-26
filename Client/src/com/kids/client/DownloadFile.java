@@ -14,8 +14,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+
 import com.kids.activity.chat.HandleMsg;
 import com.kids.activity.chat.MyApplication;
+import com.kids.util.ImageProcess;
 import com.way.chat.common.tran.bean.TranObject;
 import com.way.chat.common.util.Constants;
 import com.way.chat.common.util.MyDate;
@@ -66,7 +68,11 @@ public class DownloadFile extends Thread {
 					con.setRequestMethod("GET");
 					con.connect();
 					String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-					savePath = application.getDownloadPicPath() + "/" + mUid
+					if(ImageProcess.FileType.APK==ImageProcess.checkFileType(mUrl))
+						savePath = application.getDownloadPicPath() + "/../../" + mUid
+						+ "_kids_" + MyDate.getDateMillis() + prefix;
+					else
+						savePath = application.getDownloadPicPath() + "/" + mUid
 							+ "_kids_" + MyDate.getDateMillis() + prefix;
 					if (con.getResponseCode() == 200) {
 						InputStream is = con.getInputStream();
