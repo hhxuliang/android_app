@@ -268,7 +268,7 @@ public class GetMsgService extends Service {
 				entity.setImg(msg.getFromImg());
 			}
 
-			if (tm.getmsgtype()==1) {
+			if (tm.getmsgtype()==1 || tm.getmsgtype()==2) {
 				// new thread to download the picture to update the picpath in
 				// local db
 				application.startDownloadPic(tm.getMessage(), uid);

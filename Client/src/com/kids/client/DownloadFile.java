@@ -68,7 +68,12 @@ public class DownloadFile extends Thread {
 					con.setRequestMethod("GET");
 					con.connect();
 					String prefix = mUrl.substring(mUrl.lastIndexOf("."));
-					if(ImageProcess.FileType.APK==ImageProcess.checkFileType(mUrl))
+					if(ImageProcess.FileType.VOICE==ImageProcess.checkFileType(mUrl))
+					{
+						savePath = application.getDownloadVoicePath() + "/" + mUid
+								+ "_kids_" + System.currentTimeMillis() + prefix;
+					}
+					else if(ImageProcess.FileType.APK==ImageProcess.checkFileType(mUrl))
 						savePath = application.getDownloadPicPath() + "/../../" + mUid
 						+ "_kids_" + MyDate.getDateMillis() + prefix;
 					else

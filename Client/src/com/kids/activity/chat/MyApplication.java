@@ -65,10 +65,11 @@ public class MyApplication extends Application {
 				uid = ti.intValue();
 			switch (msg.what) {
 			case DOWNLOADPIC_OK:
-				if(hmsg.mSavePath==null)
+				if (hmsg.mSavePath == null)
 					break;
 
-				if (ImageProcess.FileType.APK==ImageProcess.checkFileType(hmsg.mSavePath))
+				if (ImageProcess.FileType.APK == ImageProcess
+						.checkFileType(hmsg.mSavePath))
 					installApk(hmsg.mSavePath);
 				if (uid > 0) {
 					hmsg.mComefromUid = uid;
@@ -190,6 +191,19 @@ public class MyApplication extends Application {
 				// 若不存在，创建目录，可以在应用启动的时候创建
 				path_pic_f_1.mkdirs();
 			}
+
+			path_pic_1 = getDownloadVoicePath();
+			path_pic_f_1 = new File(path_pic_1);
+			if (!path_pic_f_1.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path_pic_f_1.mkdirs();
+			}
+			path_pic_1 = getSendVoicePath();
+			path_pic_f_1 = new File(path_pic_1);
+			if (!path_pic_f_1.exists()) {
+				// 若不存在，创建目录，可以在应用启动的时候创建
+				path_pic_f_1.mkdirs();
+			}
 		} else {
 			Toast.makeText(this, "内存卡不存在...", Toast.LENGTH_LONG).show();
 			return;
@@ -269,6 +283,14 @@ public class MyApplication extends Application {
 
 	public String getDownloadPicPath() {
 		return home_path + "/picpath/ClassSharing";
+	}
+
+	public String getDownloadVoicePath() {
+		return home_path + "/voicepath/download";
+	}
+
+	public String getSendVoicePath() {
+		return home_path + "/voicepath/sendout";
 	}
 
 	public UserDB getUserDB() {

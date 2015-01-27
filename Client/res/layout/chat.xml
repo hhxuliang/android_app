@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/LinearLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -33,36 +33,36 @@
             android:textColor="#ffffff"
             android:textSize="20.0sp" />
     </RelativeLayout>
-    <ListView
-        android:id="@+id/listview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginLeft="10.0dip"
-        android:layout_marginRight="10.0dip"
-        android:layout_marginTop="10.0dip"
-        android:layout_weight="10"
-        android:cacheColorHint="#00000000"
-        android:divider="@null"
-        android:dividerHeight="5dp"
-        android:scrollbars="none" >
 
-    </ListView>
+
+    
     <RelativeLayout
         android:id="@+id/rl_bottom"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_weight="0.8"
+        android:layout_alignParentBottom="true"
         android:background="@drawable/layout_bg1" >
-
+		<TextView
+            android:id="@+id/btn_rcd"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@+id/ivPopUp"
+            android:background="@drawable/chat_send_btn"
+            android:gravity="center"
+            android:text="按住说话"
+            android:visibility="gone" />
 		<Button
 		    android:id="@+id/pic_send"
-		    android:layout_width="60dp"
+		    android:layout_width="40dp"
 		    android:layout_height="40dp"
 		    android:layout_alignParentRight="true"
 		    android:layout_centerVertical="true"
-		    android:layout_marginRight="10dp"
-		    android:background="@drawable/chat_send_button_bg"
-		    android:text="其他"
+		    android:background="@drawable/moretype"
 		    android:textSize="20sp" />
 
         <Button
@@ -70,23 +70,61 @@
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-             android:layout_toLeftOf="@id/pic_send"
+            android:layout_marginRight="2dp"
+            android:layout_toLeftOf="@id/pic_send"
             android:background="@drawable/chat_send_button_bg"
             android:text="发送"
             android:textSize="20sp" />
-
+		<ImageView
+            android:id="@+id/ivPopUp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/chatting_setmode_msg_btn" />
+		<ImageView
+            android:id="@+id/emotion"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/ivPopUp"
+            android:src="@drawable/viewemotion" />
         <EditText
             android:id="@+id/chat_editmessage"
             android:layout_width="fill_parent"
             android:layout_height="40dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:layout_toLeftOf="@id/chat_send"
+            android:layout_toRightOf="@id/emotion"
             android:background="@drawable/edittext1"
             android:singleLine="true"
             android:textSize="18sp" />
+        
     </RelativeLayout>
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/rl_bottom"
+        android:layout_below="@id/rl_layout"
+        android:cacheColorHint="#0000"
+        android:divider="@null"
+        android:dividerHeight="5dp"
+        android:scrollbarStyle="outsideOverlay" />
+   <LinearLayout
+        android:id="@+id/rcChat_popup"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:visibility="gone">
 
-</LinearLayout>
+        <include
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/voice_rcd_hint_window" />
+    </LinearLayout>
+	
+</RelativeLayout>

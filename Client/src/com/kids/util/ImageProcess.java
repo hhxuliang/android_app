@@ -23,7 +23,7 @@ import android.view.WindowManager;
 
 public class ImageProcess {
 	public enum FileType {
-		IMAGE, VIDEO, APK, UNKNOW
+		IMAGE, VIDEO, APK,VOICE ,UNKNOW
 	};
 
 	/**
@@ -243,6 +243,8 @@ public class ImageProcess {
 			isImageFile = ImageProcess.FileType.VIDEO;
 		} else if (FileEnd.equals("apk")) {
 			isImageFile = ImageProcess.FileType.APK;
+		}else if (FileEnd.equals("amr")) {
+			isImageFile = ImageProcess.FileType.VOICE;
 		}
 		return isImageFile;
 	}

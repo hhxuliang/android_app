@@ -22,7 +22,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.AsyncTask;
 import android.provider.MediaStore.Video.Thumbnails;
 import android.text.Html;
@@ -58,7 +60,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private User user = null;
 	private ListView mlistView;
-
+	private MediaPlayer mMediaPlayer = new MediaPlayer();
 	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u,ListView list) {
 		this.coll = coll;
 		mInflater = LayoutInflater.from(context);
@@ -102,7 +104,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		ChatMsgEntity entity = coll.get(position);
+		final ChatMsgEntity entity = coll.get(position);
 		boolean isComMsg = entity.getMsgType();
 
 		ViewHolder viewHolder = null;
@@ -145,8 +147,21 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				mPoint.set(width, height);
 			}
 		});
-		
-		if (entity.getmsgtype()==1) {
+		if (entity.getmsgtype()==2) {
+			viewHolder.tvPicture.setVisibility(View.GONE);
+			viewHolder.tvContent.setVisibility(View.VISIBLE);
+			viewHolder.tvContent.setText(entity.getMessage());
+			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
+			viewHolder.tvContent.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.chatto_voice_playing, 0);
+			viewHolder.tvContent.setOnClickListener(new OnClickListener() {
+				
+				public void onClick(View v) {
+					if (entity.getPicPath().contains(".amr")) {
+						playMusic(entity.getPicPath()) ;
+					}
+				}
+			});
+		}else if (entity.getmsgtype()==1) {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
 
@@ -276,5 +291,28 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		public ImageView tvReflesh;
 		public boolean isComMsg = true;
 	}
+	/**
+	 * @Description
+	 * @param name
+	 */
+	private void playMusic(String name) {
+		try {
+			if (mMediaPlayer.isPlaying()) {
+				mMediaPlayer.stop();
+			}
+			mMediaPlayer.reset();
+			mMediaPlayer.setDataSource(name);
+			mMediaPlayer.prepare();
+			mMediaPlayer.start();
+			mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+				public void onCompletion(MediaPlayer mp) {
 
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 }
