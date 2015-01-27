@@ -16,6 +16,7 @@ import com.kids.util.ImageProcess;
 import com.kids.util.ZoomImageView;
 import com.way.chat.activity.R;
 import com.way.chat.common.bean.User;
+import com.kids.util.ExpressionUtil;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,6 +29,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.AsyncTask;
 import android.provider.MediaStore.Video.Thumbnails;
 import android.text.Html;
+import android.text.SpannableString;
 import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -249,7 +251,17 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		} else {
 			viewHolder.tvPicture.setVisibility(View.GONE);
 			viewHolder.tvContent.setVisibility(View.VISIBLE);
-			viewHolder.tvContent.setText(entity.getMessage());
+			
+			String str = entity.getMessage(); // æ¶ˆæ�¯å…·ä½“å†…å®¹
+			String zhengze = "f0[0-9]{2}|f10[0-7]"; // æ­£åˆ™è¡¨è¾¾å¼�ï¼Œç”¨æ�¥åˆ¤æ–­æ¶ˆæ�¯å†…æ˜¯å�¦æœ‰è¡¨æƒ…
+			try {
+				SpannableString spannableString = ExpressionUtil
+						.getExpressionString(mContext, str, zhengze);
+				viewHolder.tvContent.setText(spannableString);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			//viewHolder.tvContent.setText(entity.getMessage());
 
 		}
 

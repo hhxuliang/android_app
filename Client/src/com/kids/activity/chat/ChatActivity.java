@@ -53,6 +53,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -63,10 +70,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -95,7 +105,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 	private ListView mListView;
 	private ChatMsgViewAdapter mAdapter;// 消息视图的Adapter
 	private List<ChatMsgEntity> mDataArrays = new ArrayList<ChatMsgEntity>();// 消息对象数组
-	
+	private ArrayList<GridView> grids;
 	private TextView mBtnRcd;
 	private User user;
 	private MessageDB messageDB;
@@ -119,7 +129,22 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 	private EditText progressText;
 	private ProgressBar progressBar;
 	private ProgressDialog progressDialog;
-	
+	private GridView gView1;
+	private GridView gView2;
+	private GridView gView3;
+	private int[] expressionImages;
+	private String[] expressionImageNames;
+	private int[] expressionImages1;
+	private String[] expressionImageNames1;
+	private int[] expressionImages2;
+	private String[] expressionImageNames2;
+	private ViewPager viewPager;
+	private ImageView page0;
+	private ImageView page1;
+	private ImageView page2;
+	private LinearLayout page_select;
+	private ImageView biaoqingBtn;
+	private ImageView biaoqingfocuseBtn;
 	private Handler handler_send_file = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -241,6 +266,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		client = application.getClient();
 		initView();// 初始化view
 		initData();// 初始化数据
+		initViewPager();
 		alreadycreate = false;
 
 	}
@@ -339,6 +365,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 					mEditTextContent.setVisibility(View.VISIBLE);
 					mBtnSend.setVisibility(View.VISIBLE);
 					mBtnSendPic.setVisibility(View.VISIBLE);
+					biaoqingBtn.setVisibility(View.VISIBLE);
 					btn_vocie = false;
 					chatting_mode_btn
 							.setImageResource(R.drawable.chatting_setmode_msg_btn);
@@ -348,9 +375,11 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 					mEditTextContent.setVisibility(View.GONE);
 					mBtnSend.setVisibility(View.GONE);
 					mBtnSendPic.setVisibility(View.GONE);
+					biaoqingBtn.setVisibility(View.GONE);
 					chatting_mode_btn
 							.setImageResource(R.drawable.chatting_setmode_voice_btn);
 					btn_vocie = true;
+					
 				}
 			}
 		});
@@ -375,31 +404,23 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		volume = (ImageView) this.findViewById(R.id.volume);
 		
 		progressDialog = new ProgressDialog(this);
-		emotion = (ImageView) this.findViewById(R.id.emotion);
-		emotion.setOnClickListener(new OnClickListener() {
+		
+		expressionImages = Expressions.expressionImgs;
+		expressionImageNames = Expressions.expressionImgNames;
+		expressionImages1 = Expressions.expressionImgs1;
+		expressionImageNames1 = Expressions.expressionImgNames1;
+		expressionImages2 = Expressions.expressionImgs2;
+		expressionImageNames2 = Expressions.expressionImgNames2;
+		viewPager = (ViewPager) findViewById(R.id.viewpager);
+		page_select = (LinearLayout) findViewById(R.id.page_select);
+		page0 = (ImageView) findViewById(R.id.page0_select);
+		page1 = (ImageView) findViewById(R.id.page1_select);
+		page2 = (ImageView) findViewById(R.id.page2_select);
+		biaoqingBtn = (ImageView) findViewById(R.id.chatting_biaoqing_btn);
+		biaoqingBtn.setOnClickListener(this);
+		biaoqingfocuseBtn = (ImageView) findViewById(R.id.chatting_biaoqing_focuse_btn);
+		biaoqingfocuseBtn.setOnClickListener(this);
 
-			public void onClick(View v) {
-
-				if (btn_vocie) {
-					mBtnRcd.setVisibility(View.GONE);
-					mEditTextContent.setVisibility(View.VISIBLE);
-					mBtnSend.setVisibility(View.VISIBLE);
-					mBtnSendPic.setVisibility(View.VISIBLE);
-					btn_vocie = false;
-					chatting_mode_btn
-							.setImageResource(R.drawable.chatting_setmode_msg_btn);
-
-				} else {
-					mBtnRcd.setVisibility(View.VISIBLE);
-					mEditTextContent.setVisibility(View.GONE);
-					mBtnSend.setVisibility(View.GONE);
-					mBtnSendPic.setVisibility(View.GONE);
-					chatting_mode_btn
-							.setImageResource(R.drawable.chatting_setmode_voice_btn);
-					btn_vocie = true;
-				}
-			}
-		});
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -640,7 +661,79 @@ private void updateDisplay(double signalEMA) {
 		mListView.setAdapter(mAdapter);
 		mListView.setSelection(mAdapter.getCount() - 1);
 	}
+	private void initViewPager() {
+		LayoutInflater inflater = LayoutInflater.from(this);
+		grids = new ArrayList<GridView>();
+		gView1 = (GridView) inflater.inflate(R.layout.grid1, null);
+		List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
+		// Éú³É24¸ö±íÇé
+		for (int i = 0; i < 24; i++) {
+			Map<String, Object> listItem = new HashMap<String, Object>();
+			listItem.put("image", expressionImages[i]);
+			listItems.add(listItem);
+		}
 
+		SimpleAdapter simpleAdapter = new SimpleAdapter(ChatActivity.this, listItems,
+				R.layout.singleexpression, new String[] { "image" },
+				new int[] { R.id.image });
+		gView1.setAdapter(simpleAdapter);
+		gView1.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Bitmap bitmap = null;
+				bitmap = BitmapFactory.decodeResource(getResources(),
+						expressionImages[arg2 % expressionImages.length]);
+				ImageSpan imageSpan = new ImageSpan(ChatActivity.this, bitmap);
+				SpannableString spannableString = new SpannableString(
+						expressionImageNames[arg2].substring(1,
+								expressionImageNames[arg2].length() - 1));
+				spannableString.setSpan(imageSpan, 0,
+						expressionImageNames[arg2].length() - 2,
+						Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				// ±à¼­¿òÉèÖÃÊý¾Ý
+				mEditTextContent.append(spannableString);
+				System.out.println("editµÄÄÚÈÝ = " + spannableString);
+			}
+		});
+		grids.add(gView1);
+
+		gView2 = (GridView) inflater.inflate(R.layout.grid2, null);
+		grids.add(gView2);
+
+		gView3 = (GridView) inflater.inflate(R.layout.grid3, null);
+		grids.add(gView3);
+		System.out.println("GridViewµÄ³¤¶È = " + grids.size());
+
+		// Ìî³äViewPagerµÄÊý¾ÝÊÊÅäÆ÷
+		PagerAdapter mPagerAdapter = new PagerAdapter() {
+			@Override
+			public boolean isViewFromObject(View arg0, Object arg1) {
+				return arg0 == arg1;
+			}
+
+			@Override
+			public int getCount() {
+				return grids.size();
+			}
+
+			@Override
+			public void destroyItem(View container, int position, Object object) {
+				((ViewPager) container).removeView(grids.get(position));
+			}
+
+			@Override
+			public Object instantiateItem(View container, int position) {
+				((ViewPager) container).addView(grids.get(position));
+				return grids.get(position);
+			}
+		};
+
+		viewPager.setAdapter(mPagerAdapter);
+		// viewPager.setAdapter();
+
+		viewPager.setOnPageChangeListener(new GuidePageChangeListener());
+	}
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -704,6 +797,19 @@ private void updateDisplay(double signalEMA) {
 			break;
 		case R.id.chat_back:// 返回按钮点击事件
 			finish();// 结束,实际开发中，可以返回主界面
+			break;
+		case R.id.chatting_biaoqing_btn:
+			biaoqingBtn.setVisibility(biaoqingBtn.GONE);
+			biaoqingfocuseBtn.setVisibility(biaoqingfocuseBtn.VISIBLE);
+			viewPager.setVisibility(viewPager.VISIBLE);
+			page_select.setVisibility(page_select.VISIBLE);
+			
+			break;
+		case R.id.chatting_biaoqing_focuse_btn:
+			biaoqingBtn.setVisibility(biaoqingBtn.VISIBLE);
+			biaoqingfocuseBtn.setVisibility(biaoqingfocuseBtn.GONE);
+			viewPager.setVisibility(viewPager.GONE);
+			page_select.setVisibility(page_select.GONE);
 			break;
 		}
 	}
@@ -791,6 +897,122 @@ private void updateDisplay(double signalEMA) {
 			}
 		} else {
 
+		}
+	}
+	
+	public void head_xiaohei(View v) { // ±êÌâÀ¸ ·µ»Ø°´Å¥
+	}
+
+	// ** Ö¸ÒýÒ³Ãæ¸Ä¼àÌýÆ÷ */
+	class GuidePageChangeListener implements OnPageChangeListener {
+
+		@Override
+		public void onPageScrollStateChanged(int arg0) {
+			System.out.println("Ò³Ãæ¹ö¶¯" + arg0);
+
+		}
+
+		@Override
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			System.out.println("»»Ò³ÁË" + arg0);
+		}
+
+		@Override
+		public void onPageSelected(int arg0) {
+			switch (arg0) {
+			case 0:
+				page0.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_focused));
+				page1.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+
+				break;
+			case 1:
+				page1.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_focused));
+				page0.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				page2.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
+				// Éú³É24¸ö±íÇé
+				for (int i = 0; i < 24; i++) {
+					Map<String, Object> listItem = new HashMap<String, Object>();
+					listItem.put("image", expressionImages1[i]);
+					listItems.add(listItem);
+				}
+
+				SimpleAdapter simpleAdapter = new SimpleAdapter(ChatActivity.this,
+						listItems, R.layout.singleexpression,
+						new String[] { "image" }, new int[] { R.id.image });
+				gView2.setAdapter(simpleAdapter);
+				gView2.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1,
+							int arg2, long arg3) {
+						Bitmap bitmap = null;
+						bitmap = BitmapFactory.decodeResource(getResources(),
+								expressionImages1[arg2
+										% expressionImages1.length]);
+						ImageSpan imageSpan = new ImageSpan(ChatActivity.this, bitmap);
+						SpannableString spannableString = new SpannableString(
+								expressionImageNames1[arg2]
+										.substring(1,
+												expressionImageNames1[arg2]
+														.length() - 1));
+						spannableString.setSpan(imageSpan, 0,
+								expressionImageNames1[arg2].length() - 2,
+								Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						// ±à¼­¿òÉèÖÃÊý¾Ý
+						mEditTextContent.append(spannableString);
+						System.out.println("editµÄÄÚÈÝ = " + spannableString);
+					}
+				});
+				break;
+			case 2:
+				page2.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_focused));
+				page1.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				page0.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				List<Map<String, Object>> listItems1 = new ArrayList<Map<String, Object>>();
+				// Éú³É24¸ö±íÇé
+				for (int i = 0; i < 24; i++) {
+					Map<String, Object> listItem = new HashMap<String, Object>();
+					listItem.put("image", expressionImages2[i]);
+					listItems1.add(listItem);
+				}
+
+				SimpleAdapter simpleAdapter1 = new SimpleAdapter(ChatActivity.this,
+						listItems1, R.layout.singleexpression,
+						new String[] { "image" }, new int[] { R.id.image });
+				gView3.setAdapter(simpleAdapter1);
+				gView3.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1,
+							int arg2, long arg3) {
+						Bitmap bitmap = null;
+						bitmap = BitmapFactory.decodeResource(getResources(),
+								expressionImages2[arg2
+										% expressionImages2.length]);
+						ImageSpan imageSpan = new ImageSpan(ChatActivity.this, bitmap);
+						SpannableString spannableString = new SpannableString(
+								expressionImageNames2[arg2]
+										.substring(1,
+												expressionImageNames2[arg2]
+														.length() - 1));
+						spannableString.setSpan(imageSpan, 0,
+								expressionImageNames2[arg2].length() - 2,
+								Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						// ±à¼­¿òÉèÖÃÊý¾Ý
+						mEditTextContent.append(spannableString);
+						System.out.println("editµÄÄÚÈÝ = " + spannableString);
+					}
+				});
+				break;
+
+			}
 		}
 	}
 	

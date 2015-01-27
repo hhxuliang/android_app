@@ -279,7 +279,7 @@ public class GetMsgService extends Service {
 			User user2 = userDB.selectInfo(uid);// 通过id查询对应数据库该好友信息
 			RecentChatEntity entity2 = new RecentChatEntity(uid,
 					user2.getImg(), 0, user2.getName(), MyDate.getDate(),
-					message, user2.getIsCrowd());
+					message, user2.getIsCrowd(),tm.getmsgtype());
 			if (!application.getNotReadmsslist().contains(uid + ""))
 				application.getNotReadmsslist().add(uid + "");
 			application.addNeedRefresh(uid + "");

@@ -8,13 +8,23 @@ public class RecentChatEntity {
 	private String time;
 	private String msg;
 	private int usertype;
+	private int msgtype;
+	
+
+	public int getMsgtype() {
+		return msgtype;
+	}
+
+	public void setMsgtype(int msgtype) {
+		this.msgtype = msgtype;
+	}
 
 	public RecentChatEntity() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public RecentChatEntity(int id, int img, int count, String name,
-			String time, String msg,int usertype) {
+			String time, String msg,int usertype,int msgtype) {
 		super();
 		this.id = id;
 		this.img = img;
@@ -23,6 +33,7 @@ public class RecentChatEntity {
 		this.time = time;
 		this.msg = msg;
 		this.usertype = usertype;
+		this.msgtype = msgtype;
 	}
 
 	public int getUsertype() {

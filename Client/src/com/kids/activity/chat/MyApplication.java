@@ -221,7 +221,7 @@ public class MyApplication extends Application {
 				ChatMsgEntity msg = lt.get(0);
 				RecentChatEntity entity = new RecentChatEntity(u.getId(),
 						u.getImg(), 0, u.getName(), msg.getDate(),
-						msg.getMessage(), u.getIsCrowd());
+						msg.getMessage(), u.getIsCrowd() , msg.getmsgtype());
 				mRecentList.add(entity);
 			}
 			if (messageDB.GetMsgReadSta(u.getId()))
@@ -405,7 +405,7 @@ public class MyApplication extends Application {
 			// 下面是添加到最近会话列表的处理，在按发送键之后
 			RecentChatEntity entity1 = new RecentChatEntity(user.getId(),
 					user.getImg(), 0, user.getName(), MyDate.getDate(),
-					contString, user.getIsCrowd());
+					contString, user.getIsCrowd(),entity.getmsgtype());
 			getmRecentList().remove(entity1);
 			getmRecentList().addFirst(entity1);
 			getmRecentAdapter().notifyDataSetChanged();

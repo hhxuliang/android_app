@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.kids.util.ExpressionUtil;
 import com.way.chat.activity.R;
 import com.way.chat.common.bean.User;
 
@@ -83,7 +85,23 @@ public class RecentChatAdapter extends BaseAdapter {
 		holder.name.setTextColor(Color.BLACK);
 		holder.date.setText(entity.getTime());
 		holder.date.setTextColor(Color.BLACK);
-		holder.msg.setText(entity.getMsg());
+		
+		String str = entity.getMsg(); // æ¶ˆæ�¯å…·ä½“å†…å®¹
+		String zhengze = "f0[0-9]{2}|f10[0-7]"; // æ­£åˆ™è¡¨è¾¾å¼�ï¼Œç”¨æ�¥åˆ¤æ–­æ¶ˆæ�¯å†…æ˜¯å�¦æœ‰è¡¨æƒ…
+		try {
+			SpannableString spannableString = ExpressionUtil
+					.getExpressionString(context, str, zhengze);
+			holder.msg.setText(spannableString);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (entity.getMsgtype()==1)
+			holder.msg.setText("[图片]");
+		if (entity.getMsgtype()==2)
+			holder.msg.setText("[语音]");
+		
 		holder.msg.setTextColor(Color.BLACK);
 		if (entity.getCount() > 0) {
 			holder.count.setText(entity.getCount() + "");
