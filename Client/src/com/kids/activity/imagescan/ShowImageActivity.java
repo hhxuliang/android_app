@@ -166,6 +166,7 @@ public class ShowImageActivity extends MyActivity implements
 		UploadUtil uploadUtil = UploadUtil.getInstance();
 
 		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
+		uploadUtil.shutdownAllThread();
 		super.onBackPressed();
 		
 	}

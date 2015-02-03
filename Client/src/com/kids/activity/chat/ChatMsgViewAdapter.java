@@ -55,6 +55,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		int IMVT_COM_MSG = 0;// 收到对方的消息
 		int IMVT_TO_MSG = 1;// 自己发送出去的消息
 	}
+
 	private Point mPoint = new Point(0, 0);// 用来封装ImageView的宽和高的对象
 	private Context mContext = null;
 	private static final int ITEMCOUNT = 2;// 消息类型的总数
@@ -63,7 +64,9 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 	private User user = null;
 	private ListView mlistView;
 	private MediaPlayer mMediaPlayer = new MediaPlayer();
-	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll, User u,ListView list) {
+
+	public ChatMsgViewAdapter(Context context, List<ChatMsgEntity> coll,
+			User u, ListView list) {
 		this.coll = coll;
 		mInflater = LayoutInflater.from(context);
 		mContext = context;
@@ -95,7 +98,6 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			return IMsgViewType.IMVT_TO_MSG;
 		}
 	}
-
 
 	/**
 	 * Item类型的总数
@@ -133,6 +135,8 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			viewHolder.isComMsg = isComMsg;
 			viewHolder.tvReflesh = (ImageView) convertView
 					.findViewById(R.id.imageView_reflesh);
+			viewHolder.tvVideo = (ImageView) convertView
+					.findViewById(R.id.ItemImage_video);
 
 			convertView.setTag(viewHolder);
 		} else {
@@ -141,6 +145,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		viewHolder.tvSendTime.setText(entity.getDate());
 		viewHolder.tvUserName.setText(entity.getName());
 		viewHolder.tvReflesh.setVisibility(View.GONE);
+		viewHolder.tvVideo.setVisibility(View.GONE);
 		// 用来监听ImageView的宽和高
 		viewHolder.tvPicture.setOnMeasureListener(new OnMeasureListener() {
 
@@ -208,6 +213,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 					else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
 						bitmap = ThumbnailUtils.createVideoThumbnail(path,
 								Thumbnails.MINI_KIND);
+						viewHolder.tvVideo.setVisibility(View.VISIBLE);
 					}
 				}
 				if (bitmap != null) {
@@ -301,8 +307,10 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		public MyImageView tvPicture;
 		public ImageView icon;
 		public ImageView tvReflesh;
+		public ImageView tvVideo;
 		public boolean isComMsg = true;
 	}
+
 	/**
 	 * @Description
 	 * @param name

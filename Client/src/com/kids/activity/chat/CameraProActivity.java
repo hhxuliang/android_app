@@ -324,6 +324,10 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 	@Override
 	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
+		UploadUtil uploadUtil = UploadUtil.getInstance();
+
+		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
+		uploadUtil.shutdownAllThread();
 		finish();// 再结束自己
 	}
 

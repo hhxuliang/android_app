@@ -74,7 +74,9 @@ public class ChildAdapter extends BaseAdapter {
 					.findViewById(R.id.child_image);
 			viewHolder.mCheckBox = (CheckBox) convertView
 					.findViewById(R.id.child_checkbox);
-
+			viewHolder.tvVideo= (ImageView) convertView
+					.findViewById(R.id.ItemImage_video);
+			viewHolder.tvVideo.setVisibility(View.GONE);
 			// 用来监听ImageView的宽和高
 			viewHolder.mImageView.setOnMeasureListener(new OnMeasureListener() {
 
@@ -127,6 +129,7 @@ public class ChildAdapter extends BaseAdapter {
 		} else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
 			bitmap = ThumbnailUtils.createVideoThumbnail(path,
 					Thumbnails.MINI_KIND);
+			viewHolder.tvVideo.setVisibility(View.GONE);
 		}
 		if (bitmap != null) {
 			viewHolder.mImageView.setImageBitmap(bitmap);
@@ -178,6 +181,7 @@ public class ChildAdapter extends BaseAdapter {
 	public static class ViewHolder {
 		public MyImageView mImageView;
 		public CheckBox mCheckBox;
+		public ImageView tvVideo;
 	}
 
 }

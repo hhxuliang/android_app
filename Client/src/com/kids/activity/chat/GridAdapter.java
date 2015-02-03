@@ -3,6 +3,7 @@ package com.kids.activity.chat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.kids.util.ImageProcess;
 import com.kids.util.ZoomImageView;
 import com.way.chat.activity.R;
 
@@ -53,7 +54,8 @@ public class GridAdapter extends BaseAdapter {
 			// construct an item tag
 			viewTag = new ItemViewTag(
 					(ImageView) convertView.findViewById(R.id.ItemImage),
-					(TextView) convertView.findViewById(R.id.ItemText));
+					(TextView) convertView.findViewById(R.id.ItemText),
+					(ImageView) convertView.findViewById(R.id.ItemImage_video));
 			convertView.setTag(viewTag);
 		} else {
 			viewTag = (ItemViewTag) convertView.getTag();
@@ -70,7 +72,8 @@ public class GridAdapter extends BaseAdapter {
 			((ImageView) convertView.findViewById(R.id.ItemImage_del))
 					.setVisibility(View.GONE);
 		} else {
-			viewTag.mIcon.setContentDescription((String) mDataList.get(position).get("ItemActualPath"));
+			viewTag.mIcon.setContentDescription((String) mDataList
+					.get(position).get("ItemActualPath"));
 			ImageView iv = (ImageView) convertView
 					.findViewById(R.id.ItemImage_del);
 			iv.setVisibility(View.VISIBLE);
@@ -83,6 +86,13 @@ public class GridAdapter extends BaseAdapter {
 					mAdapterThis.notifyDataSetChanged();
 				}
 			});
+			String path = (String) mDataList.get(position)
+					.get("ItemActualPath");
+			if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
+				viewTag.ItemImage_video.setVisibility(View.VISIBLE);
+				
+			} else
+				viewTag.ItemImage_video.setVisibility(View.GONE);
 		}
 		return convertView;
 	}
@@ -90,6 +100,7 @@ public class GridAdapter extends BaseAdapter {
 	class ItemViewTag {
 		protected ImageView mIcon;
 		protected TextView mName;
+		protected ImageView ItemImage_video;
 
 		/**
 		 * The constructor to construct a navigation view tag
@@ -101,9 +112,10 @@ public class GridAdapter extends BaseAdapter {
 		 * @param icon
 		 *            the icon view of the item
 		 */
-		public ItemViewTag(ImageView icon, TextView name) {
+		public ItemViewTag(ImageView icon, TextView name, ImageView v) {
 			this.mName = name;
 			this.mIcon = icon;
+			this.ItemImage_video = v;
 		}
 	}
 

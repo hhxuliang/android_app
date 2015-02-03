@@ -154,10 +154,10 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 				toUploadFile();
 				break;
 			case UPLOAD_INIT_PROCESS:
-				progressBar.setMax(msg.arg1);
+				//progressBar.setMax(msg.arg1);
 				break;
 			case UPLOAD_IN_PROCESS:
-				progressBar.setProgress(msg.arg1);
+				//progressBar.setProgress(msg.arg1);
 				break;
 			case UPLOAD_FILE_DONE:
 				if (msg.arg1 == UploadUtil.UPLOAD_SUCCESS_CODE) {
@@ -739,6 +739,10 @@ private void updateDisplay(double signalEMA) {
 		super.onDestroy();
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
+		UploadUtil uploadUtil = UploadUtil.getInstance();
+
+		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
+		uploadUtil.shutdownAllThread();
 	}
 
 	@Override

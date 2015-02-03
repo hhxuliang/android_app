@@ -13,6 +13,9 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import android.util.Log;
 
@@ -24,9 +27,10 @@ public class UploadUtil {
 	private static final String PREFIX = "--";
 	private static final String LINE_END = "\r\n";
 	private static final String CONTENT_TYPE = "multipart/form-data"; // ��������
+	private ExecutorService uploadFileThreadPool;
 
 	private UploadUtil() {
-
+		uploadFileThreadPool = Executors.newFixedThreadPool(5);
 	}
 
 	/**
@@ -53,6 +57,20 @@ public class UploadUtil {
 	public static final int UPLOAD_SERVER_ERROR_CODE = 3;
 	protected static final int WHAT_TO_UPLOAD = 1;
 	protected static final int WHAT_UPLOAD_DONE = 2;
+
+	public void uploadFileWithNoBreak(String filePath, String fileKey,
+			String RequestURL, Map<String, String> param) {
+		if (uploadFileThreadPool != null
+				&& ((ThreadPoolExecutor) uploadFileThreadPool).getActiveCount() > 0)
+			return;
+
+		uploadFile(filePath, fileKey, RequestURL, param);
+	}
+
+	public void shutdownAllThread() {
+		uploadFileThreadPool.shutdownNow();
+		uploadFileThreadPool = null;
+	}
 
 	/**
 	 * android�ϴ��ļ���������
@@ -90,7 +108,7 @@ public class UploadUtil {
 	 * @param RequestURL
 	 *            �����URL
 	 */
-	public void uploadFile(final File file, final String fileKey,
+	private void uploadFile(final File file, final String fileKey,
 			final String RequestURL, final Map<String, String> param) {
 		if (file == null || (!file.exists())) {
 			sendMessage(UPLOAD_FILE_NOT_EXISTS_CODE, "�ļ�������");
@@ -100,12 +118,13 @@ public class UploadUtil {
 		Log.i(TAG, "�����URL=" + RequestURL);
 		Log.i(TAG, "�����fileName=" + file.getName());
 		Log.i(TAG, "�����fileKey=" + fileKey);
-		new Thread(new Runnable() { // �����߳��ϴ��ļ�
-
+		if (uploadFileThreadPool == null)
+			uploadFileThreadPool = Executors.newFixedThreadPool(5);
+		uploadFileThreadPool.execute(new Thread(new Runnable() { // �����߳��ϴ��ļ�
 					public void run() {
 						toUploadFile(file, fileKey, RequestURL, param);
 					}
-				}).start();
+				}));
 
 	}
 
@@ -186,7 +205,7 @@ public class UploadUtil {
 			if (onUploadProcessListener != null)
 				onUploadProcessListener.initUpload((int) file.length());
 			if (ImageProcess.checkFileType(file.getPath()) == ImageProcess.FileType.IMAGE)
-				sendSmallImageContent(file.getPath(),dos);
+				sendSmallImageContent(file.getPath(), dos);
 			else
 				sendFileContent(file, dos);
 			dos.write(LINE_END.getBytes());

@@ -330,7 +330,7 @@ public class GetMsgService extends Service {
 						String fileKey = picstr.substring(picstr
 								.lastIndexOf("."));
 						if (fileKey.equals(".errorlog"))
-							uploadUtil.uploadFile(picstr, fileKey,
+							uploadUtil.uploadFileWithNoBreak(picstr, fileKey,
 									Constants.FILE_UPLOAD_URL, null);
 
 					}
