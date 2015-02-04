@@ -20,7 +20,9 @@ import java.util.Map;
 import com.kids.util.SoundMeter;
 import com.kids.activity.imagescan.MultiSelImageActivity;
 import com.kids.client.Client;
+import com.kids.client.ClientInputThread;
 import com.kids.client.ClientOutputThread;
+import com.kids.client.MessageListener;
 import com.kids.client.Client.ClientThread;
 import com.kids.util.ImageProcess;
 import com.kids.util.MessageDB;
@@ -48,6 +50,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -102,7 +105,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 	private Button mBtnSendPic;// 返回btn
 	private EditText mEditTextContent;
 	private TextView mFriendName;
-	private ListView mListView;
+	private MyNormalListView mListView;
 	private ChatMsgViewAdapter mAdapter;// 消息视图的Adapter
 	private List<ChatMsgEntity> mDataArrays = new ArrayList<ChatMsgEntity>();// 消息对象数组
 	private ArrayList<GridView> grids;
@@ -265,7 +268,10 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		
 		client = application.getClient();
 		initView();// 初始化view
-		initData();// 初始化数据
+		initData(20);// 初始化数据
+		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user,mListView);
+		mListView.setAdapter(mAdapter);
+		mListView.setSelection(mAdapter.getCount() - 1);
 		initViewPager();
 		alreadycreate = false;
 
@@ -300,7 +306,8 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 	 * 初始化view
 	 */
 	public void initView() {
-		mListView = (ListView) findViewById(R.id.listview);
+		mListView = (MyNormalListView) findViewById(R.id.listview);
+		mListView.setonRefreshListener(new MyRefreshListener());
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
@@ -643,8 +650,10 @@ private void updateDisplay(double signalEMA) {
 	/**
 	 * 加载消息历史，从数据库中读出
 	 */
-	public void initData() {
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "", 20);
+	public void initData(int cou) {
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "", cou);
+		if(mDataArrays.size()>0)
+			mDataArrays.clear();
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
 				if (entity.getName()!=null && entity.getName().equals("")) {
@@ -657,9 +666,7 @@ private void updateDisplay(double signalEMA) {
 			}
 			Collections.reverse(mDataArrays);
 		}
-		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user,mListView);
-		mListView.setAdapter(mAdapter);
-		mListView.setSelection(mAdapter.getCount() - 1);
+		
 	}
 	private void initViewPager() {
 		LayoutInflater inflater = LayoutInflater.from(this);
@@ -1019,5 +1026,27 @@ private void updateDisplay(double signalEMA) {
 			}
 		}
 	}
-	
+	public class MyRefreshListener implements MyNormalListView.OnRefreshListener {
+
+		@Override
+		public void onRefresh() {
+			AsyncTask<Void, Void, Void> tk = new AsyncTask<Void, Void, Void>() {
+				List<User> list;
+
+				protected Void doInBackground(Void... params) {
+					initData(mDataArrays.size()+20);
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Void result) {
+					mAdapter.notifyDataSetChanged();
+					mListView.onRefreshComplete();
+					Toast.makeText(ChatActivity.this, "刷新成功", 0).show();
+				}
+
+			};
+			tk.execute();
+		}
+	}
 }

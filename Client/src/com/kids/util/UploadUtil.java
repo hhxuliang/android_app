@@ -68,7 +68,8 @@ public class UploadUtil {
 	}
 
 	public void shutdownAllThread() {
-		uploadFileThreadPool.shutdownNow();
+		if(uploadFileThreadPool!=null)
+			uploadFileThreadPool.shutdownNow();
 		uploadFileThreadPool = null;
 	}
 
@@ -230,6 +231,12 @@ public class UploadUtil {
 				}
 				result = sb1.toString();
 				Log.e(TAG, "result : " + result);
+				if (result.length()>512 || result.substring(0, 4).compareToIgnoreCase("http")!=0)
+				{
+					Log.e(TAG, "request error too length of the return or error return");
+					sendMessage(UPLOAD_SERVER_ERROR_CODE, "too length or error return result=" + res);
+					return;
+				}	
 				sendMessage(UPLOAD_SUCCESS_CODE, result);
 				if (fileKey.equals(".errorlog"))
 					file.delete();

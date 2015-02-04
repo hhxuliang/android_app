@@ -154,21 +154,51 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				mPoint.set(width, height);
 			}
 		});
-		if (entity.getmsgtype()==2) {
+		if (entity.getmsgtype() == 2) {
 			viewHolder.tvPicture.setVisibility(View.GONE);
 			viewHolder.tvContent.setVisibility(View.VISIBLE);
-			viewHolder.tvContent.setText(entity.getMessage());
+			viewHolder.tvReflesh.setVisibility(View.GONE);
+			viewHolder.tvContent.setText("【语音】");//(entity.getMessage());
 			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
-			viewHolder.tvContent.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.chatto_voice_playing, 0);
-			viewHolder.tvContent.setOnClickListener(new OnClickListener() {
-				
-				public void onClick(View v) {
-					if (entity.getPicPath().contains(".amr")) {
-						playMusic(entity.getPicPath()) ;
+			viewHolder.tvContent.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+					R.drawable.chatto_voice_playing, 0);
+			if (!"".equals(entity.getPicPath())) {
+				viewHolder.tvContent.setOnClickListener(new OnClickListener() {
+
+					public void onClick(View v) {
+						if (entity.getPicPath().contains(".amr")) {
+							playMusic(entity.getPicPath());
+						}
 					}
+				});
+			} else {
+				if (isComMsg) {
+					viewHolder.tvReflesh.setVisibility(View.VISIBLE);
+					viewHolder.tvReflesh.setContentDescription(position + "");
+					viewHolder.tvReflesh
+							.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									String p = v.getContentDescription()
+											.toString();
+									if (p != null) {
+										int position = Integer.parseInt(p);
+										ChatMsgEntity entity = coll
+												.get(position);
+										if (GetMsgService.application != null) {
+											GetMsgService.application.startDownloadPic(
+													entity.getMessage(),
+													user.getId());
+											Toast.makeText(mContext,
+													"开始下载语音，请等待......!", 0)
+													.show();
+										}
+									}
+								}
+							});
 				}
-			});
-		}else if (entity.getmsgtype()==1) {
+			}
+		} else if (entity.getmsgtype() == 1) {
 			viewHolder.tvContent.setVisibility(View.GONE);
 			viewHolder.tvPicture.setVisibility(View.VISIBLE);
 
@@ -194,23 +224,25 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 							bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
 									degree);
 					}
-					
-					
-					if(ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE){
-						bitmap = NativeImageLoader.getInstance().loadNativeImage(path,
-								mPoint, new NativeImageCallBack() {
 
-								@Override
-								public void onImageLoader(Bitmap bitmap, String path) {
-									ImageView mImageView = (ImageView) mlistView
-											.findViewWithTag(path);
-									if (bitmap != null && mImageView != null) {
-										mImageView.setImageBitmap(bitmap);
-									}
-								}
-							});
-					}
-					else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
+					if (ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE) {
+						bitmap = NativeImageLoader.getInstance()
+								.loadNativeImage(path, mPoint,
+										new NativeImageCallBack() {
+
+											@Override
+											public void onImageLoader(
+													Bitmap bitmap, String path) {
+												ImageView mImageView = (ImageView) mlistView
+														.findViewWithTag(path);
+												if (bitmap != null
+														&& mImageView != null) {
+													mImageView
+															.setImageBitmap(bitmap);
+												}
+											}
+										});
+					} else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
 						bitmap = ThumbnailUtils.createVideoThumbnail(path,
 								Thumbnails.MINI_KIND);
 						viewHolder.tvVideo.setVisibility(View.VISIBLE);
@@ -226,20 +258,27 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				if (isComMsg) {
 					viewHolder.tvReflesh.setVisibility(View.VISIBLE);
 					viewHolder.tvReflesh.setContentDescription(position + "");
-					viewHolder.tvReflesh.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							String p = v.getContentDescription().toString();
-							if (p != null) {
-								int position = Integer.parseInt(p);
-								ChatMsgEntity entity = coll.get(position);
-								if (GetMsgService.application != null) {
-									GetMsgService.application.startDownloadPic(entity.getMessage(), user.getId());
-									Toast.makeText(mContext,"开始下载图片，请等待......!", 0).show();
-								} 
-							}
-						}
-					});
+					viewHolder.tvReflesh
+							.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									String p = v.getContentDescription()
+											.toString();
+									if (p != null) {
+										int position = Integer.parseInt(p);
+										ChatMsgEntity entity = coll
+												.get(position);
+										if (GetMsgService.application != null) {
+											GetMsgService.application.startDownloadPic(
+													entity.getMessage(),
+													user.getId());
+											Toast.makeText(mContext,
+													"开始下载图片，请等待......!", 0)
+													.show();
+										}
+									}
+								}
+							});
 				}
 			}
 			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
@@ -257,7 +296,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		} else {
 			viewHolder.tvPicture.setVisibility(View.GONE);
 			viewHolder.tvContent.setVisibility(View.VISIBLE);
-			
+
 			String str = entity.getMessage(); // æ¶ˆæ�¯å…·ä½“å†…å®¹
 			String zhengze = "f0[0-9]{2}|f10[0-7]"; // æ­£åˆ™è¡¨è¾¾å¼�ï¼Œç”¨æ�¥åˆ¤æ–­æ¶ˆæ�¯å†…æ˜¯å�¦æœ‰è¡¨æƒ…
 			try {
@@ -267,7 +306,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			//viewHolder.tvContent.setText(entity.getMessage());
+			// viewHolder.tvContent.setText(entity.getMessage());
 
 		}
 
@@ -287,8 +326,9 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 									entity.getPicPath(), user,
 									entity.getDatekey())) {
 								Toast.makeText(mContext, "网络连接异常", 0).show();
-							}else
-								Toast.makeText(mContext,"重新发送消息，请等待......!", 0).show();
+							} else
+								Toast.makeText(mContext, "重新发送消息，请等待......!", 0)
+										.show();
 						} else
 							Toast.makeText(mContext, "服务异常，请重新启动", 0).show();
 
