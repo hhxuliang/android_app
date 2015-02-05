@@ -744,6 +744,15 @@ private void updateDisplay(double signalEMA) {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
+	}
+	@Override
+	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
+		onbackclick();
+		finish();// 再结束自己
+	}
+	private void onbackclick()
+	{
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
 		UploadUtil uploadUtil = UploadUtil.getInstance();
@@ -751,7 +760,6 @@ private void updateDisplay(double signalEMA) {
 		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
 		uploadUtil.shutdownAllThread();
 	}
-
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -807,6 +815,7 @@ private void updateDisplay(double signalEMA) {
 							}).setNegativeButton("取消", null).show();
 			break;
 		case R.id.chat_back:// 返回按钮点击事件
+			onbackclick();
 			finish();// 结束,实际开发中，可以返回主界面
 			break;
 		case R.id.chatting_biaoqing_btn:

@@ -178,18 +178,18 @@ public class NativeImageLoader {
 	private int computeScale(BitmapFactory.Options options, int viewWidth,
 			int viewHeight) {
 		int inSampleSize = 1;
-		if (viewWidth == 0 || viewWidth == 0) {
+		if (viewWidth == 0 || viewHeight == 0) {
 			return inSampleSize;
 		}
 		int bitmapWidth = options.outWidth;
 		int bitmapHeight = options.outHeight;
 
 		// 假如Bitmap的宽度或高度大于我们设定图片的View的宽高，则计算缩放比例
-		if (bitmapWidth > viewWidth || bitmapHeight > viewWidth) {
+		if (bitmapWidth > viewWidth || bitmapHeight > viewHeight) {
 			int widthScale = Math
 					.round((float) bitmapWidth / (float) viewWidth);
 			int heightScale = Math.round((float) bitmapHeight
-					/ (float) viewWidth);
+					/ (float) viewHeight);
 
 			// 为了保证图片不缩放变形，我们取宽高比例最小的那个
 			inSampleSize = widthScale > heightScale ? widthScale : heightScale;

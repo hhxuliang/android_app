@@ -151,7 +151,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 
 			@Override
 			public void onMeasureSize(int width, int height) {
-				mPoint.set(width, height);
+				mPoint.set(100, 100);
 			}
 		});
 		if (entity.getmsgtype() == 2) {
@@ -172,6 +172,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 					}
 				});
 			} else {
+				viewHolder.tvContent.setOnClickListener(null);
 				if (isComMsg) {
 					viewHolder.tvReflesh.setVisibility(View.VISIBLE);
 					viewHolder.tvReflesh.setContentDescription(position + "");
