@@ -14,6 +14,7 @@ import com.kids.client.Client;
 import com.kids.client.ClientOutputThread;
 import com.kids.client.DownloadFile;
 import com.kids.util.MessageDB;
+import com.way.chat.activity.R;
 import com.way.chat.common.util.MyDate;
 import com.kids.util.ImageProcess;
 import com.kids.util.SharePreferenceUtil;
@@ -55,7 +56,9 @@ public class MyApplication extends Application {
 	public static final int DOWNLOADPIC_OK = 1;
 	public static final int DOWNLOADPIC_FAULT = 2;
 	private HashMap<String, Integer> mMap_Waiting_Download_Pic = new HashMap<String, Integer>();
-
+	public static int[] imgs = { R.drawable.p0, R.drawable.p1, R.drawable.p2,
+			R.drawable.p3, R.drawable.p4, R.drawable.p5, R.drawable.p6,
+			R.drawable.p7, R.drawable.p8, R.drawable.p9 };
 	public Handler handler_download_pic = new Handler() {
 		public void handleMessage(Message msg) {
 			HandleMsg hmsg = (HandleMsg) msg.obj;

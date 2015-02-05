@@ -47,9 +47,7 @@ import android.widget.Toast;
  * @author way
  */
 public class ChatMsgViewAdapter extends BaseAdapter {
-	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
-			R.drawable.f3, R.drawable.f4, R.drawable.f5, R.drawable.f6,
-			R.drawable.f7, R.drawable.f8, R.drawable.f9 };
+	
 
 	public static interface IMsgViewType {
 		int IMVT_COM_MSG = 0;// 收到对方的消息
@@ -154,11 +152,13 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				mPoint.set(100, 100);
 			}
 		});
+		viewHolder.tvContent
+				.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 		if (entity.getmsgtype() == 2) {
 			viewHolder.tvPicture.setVisibility(View.GONE);
 			viewHolder.tvContent.setVisibility(View.VISIBLE);
 			viewHolder.tvReflesh.setVisibility(View.GONE);
-			viewHolder.tvContent.setText("【语音】");//(entity.getMessage());
+			viewHolder.tvContent.setText("【语音】");// (entity.getMessage());
 			viewHolder.tvPicture.setContentDescription(entity.getPicPath());
 			viewHolder.tvContent.setCompoundDrawablesWithIntrinsicBounds(0, 0,
 					R.drawable.chatto_voice_playing, 0);
@@ -337,7 +337,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				}
 			});
 		}
-		viewHolder.icon.setImageResource(imgs[entity.getImg()]);
+		viewHolder.icon.setImageResource(MyApplication.imgs[entity.getImg()]);
 		return convertView;
 	}
 

@@ -102,9 +102,6 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 	private List<User> list;
 	private MenuInflater mi;// 菜单
 	private MyApplication application;
-	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
-			R.drawable.f3, R.drawable.f4, R.drawable.f5, R.drawable.f6,
-			R.drawable.f7, R.drawable.f8, R.drawable.f9 };// 头像资源
 	private HashMap<String, List<String>> mGruopMap = new HashMap<String, List<String>>();
 	private List<ImageBean> list_img = new ArrayList<ImageBean>();
 	private final static int SCAN_OK = 1;
@@ -255,7 +252,7 @@ public class FriendListActivity extends MyActivity implements OnClickListener {
 		cursor = (ImageView) findViewById(R.id.tab2_bg);
 
 		if (list != null && list.size() > 0) {
-			myHeadImage.setImageResource(imgs[list.get(0).getImg()]);
+			myHeadImage.setImageResource(MyApplication.imgs[list.get(0).getImg()]);
 			myName.setText(list.get(0).getName());
 		}
 		layout_body_activity.setFocusable(true);

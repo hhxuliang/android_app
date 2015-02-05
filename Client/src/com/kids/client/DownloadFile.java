@@ -61,6 +61,8 @@ public class DownloadFile extends Thread {
 				mUrl = hm.mUrl;
 				mUid = hm.mComefromUid;
 				try {
+					Thread.sleep(300);// so urgly for the sleep 300 because voice file is so small that download faster then the message coming,
+										// this will cause message in chat not be update.
 					URL url = new URL(mUrl);
 					HttpURLConnection con = (HttpURLConnection) url
 							.openConnection();

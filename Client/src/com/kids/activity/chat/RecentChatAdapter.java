@@ -24,9 +24,7 @@ public class RecentChatAdapter extends BaseAdapter {
 	private LinkedList<RecentChatEntity> list;
 	private MyApplication application;
 	private LayoutInflater inflater;
-	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
-			R.drawable.f3, R.drawable.f4, R.drawable.f5, R.drawable.f6,
-			R.drawable.f7, R.drawable.f8, R.drawable.f9 };
+	
 
 	public RecentChatAdapter(Context context, LinkedList<RecentChatEntity> list) {
 		// TODO Auto-generated constructor stub
@@ -80,7 +78,7 @@ public class RecentChatAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 		final RecentChatEntity entity = list.get(position);
-		holder.icon.setImageResource(imgs[entity.getImg()]);
+		holder.icon.setImageResource(MyApplication.imgs[entity.getImg()]);
 		holder.name.setText(entity.getName());
 		holder.name.setTextColor(Color.BLACK);
 		holder.date.setText(entity.getTime());

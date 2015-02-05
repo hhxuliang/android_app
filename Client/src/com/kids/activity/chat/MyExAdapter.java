@@ -26,9 +26,7 @@ import com.way.chat.common.bean.User;
  * 
  */
 public class MyExAdapter extends BaseExpandableListAdapter {
-	private int[] imgs = { R.drawable.icon, R.drawable.f1, R.drawable.f2,
-			R.drawable.f3, R.drawable.f4, R.drawable.f5, R.drawable.f6,
-			R.drawable.f7, R.drawable.f8, R.drawable.f9 };// 头像资源数组
+	
 	private int[] imgs_more = { R.drawable.page_indicator_focused};// 头像资源数组
 	private Context context;
 	private List<GroupFriend> group;// 传递过来的经过处理的总数据
@@ -109,7 +107,7 @@ public class MyExAdapter extends BaseExpandableListAdapter {
 				
 		title.setText(name);// 大标题
 		title2.setText(id);// 小标题
-		icon.setImageResource(imgs[img]);
+		icon.setImageResource(MyApplication.imgs[img]);
 		icon_more.setVisibility(View.INVISIBLE );
 		if(application.getNotReadmsslist() !=null)
 		{
