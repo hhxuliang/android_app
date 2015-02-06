@@ -147,8 +147,7 @@ public class GetMsgService extends Service {
 					Intent intent = new Intent(mContext, MyMainActivity.class);
 					PendingIntent contentIntent = PendingIntent.getActivity(
 							mContext, 0, intent, 0);
-					mNotification.setLatestEventInfo(mContext, util.getName()
-							+ " (" + newMsgNum + "条新消息)", content,
+					mNotification.setLatestEventInfo(mContext, "你有" + newMsgNum + "条新消息", content,
 							contentIntent);
 				}
 				mNotificationManager.notify(Constants.NOTIFY_ID, mNotification);// 通知一下才会生效哦

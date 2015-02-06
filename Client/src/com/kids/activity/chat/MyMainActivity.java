@@ -65,7 +65,7 @@ public class MyMainActivity extends MyActivity {
 				Intent i = new Intent(MyMainActivity.this,
 						WebActivity.class);
 				i.putExtra("title", "幼儿生活");
-				i.putExtra("url", "http://115.159.71.239:8080/QQServer/introduce.html");
+				i.putExtra("url", "http://115.159.71.239:8080/Server/introduce.html");
 				startActivity(i);
 			}
 		});

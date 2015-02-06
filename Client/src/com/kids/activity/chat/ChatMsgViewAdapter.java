@@ -54,7 +54,6 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		int IMVT_TO_MSG = 1;// 自己发送出去的消息
 	}
 
-	private Point mPoint = new Point(0, 0);// 用来封装ImageView的宽和高的对象
 	private Context mContext = null;
 	private static final int ITEMCOUNT = 2;// 消息类型的总数
 	private List<ChatMsgEntity> coll;// 消息对象数组
@@ -144,14 +143,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		viewHolder.tvUserName.setText(entity.getName());
 		viewHolder.tvReflesh.setVisibility(View.GONE);
 		viewHolder.tvVideo.setVisibility(View.GONE);
-		// 用来监听ImageView的宽和高
-		viewHolder.tvPicture.setOnMeasureListener(new OnMeasureListener() {
-
-			@Override
-			public void onMeasureSize(int width, int height) {
-				mPoint.set(100, 100);
-			}
-		});
+		
 		viewHolder.tvContent
 				.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 		if (entity.getmsgtype() == 2) {
@@ -215,20 +207,9 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 					bitmap = ThumbnailUtils.createVideoThumbnail(path,
 							Thumbnails.MINI_KIND);
 				} else {
-					bitmap = ImageProcess.GetBitmapByPath(mContext,
-							entity.getPicPath(), MyApplication.mWindowHeight,
-							MyApplication.mWindowWidth, 0.15);
-					if (bitmap != null) {
-						int degree = ImageProcess.getBitmapDegree(entity
-								.getPicPath());
-						if (degree != 0)
-							bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
-									degree);
-					}
-
 					if (ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE) {
 						bitmap = NativeImageLoader.getInstance()
-								.loadNativeImage(path, mPoint,
+								.loadNativeImage(path, new Point(100, 100),
 										new NativeImageCallBack() {
 
 											@Override
