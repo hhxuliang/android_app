@@ -77,10 +77,10 @@ public class DownloadFile extends Thread {
 					}
 					else if(ImageProcess.FileType.APK==ImageProcess.checkFileType(mUrl))
 						savePath = application.getDownloadPicPath() + "/../../" + mUid
-						+ "_kids_" + MyDate.getDateMillis() + prefix;
+						+ "_kids_" + System.currentTimeMillis() + prefix;
 					else
 						savePath = application.getDownloadPicPath() + "/" + mUid
-							+ "_kids_" + MyDate.getDateMillis() + prefix;
+							+ "_kids_" + System.currentTimeMillis() + prefix;
 					if (con.getResponseCode() == 200) {
 						InputStream is = con.getInputStream();
 

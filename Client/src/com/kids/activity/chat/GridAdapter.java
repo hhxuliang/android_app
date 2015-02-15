@@ -3,12 +3,15 @@ package com.kids.activity.chat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.kids.activity.imagescan.NativeImageLoader;
+import com.kids.activity.imagescan.NativeImageLoader.NativeImageCallBack;
 import com.kids.util.ImageProcess;
 import com.kids.util.ZoomImageView;
 import com.way.chat.activity.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,12 +29,15 @@ public class GridAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private Context mContext;
 	private GridAdapter mAdapterThis;
+	private GridView mgridview;
 
-	public GridAdapter(Context context, ArrayList<HashMap<String, Object>> data) {
+	public GridAdapter(Context context,
+			ArrayList<HashMap<String, Object>> data, GridView gridview) {
 		mDataList = data;
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
 		mAdapterThis = this;
+		mgridview = gridview;
 	}
 
 	public int getCount() {
@@ -65,8 +72,30 @@ public class GridAdapter extends BaseAdapter {
 		viewTag.mName.setText((String) mDataList.get(position).get("ItemText"));
 
 		// set icon
-		viewTag.mIcon.setImageBitmap((Bitmap) mDataList.get(position).get(
-				"ItemImage"));
+		String pa = (String) mDataList.get(position).get("ItemActualPath");
+		if (true ||pa.equals("") || ImageProcess.checkFileType(pa) != ImageProcess.FileType.IMAGE) {
+			viewTag.mIcon.setImageBitmap((Bitmap) mDataList.get(position).get(
+					"ItemImage"));
+		} else {
+
+			viewTag.mIcon.setTag(pa);
+			NativeImageLoader.getInstance(true).removepic(pa);
+			Bitmap bitmap = NativeImageLoader.getInstance(true)
+					.loadNativeImage(pa, new Point(200, 200),
+							new NativeImageCallBack() {
+
+								@Override
+								public void onImageLoader(Bitmap bitmap,
+										String path) {
+									ImageView mImageView = (ImageView) mgridview
+											.findViewWithTag(path);
+									if (bitmap != null && mImageView != null) {
+										mImageView.setImageBitmap(bitmap);
+									}
+								}
+							});
+		}
+		viewTag.ItemImage_video.setVisibility(View.GONE);
 		// viewTag.mIcon.setLayoutParams(params);
 		if (((String) mDataList.get(position).get("ItemPath")).equals("")) {
 			((ImageView) convertView.findViewById(R.id.ItemImage_del))
@@ -90,7 +119,7 @@ public class GridAdapter extends BaseAdapter {
 					.get("ItemActualPath");
 			if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
 				viewTag.ItemImage_video.setVisibility(View.VISIBLE);
-				
+
 			} else
 				viewTag.ItemImage_video.setVisibility(View.GONE);
 		}

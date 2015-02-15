@@ -75,6 +75,7 @@
 	        android:id="@+id/ItemImage_video"
 	        android:layout_width="40dp"
 	        android:layout_height="40dp"
+	        android:layout_toRightOf="@id/tv_chatcontent"
 	        android:gravity="center_horizontal|center_vertical|center"
 	        android:background="@drawable/arrowright" 
 	        android:visibility="gone"/>

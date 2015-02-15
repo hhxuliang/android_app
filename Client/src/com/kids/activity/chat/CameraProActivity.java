@@ -42,6 +42,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -116,6 +117,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	ArrayList<String> ap;
 	ArrayList<String> alp;
 	private Bitmap bitmap_zoom = null;
+	private GridView gridview;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -145,9 +147,9 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	}
 
 	private void initGrid() {
-		GridView gridview = (GridView) findViewById(R.id.GridView_upload_pic);
+		gridview = (GridView) findViewById(R.id.GridView_upload_pic);
 		mGridItemList = new ArrayList<HashMap<String, Object>>();
-		mGridAdapter = new GridAdapter(this, mGridItemList);
+		mGridAdapter = new GridAdapter(this, mGridItemList, gridview);
 
 		// 添加Item到网格中
 		gridview.setAdapter(mGridAdapter);
@@ -202,7 +204,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 					if (picpath != null) {
 						NativeImageLoader.getInstance(false).removepic(picpath);
 						Bitmap bitmap = NativeImageLoader.getInstance(false)
-								.loadNativeImage(picpath, new Point(1000, 1000),
+								.loadNativeImage(picpath,
+										new Point(1000, 1000),
 										new NativeImageCallBack() {
 
 											@Override
@@ -426,7 +429,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 	@Override
 	public void onConfigurationChanged(Configuration config) {
-		super.onConfigurationChanged(config);
+		super.onConfigurationChanged(config);	
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)
