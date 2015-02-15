@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.kids.activity.imagescan.NativeImageLoader;
+import com.kids.activity.imagescan.NativeImageLoader.NativeImageCallBack;
 import com.kids.util.DialogFactory;
 import com.kids.util.ImageProcess;
 import com.way.chat.common.util.MyDate;
@@ -45,6 +47,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -109,10 +112,10 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 	private int total_pic = 0;
 	private int upload_ok_pic = 0;
 	public String selItemIndex;
-	private User user=null;
+	private User user = null;
 	ArrayList<String> ap;
 	ArrayList<String> alp;
-	private Bitmap bitmap_zoom=null;
+	private Bitmap bitmap_zoom = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -131,7 +134,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		picPath = application.getCameraPath() + "/upload";
 		pic_path_save = application.getMyUploadPicPath();
 		// picPath = "/mnt/sdcard/children/camerapicpath/upload";
-		
+
 		ap = new ArrayList<String>();
 		alp = new ArrayList<String>();
 		mContext = this;
@@ -197,22 +200,23 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 					String picpath = image.getContentDescription().toString();
 					if (picpath != null) {
-//						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
-//							bitmap_zoom.recycle();
-//							bitmap_zoom=null;
-//						}
-//						System.gc();
-						bitmap_zoom = ImageProcess.GetBitmapByPath(
-								CameraProActivity.this, picpath,
-								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 0.8);
-						if (bitmap_zoom != null) {
-							int degree = ImageProcess.getBitmapDegree(picpath);
-							if (degree != 0)
-								bitmap_zoom = ImageProcess.rotateBitmapByDegree(
-										bitmap_zoom, degree);
-							ZoomImageView zoom = new ZoomImageView(mContext,
-									bitmap_zoom);
+						NativeImageLoader.getInstance(false).removepic(picpath);
+						Bitmap bitmap = NativeImageLoader.getInstance(false)
+								.loadNativeImage(picpath, new Point(1000, 1000),
+										new NativeImageCallBack() {
+
+											@Override
+											public void onImageLoader(
+													Bitmap bitmap, String path) {
+												ZoomImageView zoom = new ZoomImageView(
+														CameraProActivity.this,
+														bitmap);
+												zoom.showZoomView();
+											}
+										});
+						if (bitmap != null) {
+							ZoomImageView zoom = new ZoomImageView(
+									CameraProActivity.this, bitmap);
 							zoom.showZoomView();
 						}
 					}
@@ -224,8 +228,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 					String picpath = image.getContentDescription().toString();
 					if (picpath != null) {
 						Intent intent = new Intent(Intent.ACTION_VIEW);
-		                intent.setDataAndType(Uri.parse(picpath), "video/mp4");
-		                startActivity(intent);
+						intent.setDataAndType(Uri.parse(picpath), "video/mp4");
+						startActivity(intent);
 					}
 				}
 			}
@@ -410,7 +414,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 									// TODO Auto-generated method stub
 
 									String itemIndex = null;
-									itemIndex = CameraProActivity.this.pic_NO+"";
+									itemIndex = CameraProActivity.this.pic_NO
+											+ "";
 									takePhoto(picPath + itemIndex + ".jpg");
 								}
 							}).setNegativeButton("否", null).create();
@@ -641,7 +646,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		progressDialog.show();
 		String fileKey = "img";
 		UploadUtil uploadUtil = UploadUtil.getInstance();
-		
+
 		uploadUtil.setOnUploadProcessListener(this); // 设置监听器监听上传状态
 
 		Map<String, String> params = new HashMap<String, String>();
@@ -649,7 +654,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 		String picstr = (String) ((HashMap<String, Object>) this.mGridItemList
 				.get(0)).get("ItemActualPath");
 		fileKey = picstr.substring(picstr.lastIndexOf("."));
-		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL, params);
+		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL,
+				params);
 	}
 
 	private Handler handler = new Handler() {
@@ -683,7 +689,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 			if (msg.what == UPLOAD_FILE_DONE
 					&& msg.arg1 == UploadUtil.UPLOAD_SUCCESS_CODE) {
 				if (next == 1) {
-					
+
 					Toast.makeText(getApplicationContext(), "发送完成！", 0).show();
 					finish();
 				} else if (next > 1) {

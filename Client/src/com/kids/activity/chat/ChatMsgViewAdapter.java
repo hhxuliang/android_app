@@ -47,7 +47,6 @@ import android.widget.Toast;
  * @author way
  */
 public class ChatMsgViewAdapter extends BaseAdapter {
-	
 
 	public static interface IMsgViewType {
 		int IMVT_COM_MSG = 0;// 收到对方的消息
@@ -143,7 +142,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		viewHolder.tvUserName.setText(entity.getName());
 		viewHolder.tvReflesh.setVisibility(View.GONE);
 		viewHolder.tvVideo.setVisibility(View.GONE);
-		
+
 		viewHolder.tvContent
 				.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 		if (entity.getmsgtype() == 2) {
@@ -203,38 +202,32 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				Bitmap bitmap = null;
 				// 给ImageView设置路径Tag,这是异步加载图片的小技巧
 				viewHolder.tvPicture.setTag(path);
-				if (prefix.equals(".mp4")) {
+				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
+				if (ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE) {
+					bitmap = NativeImageLoader.getInstance(true).loadNativeImage(
+							path, new Point(100, 100),
+							new NativeImageCallBack() {
+
+								@Override
+								public void onImageLoader(Bitmap bitmap,
+										String path) {
+									ImageView mImageView = (ImageView) mlistView
+											.findViewWithTag(path);
+									if (bitmap != null && mImageView != null) {
+										mImageView.setImageBitmap(bitmap);
+									}
+								}
+							});
+				} else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
 					bitmap = ThumbnailUtils.createVideoThumbnail(path,
 							Thumbnails.MINI_KIND);
-				} else {
-					if (ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE) {
-						bitmap = NativeImageLoader.getInstance()
-								.loadNativeImage(path, new Point(100, 100),
-										new NativeImageCallBack() {
-
-											@Override
-											public void onImageLoader(
-													Bitmap bitmap, String path) {
-												ImageView mImageView = (ImageView) mlistView
-														.findViewWithTag(path);
-												if (bitmap != null
-														&& mImageView != null) {
-													mImageView
-															.setImageBitmap(bitmap);
-												}
-											}
-										});
-					} else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
-						bitmap = ThumbnailUtils.createVideoThumbnail(path,
-								Thumbnails.MINI_KIND);
-						viewHolder.tvVideo.setVisibility(View.VISIBLE);
-					}
+					viewHolder.tvVideo.setVisibility(View.VISIBLE);
 				}
+
 				if (bitmap != null) {
 					viewHolder.tvPicture.setImageBitmap(bitmap);
-				} else
-					viewHolder.tvPicture
-							.setImageResource(R.drawable.waitloadpic);
+				} 
+					
 			} else {
 				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
 				if (isComMsg) {

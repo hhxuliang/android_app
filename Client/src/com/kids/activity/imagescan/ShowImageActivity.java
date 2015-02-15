@@ -17,6 +17,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,9 +37,11 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.kids.activity.chat.CameraProActivity;
+import com.kids.activity.chat.ChatActivity;
 import com.kids.activity.chat.MyActivity;
 import com.kids.activity.chat.MyApplication;
 import com.kids.activity.imagescan.ChildAdapter.ViewHolder;
+import com.kids.activity.imagescan.NativeImageLoader.NativeImageCallBack;
 import com.kids.util.DialogFactory;
 import com.kids.util.ImageProcess;
 import com.kids.util.UploadUtil;
@@ -79,7 +82,8 @@ public class ShowImageActivity extends MyActivity implements
 	private ArrayList<String> alp;
 	private MyApplication application;
 	private User user = null;
-	private Bitmap bitmap_zoom=null;
+	private Bitmap bitmap_zoom = null;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -91,7 +95,7 @@ public class ShowImageActivity extends MyActivity implements
 		progressText.setVisibility(View.GONE);
 		mGridView = (GridView) findViewById(R.id.child_grid);
 		list = getIntent().getStringArrayListExtra("data");
-		
+
 		fun = getIntent().getStringExtra("fun");
 		application = (MyApplication) getApplicationContext();
 
@@ -129,24 +133,26 @@ public class ShowImageActivity extends MyActivity implements
 				if (ImageProcess.checkFileType(picpath) == ImageProcess.FileType.IMAGE) {
 
 					if (picpath != null) {
-//						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
-//							bitmap_zoom.recycle();
-//							bitmap_zoom=null;
-//						}
-//						System.gc();
-						bitmap_zoom = ImageProcess.GetBitmapByPath(
-								ShowImageActivity.this, picpath,
-								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 0.8);
-						if (bitmap_zoom != null) {
-							int degree = ImageProcess.getBitmapDegree(picpath);
-							if (degree != 0)
-								bitmap_zoom = ImageProcess.rotateBitmapByDegree(
-										bitmap_zoom, degree);
+						Bitmap bitmap = NativeImageLoader.getInstance(false)
+								.loadNativeImage(picpath, new Point(1000, 1000),
+										new NativeImageCallBack() {
+
+											@Override
+											public void onImageLoader(
+													Bitmap bitmap, String path) {
+												ZoomImageView zoom = new ZoomImageView(
+														ShowImageActivity.this,
+														bitmap);
+												zoom.showZoomView();
+											}
+										});
+						if (bitmap != null) {
 							ZoomImageView zoom = new ZoomImageView(
-									ShowImageActivity.this, bitmap_zoom);
+									ShowImageActivity.this, bitmap);
 							zoom.showZoomView();
+
 						}
+
 					}
 				} else if (ImageProcess.checkFileType(picpath) == ImageProcess.FileType.VIDEO) {
 
@@ -168,7 +174,7 @@ public class ShowImageActivity extends MyActivity implements
 		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
 		uploadUtil.shutdownAllThread();
 		super.onBackPressed();
-		
+
 	}
 
 	public void doaction() {
@@ -248,7 +254,8 @@ public class ShowImageActivity extends MyActivity implements
 		params.put("orderId", "111");
 		String picstr = (String) pathl.get(0);
 		fileKey = picstr.substring(picstr.lastIndexOf("."));
-		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL, params);
+		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL,
+				params);
 	}
 
 	private Handler handler = new Handler() {
@@ -292,7 +299,7 @@ public class ShowImageActivity extends MyActivity implements
 					progressText.setVisibility(View.GONE);
 					Toast.makeText(getApplicationContext(), "全部发送完成！", 0)
 							.show();
-					//finish();
+					// finish();
 				} else if (next >= 1) {
 					handler.sendEmptyMessage(TO_UPLOAD_FILE);
 				}
@@ -303,28 +310,30 @@ public class ShowImageActivity extends MyActivity implements
 	};
 
 	public int onUploadOK(boolean statu, String url_path) {
-		if(pathl==null || pathl.size()==0)
+		if (pathl == null || pathl.size() == 0)
 			return 0;
 		this.upload_ok_pic++;
 		String picnewstr = (String) pathl.get(0);
 		if (statu) {
-			String uploadmsg = upload_ok_pic + "/" + (this.total_pic );
+			String uploadmsg = upload_ok_pic + "/" + (this.total_pic);
 			progressText.setText(uploadmsg);
 
-			
 			alp.add(picnewstr);
 			ap.add(url_path);
 			if (user != null) {
-				if(application==null)
+				if (application == null)
 					System.out.println("application is null");
-				if (null != application.send(url_path, 1, picnewstr, user)){
-					Toast.makeText(	getApplicationContext(),"成功上传" + picnewstr ,0).show();
-				}else{
-					Toast.makeText(	getApplicationContext(),"上传" + picnewstr + "失败" ,0).show();
+				if (null != application.send(url_path, 1, picnewstr, user)) {
+					Toast.makeText(getApplicationContext(), "成功上传" + picnewstr,
+							0).show();
+				} else {
+					Toast.makeText(getApplicationContext(),
+							"上传" + picnewstr + "失败", 0).show();
 				}
 			}
 		} else {
-			Toast.makeText(	getApplicationContext(),"上传" + picnewstr + "失败" ,0).show();
+			Toast.makeText(getApplicationContext(), "上传" + picnewstr + "失败", 0)
+					.show();
 		}
 		pathl.remove(0);
 		return pathl.size();

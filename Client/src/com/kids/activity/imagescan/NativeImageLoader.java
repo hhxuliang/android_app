@@ -25,23 +25,40 @@ import android.support.v4.util.LruCache;
  */
 public class NativeImageLoader {
 	private LruCache<String, Bitmap> mMemoryCache;
-	private static NativeImageLoader mInstance = new NativeImageLoader();
+	private static NativeImageLoader mInstance_small = new NativeImageLoader(4);
+	private static NativeImageLoader mInstance_big = new NativeImageLoader(6);
 	private ExecutorService mImageThreadPool = Executors.newFixedThreadPool(1);
 
-	private NativeImageLoader() {
+	private NativeImageLoader(int num) {
 		// 获取应用程序的最大内存
-		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+		final int maxMemory =  (int) Runtime.getRuntime().maxMemory();
 
 		// 用最大内存的1/4来存储图片
-		final int cacheSize = maxMemory / 3;
+		final int cacheSize = maxMemory / num;
 		mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 
 			// 获取每张图片的大小
 			@Override
 			protected int sizeOf(String key, Bitmap bitmap) {
-				return bitmap.getRowBytes() * bitmap.getHeight() / 1024;
+				return bitmap.getByteCount() ;
 			}
 		};
+	}
+	public void clearCache() {
+        if (mMemoryCache != null) {
+            if (mMemoryCache.size() > 0) {
+                mMemoryCache.evictAll();
+            }
+        }
+    }
+	public void removepic(String path) {
+		if (path != null && mMemoryCache!=null) {
+			Bitmap b=mMemoryCache.remove(path);
+			if(b!=null){
+				b.recycle();
+				System.gc();
+			}
+		}
 	}
 
 	/**
@@ -49,8 +66,10 @@ public class NativeImageLoader {
 	 * 
 	 * @return
 	 */
-	public static NativeImageLoader getInstance() {
-		return mInstance;
+	public static NativeImageLoader getInstance(boolean instance_type) {
+		if (instance_type)
+			return mInstance_small;
+		return mInstance_big;
 	}
 
 	/**
@@ -159,12 +178,11 @@ public class NativeImageLoader {
 
 		// 设置为false,解析Bitmap对象加入到内存中
 		options.inJustDecodeBounds = false;
-	
-		Bitmap bitmap=BitmapFactory.decodeFile(path, options);
-		if(degree>0)
-			bitmap = ImageProcess.rotateBitmapByDegree(bitmap,
-				degree);
-	
+
+		Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+		if (degree > 0)
+			bitmap = ImageProcess.rotateBitmapByDegree(bitmap, degree);
+
 		return bitmap;
 	}
 

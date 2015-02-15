@@ -19,6 +19,8 @@ import java.util.Map;
 
 import com.kids.util.SoundMeter;
 import com.kids.activity.imagescan.MultiSelImageActivity;
+import com.kids.activity.imagescan.NativeImageLoader;
+import com.kids.activity.imagescan.NativeImageLoader.NativeImageCallBack;
 import com.kids.client.Client;
 import com.kids.client.ClientInputThread;
 import com.kids.client.ClientOutputThread;
@@ -47,6 +49,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
@@ -89,7 +92,8 @@ import android.widget.AdapterView.OnItemClickListener;
  * 
  * @author way
  */
-public class ChatActivity extends MyActivity implements OnClickListener,OnUploadProcessListener {
+public class ChatActivity extends MyActivity implements OnClickListener,
+		OnUploadProcessListener {
 	// 去上传文件
 	protected static final int TO_UPLOAD_FILE = 1;
 	// 上传文件响应
@@ -115,18 +119,17 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 	private MyApplication application;
 	private boolean alreadycreate;
 	private Client client;
-	private Bitmap bitmap_zoom=null;
 	private boolean btn_vocie = false;
 	private Handler mHandler = new Handler();
 	private SoundMeter mSensor;
 	private View rcChat_popup;
 	private boolean isShosrt = false;
 	private int flag = 1;
-	private ImageView img1, sc_img1,emotion;
+	private ImageView img1, sc_img1, emotion;
 	private LinearLayout del_re;
 	private String voiceName;
 	private LinearLayout voice_rcd_hint_loading, voice_rcd_hint_rcding,
-	voice_rcd_hint_tooshort;
+			voice_rcd_hint_tooshort;
 	private long startVoiceT, endVoiceT;
 	private ImageView chatting_mode_btn, volume;
 	private EditText progressText;
@@ -157,10 +160,10 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 				toUploadFile();
 				break;
 			case UPLOAD_INIT_PROCESS:
-				//progressBar.setMax(msg.arg1);
+				// progressBar.setMax(msg.arg1);
 				break;
 			case UPLOAD_IN_PROCESS:
-				//progressBar.setProgress(msg.arg1);
+				// progressBar.setProgress(msg.arg1);
 				break;
 			case UPLOAD_FILE_DONE:
 				if (msg.arg1 == UploadUtil.UPLOAD_SUCCESS_CODE) {
@@ -176,14 +179,15 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 				break;
 			}
 			super.handleMessage(msg);
-			
+
 		}
 
 	};
+
 	public void onUploadDone(int responseCode, String message) {
 		progressDialog.dismiss();
-		//progressBar.setVisibility(View.GONE);
-		//progressText.setVisibility(View.GONE);
+		// progressBar.setVisibility(View.GONE);
+		// progressText.setVisibility(View.GONE);
 		Message msg = Message.obtain();
 		msg.what = UPLOAD_FILE_DONE;
 		msg.arg1 = responseCode;
@@ -193,19 +197,17 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 
 	public int onUploadOK(boolean statu, String url_path) {
 		if (statu) {
-			ChatMsgEntity entity = application.send(url_path, 2, application.getSendVoicePath()+"/"
-					+ voiceName, user);
+			ChatMsgEntity entity = application.send(url_path, 2,
+					application.getSendVoicePath() + "/" + voiceName, user);
 			if (entity != null) {
 				mDataArrays.add(entity);
 				mAdapter.notifyDataSetChanged();// 通知ListView，数据已发生改变
 
 				mListView.setSelection(mListView.getCount() - 1);// 发送一条消息时，ListView显示选择最后一项
 			}
-			
+
 		} else {
-			Toast.makeText(getApplicationContext(),
-					"失败上传音频失败", 0)
-					.show();
+			Toast.makeText(getApplicationContext(), "失败上传音频失败", 0).show();
 		}
 		return 0;
 	}
@@ -223,9 +225,10 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		msg.arg1 = fileSize;
 		handler_send_file.sendMessage(msg);
 	}
+
 	private void toUploadFile() {
-		//progressBar.setVisibility(View.VISIBLE);
-		//progressText.setVisibility(View.VISIBLE);
+		// progressBar.setVisibility(View.VISIBLE);
+		// progressText.setVisibility(View.VISIBLE);
 		progressDialog.setCanceledOnTouchOutside(false);
 		progressDialog.setMessage("正在上传文件,请等待...");
 		/*
@@ -246,16 +249,16 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		progressDialog.show();
 		String fileKey = "amr";
 		UploadUtil uploadUtil = UploadUtil.getInstance();
-		
+
 		uploadUtil.setOnUploadProcessListener(this); // 设置监听器监听上传状态
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("orderId", "111");
-		String picstr = application.getSendVoicePath()+"/"
-				+ voiceName;
-		
+		String picstr = application.getSendVoicePath() + "/" + voiceName;
+
 		fileKey = picstr.substring(picstr.lastIndexOf("."));
-		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL, params);
+		uploadUtil.uploadFile(picstr, fileKey, Constants.FILE_UPLOAD_URL,
+				params);
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -265,11 +268,11 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		application = (MyApplication) getApplicationContext();
 		messageDB = application.getMessageDB();
 		user = (User) getIntent().getSerializableExtra("user");
-		
+
 		client = application.getClient();
 		initView();// 初始化view
 		initData(20);// 初始化数据
-		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user,mListView);
+		mAdapter = new ChatMsgViewAdapter(this, mDataArrays, user, mListView);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelection(mAdapter.getCount() - 1);
 		initViewPager();
@@ -316,37 +319,36 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 						.findViewById(R.id.imageView_chat_pic);
 				String path = image.getContentDescription().toString();
 				if (path != null && !path.equals("")) {
-					Toast.makeText(
-							ChatActivity.this,
-							path, 0).show();
+					Toast.makeText(ChatActivity.this, path, 0).show();
 					String prefix = path.substring(path.lastIndexOf("."));
-					if(prefix.equals(".amr")){
-						//playMusic(path) ;
-					}
-					else if (prefix.equals(".mp4")) {
+					if (prefix.equals(".amr")) {
+						// playMusic(path) ;
+					} else if (prefix.equals(".mp4")) {
 						Intent intent = new Intent(Intent.ACTION_VIEW);
 						intent.setDataAndType(Uri.parse(path), "video/mp4");
 						startActivity(intent);
 					} else {
-//						if(bitmap_zoom!=null && !bitmap_zoom.isRecycled()){
-//							bitmap_zoom.recycle();
-//							bitmap_zoom=null;
-//						}
-//						System.gc();
-						bitmap_zoom = ImageProcess.GetBitmapByPath(
-								ChatActivity.this, path,
-								MyApplication.mWindowHeight,
-								MyApplication.mWindowWidth, 0.8);
-						if (bitmap_zoom != null) {
-							int degree = ImageProcess.getBitmapDegree(path);
-							if (degree != 0)
-								bitmap_zoom = ImageProcess.rotateBitmapByDegree(
-										bitmap_zoom, degree);
+						Bitmap bitmap = NativeImageLoader.getInstance(false)
+								.loadNativeImage(path, new Point(1000,1000),
+										new NativeImageCallBack() {
 
+											@Override
+											public void onImageLoader(
+													Bitmap bitmap, String path) {
+												ZoomImageView zoom = new ZoomImageView(
+														ChatActivity.this,
+														bitmap);
+												zoom.showZoomView();
+											}
+										});
+						if(bitmap!=null)
+						{
 							ZoomImageView zoom = new ZoomImageView(
-									ChatActivity.this, bitmap_zoom);
+									ChatActivity.this,
+									bitmap);
 							zoom.showZoomView();
 						}
+
 					}
 				}
 
@@ -386,14 +388,14 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 					chatting_mode_btn
 							.setImageResource(R.drawable.chatting_setmode_voice_btn);
 					btn_vocie = true;
-					
+
 				}
 			}
 		});
 		mBtnRcd.setOnTouchListener(new OnTouchListener() {
-			
+
 			public boolean onTouch(View v, MotionEvent event) {
-				//��������¼�ư�ťʱ����falseִ�и���OnTouch
+				// ��������¼�ư�ťʱ����falseִ�и���OnTouch
 				return false;
 			}
 		});
@@ -409,9 +411,9 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		img1 = (ImageView) this.findViewById(R.id.img1);
 		sc_img1 = (ImageView) this.findViewById(R.id.sc_img1);
 		volume = (ImageView) this.findViewById(R.id.volume);
-		
+
 		progressDialog = new ProgressDialog(this);
-		
+
 		expressionImages = Expressions.expressionImgs;
 		expressionImageNames = Expressions.expressionImgNames;
 		expressionImages1 = Expressions.expressionImgs1;
@@ -429,6 +431,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		biaoqingfocuseBtn.setOnClickListener(this);
 
 	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 
@@ -453,7 +456,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 					return false;
 				}
 				System.out.println("2");
-				if (event.getY() > btn_rc_Y && event.getX() > btn_rc_X) {//�ж����ư��µ�λ���Ƿ�������¼�ư�ť�ķ�Χ��
+				if (event.getY() > btn_rc_Y && event.getX() > btn_rc_X) {// �ж����ư��µ�λ���Ƿ�������¼�ư�ť�ķ�Χ��
 					System.out.println("3");
 					mBtnRcd.setBackgroundResource(R.drawable.voice_rcd_btn_pressed);
 					rcChat_popup.setVisibility(View.VISIBLE);
@@ -473,11 +476,10 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 					del_re.setVisibility(View.GONE);
 					startVoiceT = System.currentTimeMillis();
 					voiceName = startVoiceT + ".amr";
-					start(application.getSendVoicePath()+"/"
-							+ voiceName);
+					start(application.getSendVoicePath() + "/" + voiceName);
 					flag = 2;
 				}
-			} else if (event.getAction() == MotionEvent.ACTION_UP && flag == 2) {//�ɿ�����ʱִ��¼�����
+			} else if (event.getAction() == MotionEvent.ACTION_UP && flag == 2) {// �ɿ�����ʱִ��¼�����
 				System.out.println("4");
 				mBtnRcd.setBackgroundResource(R.drawable.voice_rcd_btn_nor);
 				if (event.getY() >= del_Y
@@ -489,8 +491,8 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 					del_re.setVisibility(View.GONE);
 					stop();
 					flag = 1;
-					File file = new File(application.getSendVoicePath()+"/"
-									+ voiceName);
+					File file = new File(application.getSendVoicePath() + "/"
+							+ voiceName);
 					if (file.exists()) {
 						file.delete();
 					}
@@ -516,13 +518,13 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 						}, 500);
 						return false;
 					}
-					
+
 					handler_send_file.sendEmptyMessage(TO_UPLOAD_FILE);
 					rcChat_popup.setVisibility(View.GONE);
 
 				}
 			}
-			if (event.getY() < btn_rc_Y) {//���ư��µ�λ�ò�������¼�ư�ť�ķ�Χ��
+			if (event.getY() < btn_rc_Y) {// ���ư��µ�λ�ò�������¼�ư�ť�ķ�Χ��
 				System.out.println("5");
 				Animation mLitteAnimation = AnimationUtils.loadAnimation(this,
 						R.anim.cancel_rc);
@@ -548,6 +550,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		}
 		return super.onTouchEvent(event);
 	}
+
 	/**
 	 * 加载还没有显示的消息，从数据库中读出
 	 */
@@ -559,13 +562,13 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 			datestr = cme.getDate();
 			datestr = " date >'" + datestr + "' ";
 		}
-		
-		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(),datestr , 20);
+
+		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), datestr, 20);
 		List<ChatMsgEntity> mDataArrays_tmp = new ArrayList<ChatMsgEntity>();
 		System.out.println("reflesh date " + list.size());
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
-				if (entity.getName()!=null && entity.getName().equals("")) {
+				if (entity.getName() != null && entity.getName().equals("")) {
 					entity.setName(user.getName());
 				}
 				if (entity.getImg() < 0) {
@@ -589,6 +592,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 			});
 		}
 	}
+
 	private static final int POLL_INTERVAL = 300;
 	private Runnable mPollTask = new Runnable() {
 		public void run() {
@@ -603,6 +607,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 			stop();
 		}
 	};
+
 	private void start(String name) {
 		mSensor.start(name);
 		mHandler.postDelayed(mPollTask, POLL_INTERVAL);
@@ -614,8 +619,9 @@ public class ChatActivity extends MyActivity implements OnClickListener,OnUpload
 		mSensor.stop();
 		volume.setImageResource(R.drawable.amp1);
 	}
-private void updateDisplay(double signalEMA) {
-		
+
+	private void updateDisplay(double signalEMA) {
+
 		switch ((int) signalEMA) {
 		case 0:
 		case 1:
@@ -624,7 +630,7 @@ private void updateDisplay(double signalEMA) {
 		case 2:
 		case 3:
 			volume.setImageResource(R.drawable.amp2);
-			
+
 			break;
 		case 4:
 		case 5:
@@ -647,16 +653,17 @@ private void updateDisplay(double signalEMA) {
 			break;
 		}
 	}
+
 	/**
 	 * 加载消息历史，从数据库中读出
 	 */
 	public void initData(int cou) {
 		List<ChatMsgEntity> list = messageDB.getMsg(user.getId(), "", cou);
-		if(mDataArrays.size()>0)
+		if (mDataArrays.size() > 0)
 			mDataArrays.clear();
 		if (list.size() > 0) {
 			for (ChatMsgEntity entity : list) {
-				if (entity.getName()!=null && entity.getName().equals("")) {
+				if (entity.getName() != null && entity.getName().equals("")) {
 					entity.setName(user.getName());
 				}
 				if (entity.getImg() < 0) {
@@ -666,8 +673,9 @@ private void updateDisplay(double signalEMA) {
 			}
 			Collections.reverse(mDataArrays);
 		}
-		
+
 	}
+
 	private void initViewPager() {
 		LayoutInflater inflater = LayoutInflater.from(this);
 		grids = new ArrayList<GridView>();
@@ -680,8 +688,8 @@ private void updateDisplay(double signalEMA) {
 			listItems.add(listItem);
 		}
 
-		SimpleAdapter simpleAdapter = new SimpleAdapter(ChatActivity.this, listItems,
-				R.layout.singleexpression, new String[] { "image" },
+		SimpleAdapter simpleAdapter = new SimpleAdapter(ChatActivity.this,
+				listItems, R.layout.singleexpression, new String[] { "image" },
 				new int[] { R.id.image });
 		gView1.setAdapter(simpleAdapter);
 		gView1.setOnItemClickListener(new OnItemClickListener() {
@@ -741,18 +749,20 @@ private void updateDisplay(double signalEMA) {
 
 		viewPager.setOnPageChangeListener(new GuidePageChangeListener());
 	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 
 	}
+
 	@Override
 	public void onBackPressed() {// 捕获返回按键事件，进入后台运行
 		onbackclick();
 		finish();// 再结束自己
 	}
-	private void onbackclick()
-	{
+
+	private void onbackclick() {
 		application.getNotReadmsslist().remove(user.getId() + "");
 		messageDB.updateReadsta(user.getId());
 		UploadUtil uploadUtil = UploadUtil.getInstance();
@@ -760,6 +770,7 @@ private void updateDisplay(double signalEMA) {
 		uploadUtil.setOnUploadProcessListener(null); // 设置监听器监听上传状态
 		uploadUtil.shutdownAllThread();
 	}
+
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -776,7 +787,7 @@ private void updateDisplay(double signalEMA) {
 			new AlertDialog.Builder(ChatActivity.this)
 					.setTitle("发送")
 					.setIcon(android.R.drawable.ic_dialog_info)
-					.setItems(new String[] { "相机拍照/视频", "本地相册", "请假","会议通知" },
+					.setItems(new String[] { "相机拍照/视频", "本地相册", "请假", "会议通知" },
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {
@@ -799,14 +810,16 @@ private void updateDisplay(double signalEMA) {
 										intent = new Intent(ChatActivity.this,
 												ActionActivity.class);
 										intent.putExtra("user", user);
-										intent.putExtra("subview", R.layout.sub_leave);
+										intent.putExtra("subview",
+												R.layout.sub_leave);
 										startActivityForResult(intent, 1);
 										break;
 									case 3:
 										intent = new Intent(ChatActivity.this,
 												ActionActivity.class);
 										intent.putExtra("user", user);
-										intent.putExtra("subview", R.layout.sub_notify);
+										intent.putExtra("subview",
+												R.layout.sub_notify);
 										startActivityForResult(intent, 1);
 										break;
 									}
@@ -823,7 +836,7 @@ private void updateDisplay(double signalEMA) {
 			biaoqingfocuseBtn.setVisibility(biaoqingfocuseBtn.VISIBLE);
 			viewPager.setVisibility(viewPager.VISIBLE);
 			page_select.setVisibility(page_select.VISIBLE);
-			
+
 			break;
 		case R.id.chatting_biaoqing_focuse_btn:
 			biaoqingBtn.setVisibility(biaoqingBtn.VISIBLE);
@@ -919,7 +932,7 @@ private void updateDisplay(double signalEMA) {
 
 		}
 	}
-	
+
 	public void head_xiaohei(View v) { // ±êÌâÀ¸ ·µ»Ø°´Å¥
 	}
 
@@ -962,9 +975,10 @@ private void updateDisplay(double signalEMA) {
 					listItems.add(listItem);
 				}
 
-				SimpleAdapter simpleAdapter = new SimpleAdapter(ChatActivity.this,
-						listItems, R.layout.singleexpression,
-						new String[] { "image" }, new int[] { R.id.image });
+				SimpleAdapter simpleAdapter = new SimpleAdapter(
+						ChatActivity.this, listItems,
+						R.layout.singleexpression, new String[] { "image" },
+						new int[] { R.id.image });
 				gView2.setAdapter(simpleAdapter);
 				gView2.setOnItemClickListener(new OnItemClickListener() {
 					@Override
@@ -974,7 +988,8 @@ private void updateDisplay(double signalEMA) {
 						bitmap = BitmapFactory.decodeResource(getResources(),
 								expressionImages1[arg2
 										% expressionImages1.length]);
-						ImageSpan imageSpan = new ImageSpan(ChatActivity.this, bitmap);
+						ImageSpan imageSpan = new ImageSpan(ChatActivity.this,
+								bitmap);
 						SpannableString spannableString = new SpannableString(
 								expressionImageNames1[arg2]
 										.substring(1,
@@ -1004,9 +1019,10 @@ private void updateDisplay(double signalEMA) {
 					listItems1.add(listItem);
 				}
 
-				SimpleAdapter simpleAdapter1 = new SimpleAdapter(ChatActivity.this,
-						listItems1, R.layout.singleexpression,
-						new String[] { "image" }, new int[] { R.id.image });
+				SimpleAdapter simpleAdapter1 = new SimpleAdapter(
+						ChatActivity.this, listItems1,
+						R.layout.singleexpression, new String[] { "image" },
+						new int[] { R.id.image });
 				gView3.setAdapter(simpleAdapter1);
 				gView3.setOnItemClickListener(new OnItemClickListener() {
 					@Override
@@ -1016,7 +1032,8 @@ private void updateDisplay(double signalEMA) {
 						bitmap = BitmapFactory.decodeResource(getResources(),
 								expressionImages2[arg2
 										% expressionImages2.length]);
-						ImageSpan imageSpan = new ImageSpan(ChatActivity.this, bitmap);
+						ImageSpan imageSpan = new ImageSpan(ChatActivity.this,
+								bitmap);
 						SpannableString spannableString = new SpannableString(
 								expressionImageNames2[arg2]
 										.substring(1,
@@ -1035,7 +1052,9 @@ private void updateDisplay(double signalEMA) {
 			}
 		}
 	}
-	public class MyRefreshListener implements MyNormalListView.OnRefreshListener {
+
+	public class MyRefreshListener implements
+			MyNormalListView.OnRefreshListener {
 
 		@Override
 		public void onRefresh() {
@@ -1043,7 +1062,7 @@ private void updateDisplay(double signalEMA) {
 				List<User> list;
 
 				protected Void doInBackground(Void... params) {
-					initData(mDataArrays.size()+20);
+					initData(mDataArrays.size() + 20);
 					return null;
 				}
 

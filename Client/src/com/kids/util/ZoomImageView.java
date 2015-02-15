@@ -75,19 +75,7 @@ public class ZoomImageView {
 		popupWindow.setAnimationStyle(R.style.AnimationPop);
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
-        popupWindow.setOnDismissListener(new OnDismissListener(){
-            @Override
-            public void onDismiss() {
-            	BitmapDrawable drawable = (BitmapDrawable)imageView.getDrawable();
-            	Bitmap bmp = drawable.getBitmap();
-            	if (null != bmp && !bmp.isRecycled()){
-            		bmp.recycle();
-            		bmp = null;
-            	}
-            	imageView.setImageBitmap(null);
-            }
-        });
-		layout.setFocusable(true);
+        layout.setFocusable(true);
 		layout.setFocusableInTouchMode(true);
 		layout.setBackgroundColor(Color.BLACK);
 		layout.getBackground().setAlpha(200);
