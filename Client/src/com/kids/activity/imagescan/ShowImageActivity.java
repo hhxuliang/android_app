@@ -133,7 +133,7 @@ public class ShowImageActivity extends MyActivity implements
 				if (ImageProcess.checkFileType(picpath) == ImageProcess.FileType.IMAGE) {
 
 					if (picpath != null) {
-						Bitmap bitmap = NativeImageLoader.getInstance(false)
+						Bitmap bitmap = NativeImageLoader.getInstance("big")
 								.loadNativeImage(picpath, new Point(1000, 1000),
 										new NativeImageCallBack() {
 

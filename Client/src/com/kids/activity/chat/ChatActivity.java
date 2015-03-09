@@ -328,7 +328,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,
 						intent.setDataAndType(Uri.parse(path), "video/mp4");
 						startActivity(intent);
 					} else {
-						Bitmap bitmap = NativeImageLoader.getInstance(false)
+						Bitmap bitmap = NativeImageLoader.getInstance("big")
 								.loadNativeImage(path, new Point(1000,1000),
 										new NativeImageCallBack() {
 

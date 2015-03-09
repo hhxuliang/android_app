@@ -79,8 +79,8 @@ public class GridAdapter extends BaseAdapter {
 		} else {
 
 			viewTag.mIcon.setTag(pa);
-			NativeImageLoader.getInstance(true).removepic(pa);
-			Bitmap bitmap = NativeImageLoader.getInstance(true)
+			NativeImageLoader.getInstance("small").removepic(pa);
+			Bitmap bitmap = NativeImageLoader.getInstance("small")
 					.loadNativeImage(pa, new Point(200, 200),
 							new NativeImageCallBack() {
 

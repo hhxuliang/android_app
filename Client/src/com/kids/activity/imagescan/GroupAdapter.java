@@ -96,7 +96,7 @@ public class GroupAdapter extends BaseAdapter {
 		// 利用NativeImageLoader类加载本地图片
 		Bitmap bitmap=null;
 		if(ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE){
-		bitmap = NativeImageLoader.getInstance(true).loadNativeImage(path,
+		bitmap = NativeImageLoader.getInstance("group").loadNativeImage(path,
 				mPoint, new NativeImageCallBack() {
 
 					@Override

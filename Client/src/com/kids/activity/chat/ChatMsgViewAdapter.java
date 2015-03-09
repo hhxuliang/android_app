@@ -204,7 +204,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 				viewHolder.tvPicture.setTag(path);
 				viewHolder.tvPicture.setImageResource(R.drawable.waitloadpic);
 				if (ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE) {
-					bitmap = NativeImageLoader.getInstance(true).loadNativeImage(
+					bitmap = NativeImageLoader.getInstance("small").loadNativeImage(
 							path, new Point(100, 100),
 							new NativeImageCallBack() {
 

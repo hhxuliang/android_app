@@ -202,8 +202,8 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 
 					String picpath = image.getContentDescription().toString();
 					if (picpath != null) {
-						NativeImageLoader.getInstance(false).removepic(picpath);
-						Bitmap bitmap = NativeImageLoader.getInstance(false)
+						NativeImageLoader.getInstance("big").removepic(picpath);
+						Bitmap bitmap = NativeImageLoader.getInstance("big")
 								.loadNativeImage(picpath,
 										new Point(1000, 1000),
 										new NativeImageCallBack() {
