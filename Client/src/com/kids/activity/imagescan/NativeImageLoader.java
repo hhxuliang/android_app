@@ -25,10 +25,10 @@ import android.support.v4.util.LruCache;
  */
 public class NativeImageLoader {
 	private LruCache<String, Bitmap> mMemoryCache;
-	private static NativeImageLoader mInstance_small = new NativeImageLoader(3);
-	private static NativeImageLoader mInstance_big = new NativeImageLoader(6);
+	private static NativeImageLoader mInstance_small = new NativeImageLoader(4);
+	private static NativeImageLoader mInstance_big = new NativeImageLoader(4);
 	private static NativeImageLoader mInstance_group = new NativeImageLoader(10);
-	private ExecutorService mImageThreadPool = Executors.newFixedThreadPool(5);
+	private ExecutorService mImageThreadPool = Executors.newFixedThreadPool(2);
 
 	private NativeImageLoader(int num) {
 		// 获取应用程序的最大内存

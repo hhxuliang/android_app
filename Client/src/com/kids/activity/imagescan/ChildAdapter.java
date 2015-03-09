@@ -115,7 +115,7 @@ public class ChildAdapter extends BaseAdapter {
 		if (ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE) {
 			// 利用NativeImageLoader类加载本地图片
 			bitmap = NativeImageLoader.getInstance("small").loadNativeImage(path,
-					mPoint, new NativeImageCallBack() {
+					new Point(150, 150), new NativeImageCallBack() {
 
 						@Override
 						public void onImageLoader(Bitmap bitmap, String path) {

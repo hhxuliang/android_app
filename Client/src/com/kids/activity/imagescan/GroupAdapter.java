@@ -97,7 +97,7 @@ public class GroupAdapter extends BaseAdapter {
 		Bitmap bitmap=null;
 		if(ImageProcess.checkFileType(path) == ImageProcess.FileType.IMAGE){
 		bitmap = NativeImageLoader.getInstance("group").loadNativeImage(path,
-				mPoint, new NativeImageCallBack() {
+				new Point(150, 150), new NativeImageCallBack() {
 
 					@Override
 					public void onImageLoader(Bitmap bitmap, String path) {
