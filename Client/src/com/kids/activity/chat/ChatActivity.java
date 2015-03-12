@@ -329,7 +329,7 @@ public class ChatActivity extends MyActivity implements OnClickListener,
 						startActivity(intent);
 					} else {
 						Bitmap bitmap = NativeImageLoader.getInstance("big")
-								.loadNativeImage(path, new Point(1000,1000),
+								.loadNativeImage(path, new Point(500,500),
 										new NativeImageCallBack() {
 
 											@Override

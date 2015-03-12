@@ -205,7 +205,7 @@ public class CameraProActivity extends MyActivity implements OnClickListener,
 						NativeImageLoader.getInstance("big").removepic(picpath);
 						Bitmap bitmap = NativeImageLoader.getInstance("big")
 								.loadNativeImage(picpath,
-										new Point(1000, 1000),
+										new Point(500, 500),
 										new NativeImageCallBack() {
 
 											@Override

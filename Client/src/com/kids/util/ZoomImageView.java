@@ -1,6 +1,7 @@
 package com.kids.util;
 
 
+import com.kids.activity.imagescan.NativeImageLoader;
 import com.way.chat.activity.R;
 
 import android.app.Activity;
@@ -75,6 +76,12 @@ public class ZoomImageView {
 		popupWindow.setAnimationStyle(R.style.AnimationPop);
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.setOnDismissListener(new OnDismissListener(){
+            @Override
+            public void onDismiss() {
+            	NativeImageLoader.getInstance("big").clearCache();
+            }
+        });
         layout.setFocusable(true);
 		layout.setFocusableInTouchMode(true);
 		layout.setBackgroundColor(Color.BLACK);
