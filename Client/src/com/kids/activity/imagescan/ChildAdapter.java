@@ -129,7 +129,7 @@ public class ChildAdapter extends BaseAdapter {
 		} else if (ImageProcess.checkFileType(path) == ImageProcess.FileType.VIDEO) {
 			bitmap = ThumbnailUtils.createVideoThumbnail(path,
 					Thumbnails.MINI_KIND);
-			viewHolder.tvVideo.setVisibility(View.GONE);
+			viewHolder.tvVideo.setVisibility(View.VISIBLE);
 		}
 		if (bitmap != null) {
 			viewHolder.mImageView.setImageBitmap(bitmap);
